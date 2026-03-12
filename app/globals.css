@@ -24,3 +24,24 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* globals.css */
+.inverted-top-left-mask {
+  /* This creates a transparent rectangle in the top left corner */
+  /* Adjust the 120px (width) and 80px (height) to match your logo size */
+  mask-image: 
+    radial-gradient(circle at 120px 80px, black 32px, transparent 0), /* Bottom-right curve */
+    linear-gradient(to right, transparent 120px, black 0),            /* Right side content */
+    linear-gradient(to bottom, transparent 80px, black 0);           /* Bottom side content */
+  mask-composite: intersect;
+  -webkit-mask-composite: source-in;
+}
