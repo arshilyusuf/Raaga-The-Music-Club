@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import "./globals.css";
 import localFont from "next/font/local";
 import StaggeredMenu from "@/Reactbits/StaggeredMenu";
-import { motion } from "framer-motion";
 import ZoomWrapper from "@/components/ZoomWrapper";
 const clashGrotesk = localFont({
   src: "../public/fonts/ClashGrotesk-Variable.ttf",

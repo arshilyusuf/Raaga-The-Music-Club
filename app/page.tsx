@@ -4,6 +4,9 @@ import { motion } from "framer-motion";
 import MagicRings from "@/Reactbits/MagicRings";
 import InfiniteMenu from "@/Reactbits/InfiniteMenu";
 import CircularText from "@/Reactbits/CircularText";
+import CurvedLoop from "@/Reactbits/CurvedLoop";
+import TextPressure from "@/Reactbits/TextPressure";
+import ScrollTimeline from "@/components/ScrollTimeline";
 
 export default function Home() {
   const items = [
@@ -80,7 +83,7 @@ export default function Home() {
           className="flex flex-col items-center justify-center text-center"
         >
           <motion.h1
-            className="sm:text-5xl md:text-6xl lg:text-7xl mb-6 tracking-normal leading-tight"
+            className="sm:text-5xl md:text-6xl lg:text-7xl mb-6 -mt-40 tracking-normal leading-tight"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{
@@ -89,7 +92,23 @@ export default function Home() {
               ease: [0.22, 1, 0.36, 1],
             }}
           >
-            <span className="block font-black text-[10rem]">RAAGA</span>
+            {/* <span className="block font-black text-[10rem]">RAAGA</span> */}
+            <div style={{ position: "relative", height: "100%" }}>
+              <TextPressure
+                text="RAAGA"
+                flex
+                alpha={false}
+                stroke
+                scale
+                width
+                weight
+                strokeColor="#722f37"
+                strokeWidth={10}
+                italic
+                textColor="#ffffff"
+                minFontSize={300}
+              />
+            </div>
             <span className="block text-[4rem] font-black text-base sm:text-lg md:text-xl lg:text-2xl text-zinc-100/90 tracking-widest">
               THE MUSIC CLUB <br />
             </span>
@@ -103,15 +122,19 @@ export default function Home() {
               ease: [0.22, 1, 0.36, 1],
             }}
           >
-            <CircularText
-              text="AUDITIONS*COMING SOON*"
-              onHover="speedUp"
-              spinDuration={20}
-              className="custom-class"
-            />
+            <div className="left-15 pointer-events-none absolute inset-0 w-screen">
+              <CurvedLoop
+                marqueeText="Auditions ✦ coming ✦ soon ✦ "
+                speed={2}
+                curveAmount={400}
+                direction="right"
+                interactive
+                className="w-full"
+              />
+            </div>
           </motion.div>
           <motion.p
-            className="mt-4 text-sm sm:text-base md:text-lg text-zinc-200/90"
+            className="-mt-4 text-sm sm:text-base md:text-lg text-zinc-200/90"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{
@@ -129,6 +152,7 @@ export default function Home() {
           <InfiniteMenu items={items} scale={1.8} />
         </div>
       </section>
+      <ScrollTimeline/>
     </main>
   );
 }
