@@ -37,6 +37,16 @@ export default function Home() {
   ];
   return (
     <main className="relative min-h-screen w-full text-zinc-50 overflow-hidden">
+      <div className="pointer-events-none absolute z-300 left-20 right-0 w-full">
+        <CurvedLoop
+          marqueeText="Auditions ✦ coming ✦ soon ✦ "
+          speed={2}
+          curveAmount={400}
+          direction="right"
+          interactive
+          className="w-full"
+        />
+      </div>
       <section className="relative z-10 flex min-h-screen items-center justify-center px-4">
         <div
           className="absolute inset-0 bg-cover bg-center bg-no-repeat -z-10"
@@ -121,18 +131,7 @@ export default function Home() {
               duration: 3.7,
               ease: [0.22, 1, 0.36, 1],
             }}
-          >
-            <div className="left-15 pointer-events-none absolute inset-0 w-screen">
-              <CurvedLoop
-                marqueeText="Auditions ✦ coming ✦ soon ✦ "
-                speed={2}
-                curveAmount={400}
-                direction="right"
-                interactive
-                className="w-full"
-              />
-            </div>
-          </motion.div>
+          ></motion.div>
           <motion.p
             className="-mt-4 text-sm sm:text-base md:text-lg text-zinc-200/90"
             initial={{ opacity: 0, y: 10 }}
@@ -148,16 +147,16 @@ export default function Home() {
         </motion.div>
       </section>
       <section className="min-h-screen w-full bg-[#722f37] relative">
-  <div style={{ height: "100%", position: "relative" }}>
-    <InfiniteMenu items={items} scale={1.8} />
-  </div>
+        <div style={{ height: "100%", position: "relative" }}>
+          <InfiniteMenu items={items} scale={1.8} />
+        </div>
 
-  {/* Top gradient */}
-  <div className="pointer-events-none absolute inset-x-0 top-0 h-64 bg-gradient-to-b from-[#722f37] to-transparent" />
+        {/* Top gradient */}
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-64 bg-gradient-to-b from-[#722f37] to-transparent" />
 
-  {/* Bottom gradient */}
-  <div className="pointer-events-none absolute inset-x-0 bottom-0 h-64 bg-gradient-to-t from-[#722f37] to-transparent" />
-</section>
+        {/* Bottom gradient */}
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-64 bg-gradient-to-t from-[#722f37] to-transparent" />
+      </section>
       <ScrollTimeline />
     </main>
   );

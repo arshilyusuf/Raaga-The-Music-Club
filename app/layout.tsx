@@ -14,9 +14,9 @@ export const metadata: Metadata = {
 };
 const menuItems = [
   { label: "Home", ariaLabel: "Go to home page", link: "/" },
-  { label: "team", ariaLabel: "Learn about us", link: "/about" },
-  { label: "gallery", ariaLabel: "View our services", link: "/services" },
-  { label: "Contact", ariaLabel: "Get in touch", link: "/contact" },
+  { label: "auditions", ariaLabel: "Learn about us", link: "/auditions" },
+  { label: "gallery", ariaLabel: "View our services", link: "/gallery" },
+  { label: "team", ariaLabel: "Get in touch", link: "/team" },
 ];
 
 const socialItems = [
