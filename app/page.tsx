@@ -147,12 +147,18 @@ export default function Home() {
           </motion.p>
         </motion.div>
       </section>
-      <section className="min-h-screen w-full bg-[#722f37]">
-        <div style={{ height: "100%", position: "relative" }}>
-          <InfiniteMenu items={items} scale={1.8} />
-        </div>
-      </section>
-      <ScrollTimeline/>
+      <section className="min-h-screen w-full bg-[#722f37] relative">
+  <div style={{ height: "100%", position: "relative" }}>
+    <InfiniteMenu items={items} scale={1.8} />
+  </div>
+
+  {/* Top gradient */}
+  <div className="pointer-events-none absolute inset-x-0 top-0 h-64 bg-gradient-to-b from-[#722f37] to-transparent" />
+
+  {/* Bottom gradient */}
+  <div className="pointer-events-none absolute inset-x-0 bottom-0 h-64 bg-gradient-to-t from-[#722f37] to-transparent" />
+</section>
+      <ScrollTimeline />
     </main>
   );
 }
