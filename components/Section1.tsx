@@ -2,6 +2,7 @@
 import { motion } from "framer-motion";
 
 import Image from "next/image";
+import Button from "./Button";
 
 export default function Section1() {
   const handleAnimationComplete = () => {
@@ -40,11 +41,20 @@ drop-shadow-[0_8px_25px_rgba(0,0,0,0.9)]"
         </motion.div>
 
         <p className="mt-6 text-lg leading-relaxed text-zinc-100 drop-shadow-[0_6px_20px_rgba(0,0,0,0.9)]">
-          Shruti is the flagship annual music evening of Raaga. It is a
-          celebration of sound, rhythm, and artistic expression where our
-          talented performers take the stage to create an unforgettable musical
-          experience.
+          Shruti is Raaga’s flagship annual music evening, where the club’s
+          talented performers come together to showcase a diverse range of
+          music—from soulful vocals to intricate instrumental pieces. The event
+          features carefully arranged performances that highlight both
+          individual skill and collaborative creativity, giving performers a
+          platform to experiment and express themselves. Audiences witness a
+          dynamic mix of styles and genres, with each act crafted to engage,
+          move, and inspire, making Shruti not just a showcase of talent but a
+          celebration of music as a living, shared experience.
         </p>
+        <Button
+          text="View Gallery"
+          onClick={() => console.log("Button clicked!")}
+        />
       </div>
     </div>
   );

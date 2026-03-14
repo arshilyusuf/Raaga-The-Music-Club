@@ -7,6 +7,7 @@ import CircularText from "@/Reactbits/CircularText";
 import CurvedLoop from "@/Reactbits/CurvedLoop";
 import TextPressure from "@/Reactbits/TextPressure";
 import ScrollTimeline from "@/components/ScrollTimeline";
+import Footer from "@/components/Footer";
 
 export default function Home() {
   const items = [
@@ -158,6 +159,7 @@ export default function Home() {
         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-64 bg-gradient-to-t from-[#722f37] to-transparent" />
       </section>
       <ScrollTimeline />
+      <Footer />
     </main>
   );
 }

@@ -3,6 +3,12 @@ import "./globals.css";
 import localFont from "next/font/local";
 import StaggeredMenu from "@/Reactbits/StaggeredMenu";
 import ZoomWrapper from "@/components/ZoomWrapper";
+import { Geist } from "next/font/google";
+import { cn } from "@/lib/utils";
+import Footer from "@/components/Footer";
+
+const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });
+
 const clashGrotesk = localFont({
   src: "../public/fonts/ClashGrotesk-Variable.ttf",
   variable: "--font-main",
@@ -30,7 +36,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="en" className={cn("font-sans", geist.variable)}>
       <body className={`${clashGrotesk.className} antialiased bg-black`}>
         <div className="relative min-h-screen w-screen">
           {/* Full-screen black background */}
@@ -74,7 +80,7 @@ export default function RootLayout({
                 />
               </div>
 
-              <div className="relative z-10 min-h-full">
+              <div className="relative z-10 min-h-screen">
                 <ZoomWrapper>{children}</ZoomWrapper>
               </div>
             </div>
