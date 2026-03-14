@@ -65,7 +65,7 @@ export default function RootLayout({
                       src="/svg-path.svg"
                       alt=""
                       aria-hidden="true"
-                      className="pointer-events-none absolute sm:-right-6 -right-[1.4rem] sm:top-[0.2rem] top-[0.2rem] h-8 w-6"
+                      className="pointer-events-none absolute sm:-right-6 -right-6 sm:top-[0.25rem] top-[0.45rem] h-6 w-6"
                     />
                     <img
                       src="/svg-path.svg"
