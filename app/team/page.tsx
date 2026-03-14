@@ -1,4 +1,5 @@
 import ColorBends from "@/Reactbits/ColorBends";
+import Grainient from "@/Reactbits/Grainient";
 import ProfileCard from "@/Reactbits/ProfileCard";
 import TiltedCard from "@/Reactbits/TiltedCard";
 
@@ -66,18 +67,19 @@ export default function Page() {
     },
   ];
 
+  const colors = { c1: "#722f37", c2: "#bd9398", c3: "#18022e" };
   return (
     <div className="relative w-full min-h-screen overflow-hidden">
-      <div className="fixed bottom-0 left-[0.1rem] sm:top-5 sm:left-1/2 sm:-translate-x-1/2 z-50">
+     <div className="fixed bottom-0 left-[6rem] sm:top-5 top-0 sm:left-1/2 sm:-translate-x-1/2 z-50">
         <div
           className="relative w-fit bg-black 
-                rounded-tr-2xl sm:rounded-tr-none 
-                sm:rounded-bl-2xl sm:rounded-br-2xl 
+                sm:rounded-tr-none 
+                sm:rounded-bl-2xl rounded-br-2xl 
                 px-4 pb-2 sm:pt-0 pt-2"
         >
           <img
             src="/svg-path.svg"
-            className="absolute sm:left-[0.5] bottom-[0.45rem] left-[8.1rem] sm:top-0 h-6 w-auto -translate-x-full rotate-270 sm:rotate-90"
+            className="absolute sm:left-[0.5] bottom-3 left-[9.1rem] sm:top-0 h-9 w-auto -translate-x-full sm:rotate-90"
           />
 
           <h1
@@ -89,25 +91,36 @@ export default function Page() {
 
           <img
             src="/svg-path.svg"
-            className="absolute right-[6.4rem] sm:right-[0.5] sm:top-0 -top-[1.45rem] h-6 w-auto translate-x-full sm:rotate-0 -rotate-90"
+            className="absolute right-37 sm:right-[0.5] sm:top-0 -top-[1.45rem] h-6 w-auto translate-x-full sm:rotate-0 -rotate-90"
           />
         </div>
       </div>
 
       <div className="absolute inset-0 -z-10">
-        <ColorBends
-          colors={["#722f37", "#bd9398", "#5b0b14"]}
-          rotation={0}
-          speed={0.2}
-          scale={1}
-          frequency={1}
-          warpStrength={1}
-          mouseInfluence={1}
-          parallax={0.5}
-          noise={0.1}
-          transparent
-          autoRotate={0}
-        />
+        <Grainient
+          color1={colors.c1}
+          color2={colors.c2}
+          color3={colors.c3}
+          timeSpeed={0.02}
+          colorBalance={0}
+          warpStrength={3.35}
+          warpFrequency={5}
+          warpSpeed={0}
+          warpAmplitude={50}
+          blendAngle={114}
+          blendSoftness={0.05}
+          rotationAmount={500}
+          noiseScale={3.3}
+          grainAmount={0.1}
+          grainScale={2}
+          grainAnimated={false}
+          contrast={1.5}
+          gamma={1}
+          saturation={1}
+          centerX={0}
+          centerY={0}
+          zoom={1.6}
+        />{" "}
       </div>
 
       <div className="relative mb-10 z-10 flex flex-col items-center h-full">

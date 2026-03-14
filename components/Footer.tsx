@@ -2,8 +2,7 @@ import Image from "next/image";
 
 export default function Footer() {
   return (
-    <footer className="relative bg-black text-white w-full py-16 pb-2 px-6">
-      
+    <footer className="relative bg-black text-white w-full py-16 pb-2 px-6 overflow-hidden">
       {/* Left inverted border */}
       <Image
         src="/svg-path.svg"
@@ -23,7 +22,6 @@ export default function Footer() {
       />
 
       <div className="max-w-7xl mx-auto grid md:grid-cols-3 gap-12">
-        
         {/* Logo + slogan */}
         <div className="flex flex-col">
           <Image
@@ -42,8 +40,12 @@ export default function Footer() {
         <div>
           <h3 className="text-xl font-semibold mb-4">Connect With Us</h3>
           <div className="flex flex-col gap-3 text-gray-300">
-            <a href="#" className="hover:text-white transition">Instagram</a>
-            <a href="#" className="hover:text-white transition">YouTube</a>
+            <a href="#" className="hover:text-white transition">
+              Instagram
+            </a>
+            <a href="#" className="hover:text-white transition">
+              YouTube
+            </a>
           </div>
         </div>
 
@@ -54,14 +56,12 @@ export default function Footer() {
             <p>xyz@gmail.com</p>
           </div>
         </div>
-
       </div>
 
       {/* Bottom bar */}
       <div className="mt-12 pt-6 border-t border-gray-800 text-center text-gray-400">
         <p>Made by Raaga The Music Club</p>
       </div>
-
     </footer>
   );
 }

@@ -505,7 +505,7 @@ const ProfileCardComponent: React.FC<ProfileCardProps> = ({
         <section
           className="grid relative overflow-hidden"
           style={{
-                height: typeof window !== "undefined" && window.innerWidth < 640 ? "50svh" : "65svh",
+                height: "66svh",
 
             maxHeight: "540px",
             aspectRatio: "0.718",
@@ -662,7 +662,7 @@ const ProfileCardComponent: React.FC<ProfileCardProps> = ({
                 <h3
                   className="font-semibold leading-tight text-left m-0"
                   style={{
-                    fontSize: "min(5svh, 2em)",
+                    fontSize: "min(4svh, 2em)",
                     backgroundImage:
                       "linear-gradient(to bottom, #fff, #6f6fbe)",
                     backgroundSize: "1em 1.5em",

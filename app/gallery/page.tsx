@@ -128,16 +128,16 @@ export default function Page() {
 
   return (
     <div className="relative flex flex-col justify-center w-full min-h-full">
-      <div className="fixed bottom-0 left-[0.1rem] sm:top-5 sm:left-1/2 sm:-translate-x-1/2 z-50">
+      <div className="fixed bottom-0 left-[6rem] sm:top-5 top-0 sm:left-1/2 sm:-translate-x-1/2 z-50">
         <div
           className="relative w-fit bg-black 
-                rounded-tr-2xl sm:rounded-tr-none 
-                sm:rounded-bl-2xl sm:rounded-br-2xl 
+                sm:rounded-tr-none 
+                sm:rounded-bl-2xl rounded-br-2xl 
                 px-4 pb-2 sm:pt-0 pt-2"
         >
           <img
             src="/svg-path.svg"
-            className="absolute sm:left-[0.5] bottom-1 left-[10.9rem] sm:top-0 h-6 w-auto -translate-x-full rotate-270 sm:rotate-90"
+            className="absolute sm:left-[0.5] bottom-3 left-[12rem] sm:top-0 h-9 w-auto -translate-x-full sm:rotate-90"
           />
 
           <h1

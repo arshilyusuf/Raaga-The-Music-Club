@@ -7,6 +7,8 @@ import CurvedLoop from "@/Reactbits/CurvedLoop";
 import TextPressure from "@/Reactbits/TextPressure";
 import ScrollTimeline from "@/components/ScrollTimeline";
 import { useEffect, useState } from "react";
+import DomeGallery from "@/Reactbits/DomeGallery";
+import CircularText from "@/Reactbits/CircularText";
 
 export default function Home() {
   const items = [
@@ -49,16 +51,27 @@ export default function Home() {
 
   return (
     <main className="relative min-h-screen w-full text-zinc-50 overflow-hidden ">
-      <div className="pointer-events-none sm:top-30 absolute z-[300] left-5 sm:left-10 right-0 w-[calc(100%-1.25rem)] sm:w-full">
-        <CurvedLoop
-          marqueeText="Auditions ✦ coming ✦ soon ✦ "
-          speed={2}
-          curveAmount={200} // reduced for smaller screens
-          direction="right"
-          interactive
-          className="w-full"
-        />
-      </div>
+      {isMobile ? (
+        <div className="absolute w-full h-screen mt-20 flex items-center justify-center z-[300] pointer-events-none">
+          <CircularText
+            text="AUDITIONS ✦ COMING ✦ SOON ✦ "
+            onHover="speedUp"
+            spinDuration={20}
+            className="custom-class"
+          />
+        </div>
+      ) : (
+        <div className="pointer-events-none sm:top-30 absolute z-[300] left-5 sm:left-10 right-0 w-[calc(100%-1.25rem)] sm:w-full">
+          <CurvedLoop
+            marqueeText="Auditions ✦ coming ✦ soon ✦ "
+            speed={2}
+            curveAmount={200}
+            direction="right"
+            interactive
+            className="w-full"
+          />
+        </div>
+      )}
       <section className="relative z-10 flex min-h-screen items-center justify-center px-4">
         <div
           className="absolute inset-0 bg-cover bg-center bg-no-repeat -z-10"
@@ -102,7 +115,7 @@ export default function Home() {
             damping: 6,
             mass: 0.7,
           }}
-          className="flex flex-col items-center justify-center text-center -mt-50 sm:mt-0"
+          className="flex flex-col items-center justify-center text-center -mt-30 sm:mt-0"
         >
           <motion.h1
             className="sm:text-5xl md:text-6xl lg:text-7xl mb-6 -mt-40 tracking-normal leading-tight"
@@ -116,7 +129,7 @@ export default function Home() {
           >
             <div className="relative sm:w-full w-120 sm:h-full h-full">
               {isMobile ? (
-                <h1 className="text-6xl font-black text-white">RAAGA</h1>
+                <h1 className="text-6xl mt-10 font-black text-white">RAAGA</h1>
               ) : (
                 <TextPressure
                   text="RAAGA"
@@ -148,7 +161,7 @@ export default function Home() {
             }}
           ></motion.div>
           <motion.p
-            className="sm:-mt-4 text-sm sm:text-base md:text-lg text-zinc-200/90"
+            className="sm:-mt-4 text-lg sm:text-xl md:text-lg text-zinc-200/90"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{
@@ -157,12 +170,27 @@ export default function Home() {
               ease: [0.22, 1, 0.36, 1],
             }}
           >
-            The official music community of NIT Raipur{" "}
+            The official music community of <br className="block sm:hidden" />{" "}
+            NIT Raipur{" "}
           </motion.p>
         </motion.div>
       </section>
       <section className="min-h-[120vh] sm:min-h-screen w-full bg-[#722f37] relative">
-        <div  style={{ height: "100%", position: "relative" }}>
+        {/* DomeGallery for mobile */}
+        <div className="block sm:hidden w-full h-screen sm:mb-0 -mb-30">
+          <DomeGallery
+            fit={0.8}
+            minRadius={600}
+            maxVerticalRotationDeg={0}
+            segments={34}
+            dragDampening={2}
+            grayscale
+            overlayBlurColor="#722f37"
+          />
+        </div>
+
+        {/* InfiniteMenu for larger screens */}
+        <div className="hidden sm:block h-full w-full relative">
           <InfiniteMenu items={items} scale={1.8} />
         </div>
 
