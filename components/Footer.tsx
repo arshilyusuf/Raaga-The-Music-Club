@@ -10,7 +10,7 @@ export default function Footer() {
         alt=""
         width={24}
         height={24}
-        className="absolute -top-6 left-0 rotate-[270deg] pointer-events-none"
+        className="absolute z-100 sm:-top-6 -top-[1.45rem] left-0 rotate-[270deg] pointer-events-none"
       />
 
       {/* Right inverted border */}
@@ -19,7 +19,7 @@ export default function Footer() {
         alt=""
         width={24}
         height={24}
-        className="absolute -top-6 right-0 rotate-180 pointer-events-none"
+        className="absolute z-100 sm:-top-6 -top-[1.45rem] sm:right-0 -right-[0.1rem] rotate-180 pointer-events-none"
       />
 
       <div className="max-w-7xl mx-auto grid md:grid-cols-3 gap-12">

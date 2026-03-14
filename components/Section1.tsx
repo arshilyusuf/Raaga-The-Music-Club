@@ -10,8 +10,7 @@ export default function Section1() {
   };
 
   return (
-    <div className="relative w-full h-full overflow-hidden flex items-start justify-start p-16">
-      ```
+    <div className="relative w-full h-full overflow-hidden flex items-start justify-start sm:p-16 px-6">
       {/* Background Image */}
       <Image
         src="/pictures/Copy of Copy of NIK_0636.jpg"
@@ -20,10 +19,8 @@ export default function Section1() {
         priority
         className="object-cover scale-105"
       />
-      {/* Gradient Overlay */}
       <div className="absolute inset-0 bg-gradient-to-b from-[#722f37] via-[#722f37]/60 to-transparent z-10" />
-      {/* Content */}
-      <div className="relative mt-10 z-20 max-w-3xl">
+      <div className="relative mt-10 sm:pt-0 pt-20 z-20 sm:max-w-3xl">
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -32,7 +29,7 @@ export default function Section1() {
             ease: [0.22, 1, 0.36, 1],
           }}
           viewport={{ margin: "-100px" }}
-          className="text-[4rem] font-bold text-left leading-[1.1]
+          className="sm:text-[4rem] text-3xl font-bold text-left leading-[1.1]
 bg-gradient-to-br from-yellow-200 to-white
 bg-clip-text text-transparent
 drop-shadow-[0_8px_25px_rgba(0,0,0,0.9)]"
@@ -40,7 +37,7 @@ drop-shadow-[0_8px_25px_rgba(0,0,0,0.9)]"
           Shruti - The Annual Music Eve
         </motion.div>
 
-        <p className="mt-6 text-lg leading-relaxed text-zinc-100 drop-shadow-[0_6px_20px_rgba(0,0,0,0.9)]">
+        <p className="mt-6 sm:text-lg text-baseleading-relaxed text-zinc-100 drop-shadow-[0_6px_20px_rgba(0,0,0,0.9)]">
           Shruti is Raaga’s flagship annual music evening, where the club’s
           talented performers come together to showcase a diverse range of
           music—from soulful vocals to intricate instrumental pieces. The event

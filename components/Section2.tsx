@@ -3,7 +3,12 @@ import Image from "next/image"; // optional if you want next/image optimization
 import UntitledImage from "@/public/pictures/Untitled.png";
 import { motion } from "framer-motion";
 import Button from "./Button";
+import { useRouter } from "next/navigation";
 export default function Section2() {
+  const router = useRouter();
+  const goToTeam = () => {
+    router.push("/team");
+  };
   return (
     <section
       className="flex flex-col h-screen justify-center items-center w-full bg-cover bg-center"
@@ -34,16 +39,13 @@ export default function Section2() {
           passionate artists into our club.
         </motion.p>
         <motion.p
-          className="text-2xl  w-1/3 text-white text-center"
+          className="text-2xl sm:w-1/3 w-full text-white text-center"
           initial={{ opacity: 0, y: 40 }} // start slightly below and invisible
           whileInView={{ opacity: 1, y: 0 }} // animate when it enters viewport
           viewport={{ once: false, amount: 0.8 }} // trigger once when 50% visible
           transition={{ duration: 1, ease: "easeOut" }} // smooth animation
         >
-          <Button
-            text="Meet our Team"
-            onClick={() => console.log("Button clicked!")}
-          />
+          <Button text="Meet our Team" onClick={goToTeam} />
         </motion.p>
       </div>
     </section>

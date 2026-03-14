@@ -128,6 +128,32 @@ export default function Page() {
 
   return (
     <div className="relative flex flex-col justify-center w-full min-h-full">
+      <div className="fixed bottom-0 left-[0.1rem] sm:top-5 sm:left-1/2 sm:-translate-x-1/2 z-50">
+        <div
+          className="relative w-fit bg-black 
+                rounded-tr-2xl sm:rounded-tr-none 
+                sm:rounded-bl-2xl sm:rounded-br-2xl 
+                px-4 pb-2 sm:pt-0 pt-2"
+        >
+          <img
+            src="/svg-path.svg"
+            className="absolute sm:left-[0.5] bottom-1 left-[10.9rem] sm:top-0 h-6 w-auto -translate-x-full rotate-270 sm:rotate-90"
+          />
+
+          <h1
+            className="text-center font-bold text-2xl sm:text-4xl bg-gradient-to-br from-yellow-200 to-white
+                 bg-clip-text text-transparent drop-shadow-[0_8px_25px_rgba(0,0,0,0.9)]"
+          >
+            GALLERY
+          </h1>
+
+          <img
+            src="/svg-path.svg"
+            className="absolute right-37 sm:right-[0.5] sm:top-0 -top-[1.45rem] h-6 w-auto translate-x-full sm:rotate-0 -rotate-90"
+          />
+        </div>
+      </div>
+
       <div className="absolute inset-0 -z-10">
         <Grainient
           color1="#722f37"
@@ -154,26 +180,6 @@ export default function Page() {
           zoom={1.6}
         />
       </div>
-      <div className="fixed top-5 left-1/2 -translate-x-1/2 z-50">
-        <div className="relative w-fit bg-black rounded-bl-2xl rounded-br-2xl px-4 pb-2">
-          <img
-            src="/svg-path.svg"
-            className="absolute left-[0.5] top-0 h-6 w-auto -translate-x-full rotate-90"
-          />
-
-          <h1
-            className="text-center font-bold text-4xl bg-gradient-to-br from-yellow-200 to-white
-            bg-clip-text text-transparent drop-shadow-[0_8px_25px_rgba(0,0,0,0.9)]"
-          >
-            GALLERY
-          </h1>
-
-          <img
-            src="/svg-path.svg"
-            className="absolute right-[0.5] top-0 h-6 w-auto translate-x-full"
-          />
-        </div>
-      </div>
       <div className="mt-10">
         <div className="mb-5 border-b border-zinc-50">
           <Event eventName="Shruti'25" date="January 9, 2026" items={items} />
@@ -185,7 +191,6 @@ export default function Page() {
           <Event eventName="Shruti'23" date="October 12, 2023" items={items} />
         </div>
       </div>
-      <Footer/>
     </div>
   );
 }

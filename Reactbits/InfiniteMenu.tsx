@@ -1286,7 +1286,7 @@ const InfiniteMenu: FC<InfiniteMenuProps> = ({ items = [], scale = 1.0 }) => {
   };
 
   return (
-    <div className="relative w-full">
+    <div className="relative sm:left-0 -left-225 flex justify-center items-center sm:h-full h-screen w-550 sm:w-full">
       {" "}
       <canvas
         id="infinite-grid-menu-canvas"
@@ -1296,18 +1296,17 @@ const InfiniteMenu: FC<InfiniteMenuProps> = ({ items = [], scale = 1.0 }) => {
       {activeItem && (
         <>
           <h2
-            className={`
-          select-none
-          absolute
-          font-black
-          [font-size:4rem]
-          left-[1.6em]
-          top-1/2
-          transform
-          translate-x-[20%]
-          -translate-y-1/2
-          transition-all
-          ease-[cubic-bezier(0.25,0.1,0.25,1.0)]
+             className={`
+    select-none
+    absolute
+    font-black
+    [font-size:4rem] sm:[font-size:4rem] md:[font-size:5rem] lg:[font-size:6rem]
+    left-1/2
+    sm:left-1/2
+    transform -translate-x-1/2
+    top-30 sm:top-1/2 sm:-translate-y-1/2
+    transition-all
+    ease-[cubic-bezier(0.25,0.1,0.25,1.0)]
           ${
             isMoving
               ? "opacity-0 pointer-events-none duration-[100ms]"

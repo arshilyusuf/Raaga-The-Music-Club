@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import ShinyText from "@/Reactbits/ShinyText";
 import Grainient from "@/Reactbits/Grainient";
-import { AnimatePresence,motion} from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 
 export default function Page() {
   const [type, setType] = useState<"vocal" | "instrumental">("vocal");
@@ -20,32 +20,32 @@ export default function Page() {
     exit: { opacity: 0, y: 10, transition: { duration: 0.3 } },
   };
   return (
-    <div className="relative min-h-screen w-full overflow-hidden flex flex-col justify-center items-center px-6 py-12">
+    <div className="relative min-h-screen w-full overflow-hidden flex flex-col justify-center items-center px-6 sm:py-12 py-20">
       <div className="absolute inset-0 -z-10">
-          <Grainient
-            color1={colors.c1}
-            color2={colors.c2}
-            color3={colors.c3}
-            timeSpeed={0.25}
-            colorBalance={0}
-            warpStrength={3.35}
-            warpFrequency={5}
-            warpSpeed={2}
-            warpAmplitude={50}
-            blendAngle={114}
-            blendSoftness={0.05}
-            rotationAmount={500}
-            noiseScale={3.3}
-            grainAmount={0.1}
-            grainScale={2}
-            grainAnimated={false}
-            contrast={1.5}
-            gamma={1}
-            saturation={1}
-            centerX={0}
-            centerY={0}
-            zoom={1.6}
-          />{" "}
+        <Grainient
+          color1={colors.c1}
+          color2={colors.c2}
+          color3={colors.c3}
+          timeSpeed={0.25}
+          colorBalance={0}
+          warpStrength={3.35}
+          warpFrequency={5}
+          warpSpeed={2}
+          warpAmplitude={50}
+          blendAngle={114}
+          blendSoftness={0.05}
+          rotationAmount={500}
+          noiseScale={3.3}
+          grainAmount={0.1}
+          grainScale={2}
+          grainAnimated={false}
+          contrast={1.5}
+          gamma={1}
+          saturation={1}
+          centerX={0}
+          centerY={0}
+          zoom={1.6}
+        />{" "}
       </div>
 
       <ShinyText
@@ -130,7 +130,7 @@ export default function Page() {
             />
           </div>
 
-           {/* Conditional Fields */}
+          {/* Conditional Fields */}
           <AnimatePresence mode="wait">
             {type === "vocal" && (
               <motion.div
@@ -141,12 +141,24 @@ export default function Page() {
                 variants={fieldVariants}
               >
                 <div className="flex flex-col">
-                  <label className="font-semibold mb-1">Languages You Sing In</label>
-                  <input type="text" placeholder="Enter languages" className="input" />
+                  <label className="font-semibold mb-1">
+                    Languages You Sing In
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Enter languages"
+                    className="input"
+                  />
                 </div>
                 <div className="flex flex-col">
-                  <label className="font-semibold mb-1">Links to Backing Tracks / Karaoke (if any)</label>
-                  <input type="url" placeholder="Paste link(s) here" className="input" />
+                  <label className="font-semibold mb-1">
+                    Links to Backing Tracks / Karaoke (if any)
+                  </label>
+                  <input
+                    type="url"
+                    placeholder="Paste link(s) here"
+                    className="input"
+                  />
                 </div>
               </motion.div>
             )}
@@ -161,11 +173,31 @@ export default function Page() {
               >
                 <p className="mb-2 font-semibold">Instruments</p>
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 text-sm">
-                  {["Guitar","Keyboard","Drums","Violin","Harmonium","Flute","Tabla/Dholak","Other"].map((inst) => (
-                    <label key={inst} className="flex items-center gap-2 cursor-pointer select-none">
-                      <input type="checkbox" name="instruments" value={inst} className="peer hidden" />
+                  {[
+                    "Guitar",
+                    "Keyboard",
+                    "Drums",
+                    "Violin",
+                    "Harmonium",
+                    "Flute",
+                    "Tabla/Dholak",
+                    "Other",
+                  ].map((inst) => (
+                    <label
+                      key={inst}
+                      className="flex items-center gap-2 cursor-pointer select-none"
+                    >
+                      <input
+                        type="checkbox"
+                        name="instruments"
+                        value={inst}
+                        className="peer hidden"
+                      />
                       <span className="w-5 h-5 rounded border-2 border-white flex-shrink-0 flex items-center justify-center peer-checked:bg-white transition-colors duration-200">
-                        <span className="w-2.5 h-2.5 rounded" style={{ backgroundColor: colors.c1 }} />
+                        <span
+                          className="w-2.5 h-2.5 rounded"
+                          style={{ backgroundColor: colors.c1 }}
+                        />
                       </span>
                       <span className="text-white">{inst}</span>
                     </label>
@@ -174,11 +206,20 @@ export default function Page() {
 
                 <div className="mt-4 border-t">
                   <label className="flex mt-3 items-center gap-3 cursor-pointer select-none">
-                    <input type="checkbox" name="requireInstrument" className="peer hidden" />
+                    <input
+                      type="checkbox"
+                      name="requireInstrument"
+                      className="peer hidden"
+                    />
                     <span className="w-5 h-5 rounded border-2 border-white flex items-center justify-center peer-checked:bg-white transition-colors duration-200">
-                      <span className="w-2.5 h-2.5 rounded" style={{ backgroundColor: colors.c1 }} />
+                      <span
+                        className="w-2.5 h-2.5 rounded"
+                        style={{ backgroundColor: colors.c1 }}
+                      />
                     </span>
-                    <span className="text-white font-semisemibold">Requirement for instrument from our side</span>
+                    <span className="text-white font-semisemibold sm:text-lg text-[0.99rem]">
+                      Requirement for instrument from our side
+                    </span>
                   </label>
                 </div>
               </motion.div>

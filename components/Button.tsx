@@ -12,7 +12,7 @@ const Button: React.FC<ButtonProps> = ({ onClick = () => {}, color = "#ffffff", 
   return (
    <button
       onClick={onClick}
-      className="mt-6 flex items-center gap-3 justify-center w-full border py-3 font-semibold transition-colors duration-300"
+      className="mt-6 px-4 flex items-center gap-3 justify-center w-full border py-3 font-semibold transition-colors duration-300"
       style={{
         borderColor: color,
         color: color,
