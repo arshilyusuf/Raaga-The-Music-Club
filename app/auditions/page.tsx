@@ -82,7 +82,6 @@ export default function Page() {
           </button>
         </div>
 
-        {/* Main Grid */}
         <div className="grid grid-cols-2 gap-6">
           {/* Full Name */}
           <div className="col-span-2 flex flex-col">
@@ -93,8 +92,6 @@ export default function Page() {
               className="input"
             />
           </div>
-
-          {/* Roll Number */}
           <div className="flex flex-col">
             <label className="font-semibold mb-1">Roll Number</label>
             <input
@@ -104,13 +101,11 @@ export default function Page() {
             />
           </div>
 
-          {/* Branch */}
           <div className="flex flex-col">
             <label className="font-semibold mb-1">Branch</label>
             <input type="text" placeholder="Enter branch" className="input" />
           </div>
 
-          {/* Year */}
           <div className="flex flex-col">
             <label className="font-semibold mb-1">Year</label>
             <input type="text" placeholder="Enter year" className="input" />
@@ -150,8 +145,8 @@ export default function Page() {
                     className="input"
                   />
                 </div>
-                <div className="flex flex-col">
-                  <label className="font-semibold mb-1">
+                <div className="flex text-[0.9rem] sm:text-lg flex-col">
+                  <label className="font-semibold  mb-1">
                     Links to Backing Tracks / Karaoke (if any)
                   </label>
                   <input

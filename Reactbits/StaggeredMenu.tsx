@@ -1,5 +1,5 @@
 "use client";
-import React, { useCallback, useLayoutEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 
 export interface StaggeredMenuItem {
@@ -49,7 +49,14 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
   onMenuClose,
 }: StaggeredMenuProps) => {
   const [open, setOpen] = useState(false);
+  const [isReady, setIsReady] = useState(false);
   const openRef = useRef(false);
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => setIsReady(true), 1000);
+    return () => window.clearTimeout(timer);
+  }, []);
+
 
   const panelRef = useRef<HTMLDivElement | null>(null);
   const preLayersRef = useRef<HTMLDivElement | null>(null);
@@ -439,7 +446,8 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
 
   return (
     <div
-      className={`sm-scope z-40 ${isFixed ? "fixed top-0 left-0 w-screen h-screen overflow-hidden" : "w-full h-full"}`}
+      className={`sm-scope z-40 ${isFixed ? "fixed top-0 left-0 w-screen h-screen overflow-hidden" : "w-full h-full"} ${isReady ? "opacity-100" : "opacity-0"}`}
+      style={{ transition: "opacity 200ms ease" }}
     >
       <div
         className={

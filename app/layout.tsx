@@ -52,8 +52,8 @@ export default function RootLayout({
             {/* Full-screen black background */}
             {/* <div className="absolute inset-0 bg-black z-0 touch-none" /> */}
 
-            <div className="fixed overflow-y-auto no-scrollbar inset-2 sm:inset-3 md:inset-4 lg:inset-5 rounded-3xl z-10">
-              <div className="relative min-h-full w-full bg-black text-zinc-50 rounded-3xl">
+            <div className="fixed overflow-y-auto overscroll-none no-scrollbar inset-2 sm:inset-3 md:inset-4 lg:inset-5 rounded-3xl z-10">
+              <div className="relative flex min-h-full flex-col w-full bg-black text-zinc-50 rounded-3xl">
                 {/* Top-left logo rectangle */}
                 <div className="fixed sm:top-4 top-0 sm:left-4 left-1 z-20">
                   <div className="relative flex p-3 px-4 rounded-br-2xl h-15 w-25 sm:h-15 sm:w-25 items-center justify-center bg-black">
@@ -90,7 +90,10 @@ export default function RootLayout({
                   />
                 </div>
 
-                <ZoomWrapper>{children}</ZoomWrapper>
+                <div className="flex-1">
+                  <ZoomWrapper>{children}</ZoomWrapper>
+                </div>
+
                 <Footer />
               </div>
             </div>
