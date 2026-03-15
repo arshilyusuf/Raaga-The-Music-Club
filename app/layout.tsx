@@ -39,7 +39,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={cn("font-sans", geist.variable)}>
       <body
-        className={`${clashGrotesk.className} antialiased bg-black cursor-pointer select-none`}
+        className={`${clashGrotesk.className} antialiased bg-black cursor-pointer select-none overflow-hidden`}
       >
         <ClickSpark
           sparkColor="#fff"
@@ -50,9 +50,9 @@ export default function RootLayout({
         >
           <div className="relative min-h-screen w-screen">
             {/* Full-screen black background */}
-            <div className="absolute inset-0 bg-black z-0 touch-none" />
+            {/* <div className="absolute inset-0 bg-black z-0 touch-none" /> */}
 
-            <div className="absolute overflow-y-auto no-scrollbar inset-2 sm:inset-3 md:inset-4 lg:inset-5 rounded-3xl z-10">
+            <div className="fixed overflow-y-auto no-scrollbar inset-2 sm:inset-3 md:inset-4 lg:inset-5 rounded-3xl z-10">
               <div className="relative min-h-full w-full bg-black text-zinc-50 rounded-3xl">
                 {/* Top-left logo rectangle */}
                 <div className="fixed sm:top-4 top-0 sm:left-4 left-1 z-20">
