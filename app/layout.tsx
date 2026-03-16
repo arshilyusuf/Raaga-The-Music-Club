@@ -28,7 +28,7 @@ const menuItems = [
 
 const socialItems = [
   { label: "Instagram", link: "https://www.instagram.com/raaga.nitrr" },
-  { label: "Youtube", link: "https://youtube.com" },
+  { label: "Youtube", link: "https://youtube.com/@raaga-themusicclub799?si=YkO73liY-L9h2VMw" },
 ];
 
 export default function RootLayout({
