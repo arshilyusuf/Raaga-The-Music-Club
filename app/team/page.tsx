@@ -164,8 +164,8 @@ export default function Page() {
                   captionText={person.name}
                   containerHeight="300px"
                   containerWidth="300px"
-                  imageHeight="400px"
-                  imageWidth="350px"
+                  imageHeight="250px"
+                  imageWidth="270px"
                   rotateAmplitude={12}
                   scaleOnHover={1.05}
                   showMobileWarning={false}
