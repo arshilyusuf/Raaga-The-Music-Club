@@ -118,7 +118,7 @@ export default function Page() {
   const colors = { c1: "#722f37", c2: "#bd9398", c3: "#18022e" };
   return (
     <div className="relative w-full min-h-screen overflow-hidden">
-      <div className="absolute sm:fixed left-18 top-0 sm:top-3 lg:top-5 sm:left-1/2 sm:-translate-x-1/2 z-50">
+      <div className="absolute sm:fixed left-14 top-0 sm:top-3 lg:top-5 sm:left-1/2 sm:-translate-x-1/2 z-50">
         <div className="flex">
           <img
             src="/svg-path.svg"

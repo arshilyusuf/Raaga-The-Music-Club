@@ -128,7 +128,7 @@ export default function Page() {
 
   return (
     <div className="relative flex flex-col justify-center w-full min-h-full">
-      <div className="absolute sm:fixed left-18 top-0 sm:top-3 lg:top-5  sm:left-1/2 sm:-translate-x-1/2 z-50">
+      <div className="absolute sm:fixed left-13 top-0 sm:top-3 lg:top-5  sm:left-1/2 sm:-translate-x-1/2 z-50">
         <div className="flex">
           <img
             src="/svg-path.svg"

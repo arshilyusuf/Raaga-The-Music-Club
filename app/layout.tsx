@@ -28,7 +28,10 @@ const menuItems = [
 
 const socialItems = [
   { label: "Instagram", link: "https://www.instagram.com/raaga.nitrr" },
-  { label: "Youtube", link: "https://youtube.com/@raaga-themusicclub799?si=YkO73liY-L9h2VMw" },
+  {
+    label: "Youtube",
+    link: "https://youtube.com/@raaga-themusicclub799?si=YkO73liY-L9h2VMw",
+  },
 ];
 
 export default function RootLayout({
@@ -56,32 +59,32 @@ export default function RootLayout({
               <div className="relative flex min-h-full flex-col w-full bg-black text-zinc-50 rounded-3xl">
                 {/* Top-left logo rectangle */}
                 <div className="fixed top-0 left-1 sm:top-1 sm:left-0 lg:top-4 lg:left-4 z-20">
-                  {" "}
-                  <div className="flex-col p-1">
-                    <div className="flex">
-                      <a href="/">
-                        <div className="bg-black h-13 rounded-br-2xl p-2">
-                          <img
-                            src="/pictures/Shruti26 Profile Picture-7.png"
-                            className="h-full w-full object-contain"
-                          />
-                        </div>
-                      </a>
-                      <img
-                        src="/svg-path1.svg"
-                        alt=""
-                        aria-hidden="true"
-                        className="h-8"
-                      />
-                    </div>
-                    <img
-                      src="/svg-path1.svg"
-                      alt=""
-                      aria-hidden="true"
-                      className="h-8"
-                    />
-                  </div>
-                  {/* <div className="relative flex p-3 px-4 rounded-br-2xl h-15 w-25 sm:h-15 sm:w-25 items-center justify-center bg-black">
+  <div className="flex-col p-1">
+    <div className="flex">
+      <a href="/">
+        <div className="bg-black h-13 sm:h-13 w-16 sm:w-auto rounded-br-2xl p-2">
+          <img
+            src="/pictures/Shruti26 Profile Picture-7.png"
+            className="h-full w-full object-contain"
+          />
+        </div>
+      </a>
+      <img
+        src="/svg-path1.svg"
+        alt=""
+        aria-hidden="true"
+        className="h-8"
+      />
+    </div>
+    <img
+      src="/svg-path1.svg"
+      alt=""
+      aria-hidden="true"
+      className="h-8"
+    />
+  </div>
+</div>
+                {/* <div className="relative flex p-3 px-4 rounded-br-2xl h-15 w-25 sm:h-15 sm:w-25 items-center justify-center bg-black">
                     <img
                       src="/pictures/Shruti26 Profile Picture-7.png"
                       className="h-full w-full object-contain"
@@ -98,8 +101,7 @@ export default function RootLayout({
                       aria-hidden="true"
                       className="pointer-events-none absolute sm:left-1 left-[0.2rem] sm:-bottom-6 -bottom-[1.45rem] h-6 w-6"
                     />
-                  </div> */}
-                </div>
+                      </div> */}
                 <div className="fixed inset-0 z-999 pointer-events-none">
                   <StaggeredMenu
                     position="right"
