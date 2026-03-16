@@ -64,6 +64,7 @@ interface ProfileCardProps {
   contactText?: string;
   showUserInfo?: boolean;
   onContactClick?: () => void;
+  instagram?: string;
 }
 
 interface TiltEngine {
@@ -94,6 +95,7 @@ const ProfileCardComponent: React.FC<ProfileCardProps> = ({
   status = "Online",
   contactText = "Contact",
   showUserInfo = true,
+  instagram = "",
   onContactClick,
 }) => {
   const wrapRef = useRef<HTMLDivElement>(null);
@@ -501,11 +503,28 @@ const ProfileCardComponent: React.FC<ProfileCardProps> = ({
           }}
         />
       )}
+      {instagram && (
+        <a
+          href={instagram}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="absolute bottom-4 right-4 flex items-center z-[1000] justify-center w-7 h-7 rounded-full bg-white/20 backdrop-blur-md border border-white/20 hover:bg-white/30 transition"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+            className="w-4 h-4 text-white"
+          >
+            <path d="M7.75 2h8.5A5.75 5.75 0 0 1 22 7.75v8.5A5.75 5.75 0 0 1 16.25 22h-8.5A5.75 5.75 0 0 1 2 16.25v-8.5A5.75 5.75 0 0 1 7.75 2Zm4.25 5.5A4.75 4.75 0 1 0 16.75 12 4.76 4.76 0 0 0 12 7.5Zm0 7.7A2.95 2.95 0 1 1 14.95 12 2.96 2.96 0 0 1 12 15.2Zm4.8-8.9a1.1 1.1 0 1 1 1.1-1.1 1.1 1.1 0 0 1-1.1 1.1Z" />
+          </svg>
+        </a>
+      )}
       <div ref={shellRef} className="relative z-[1] group">
         <section
           className="grid relative overflow-hidden"
           style={{
-                height: "66svh",
+            height: "50svh",
 
             maxHeight: "540px",
             aspectRatio: "0.718",
@@ -562,23 +581,25 @@ const ProfileCardComponent: React.FC<ProfileCardProps> = ({
                 backfaceVisibility: "hidden",
               }}
             >
-              <img
-                className="w-full absolute left-1/2 bottom-[-1px] will-change-transform transition-transform duration-[120ms] ease-out"
-                src={avatarUrl}
-                alt={`${name || "User"} avatar`}
-                loading="lazy"
-                style={{
-                  transformOrigin: "50% 100%",
-                  transform:
-                    "translateX(calc(-50% + (var(--pointer-from-left) - 0.5) * 6px)) translateZ(0) scaleY(calc(1 + (var(--pointer-from-top) - 0.5) * 0.02)) scaleX(calc(1 + (var(--pointer-from-left) - 0.5) * 0.01))",
-                  borderRadius: cardRadius,
-                  backfaceVisibility: "hidden",
-                }}
-                onError={(e) => {
-                  const t = e.target as HTMLImageElement;
-                  t.style.display = "none";
-                }}
-              />
+              {avatarUrl && (
+                <img
+                  className="w-full absolute left-1/2 bottom-[-1px] will-change-transform transition-transform duration-[120ms] ease-out"
+                  src={avatarUrl}
+                  loading="lazy"
+                  style={{
+                    transformOrigin: "50% 100%",
+                    transform:
+                      "translateX(calc(-50% + (var(--pointer-from-left) - 0.5) * 6px)) translateZ(0) scaleY(calc(1 + (var(--pointer-from-top) - 0.5) * 0.02)) scaleX(calc(1 + (var(--pointer-from-left) - 0.5) * 0.01))",
+                    borderRadius: cardRadius,
+                    backfaceVisibility: "hidden",
+                  }}
+                  onError={(e) => {
+                    const t = e.target as HTMLImageElement;
+                    t.style.display = "none";
+                  }}
+                />
+              )}
+
               {showUserInfo && (
                 <div
                   className="absolute z-[2] flex items-center justify-between backdrop-blur-[30px] border border-white/10 pointer-events-auto"

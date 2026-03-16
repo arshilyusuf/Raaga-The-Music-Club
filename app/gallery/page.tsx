@@ -128,7 +128,24 @@ export default function Page() {
 
   return (
     <div className="relative flex flex-col justify-center w-full min-h-full">
-      <div className="fixed bottom-0 left-[6rem] sm:top-5 top-0 sm:left-1/2 sm:-translate-x-1/2 z-50">
+      <div className="absolute sm:fixed left-18 top-0 sm:top-3 lg:top-5  sm:left-1/2 sm:-translate-x-1/2 z-50">
+        <div className="flex">
+          <img
+            src="/svg-path.svg"
+            className="hidden sm:block scale-x-[-1] h-9 w-auto max-h-full"
+          />
+          <div className="bg-black sm:rounded-bl-2xl rounded-br-2xl px-2 sm:px-4 pb-0 sm:pb-2 pl-4 sm:pl-4 ">
+            <h1
+              className="text-center font-bold text-2xl sm:text-4xl bg-gradient-to-br from-yellow-200 to-white
+        bg-clip-text text-transparent drop-shadow-[0_8px_25px_rgba(0,0,0,0.9)]"
+            >
+              GALLERY
+            </h1>
+          </div>
+          <img src="/svg-path.svg" className="h-9 w-auto max-h-full" />
+        </div>
+      </div>
+      {/* <div className="fixed bottom-0 left-[6rem] sm:top-5 top-0 sm:left-1/2 sm:-translate-x-1/2 z-50">
         <div
           className="relative w-fit bg-black 
                 sm:rounded-tr-none 
@@ -152,7 +169,7 @@ export default function Page() {
             className="absolute right-37 sm:right-[0.5] sm:top-0 -top-[1.45rem] h-6 w-auto translate-x-full sm:rotate-0 -rotate-90"
           />
         </div>
-      </div>
+      </div> */}
 
       <div className="absolute inset-0 -z-10">
         <Grainient

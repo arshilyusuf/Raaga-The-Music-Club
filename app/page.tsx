@@ -127,7 +127,7 @@ export default function Home() {
               ease: [0.22, 1, 0.36, 1],
             }}
           >
-            <div className="relative sm:w-full w-120 sm:h-full h-full">
+            <div className="relative w-120 sm:w-full  sm:h-full h-full">
               {isMobile ? (
                 <h1 className="text-6xl mt-10 font-black text-white">RAAGA</h1>
               ) : (
@@ -143,7 +143,7 @@ export default function Home() {
                   width={true}
                   italic
                   textColor="#ffffff"
-                  minFontSize={300}
+                  minFontSize={260}
                 />
               )}
             </div>
@@ -175,9 +175,9 @@ export default function Home() {
           </motion.p>
         </motion.div>
       </section>
-      <section className="min-h-[120vh] sm:min-h-screen w-full bg-[#722f37] relative">
+      <section className="h-[100vh] sm:min-h-fit w-full bg-[#722f37] relative">
         {/* DomeGallery for mobile */}
-        <div className="block sm:hidden w-full h-screen sm:mb-0 -mb-30">
+        <div className="block lg:hidden w-full h-screen sm:mb-0 -mb-30">
           <DomeGallery
             fit={0.8}
             minRadius={600}
@@ -190,7 +190,7 @@ export default function Home() {
         </div>
 
         {/* InfiniteMenu for larger screens */}
-        <div className="hidden sm:block h-full w-full relative">
+        <div className="hidden lg:block h-full w-full relative">
           <InfiniteMenu items={items} scale={1.8} />
         </div>
 

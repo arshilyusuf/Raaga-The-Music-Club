@@ -9,24 +9,38 @@ export default function Page() {
       name: "Arshil Yusuf",
       title: "Instrumentalist",
       avatar: "/pictures/Untitled (1).png",
+      instagramURL: "https://www.instagram.com/arrshilyusuf",
     },
     {
       name: "Siddharth Phatak",
       title: "Vocalist",
-      avatar: "/team/siddharth.jpg",
+      avatar: "",
+      instagramURL: "",
     },
     {
       name: "Tanishq Roy Chowdhary",
       title: "Head Coordinator",
-      avatar: "/team/john.jpg",
+      avatar: "",
+      instagramURL: "",
     },
-    { name: "Jane Smith", title: "Head Coordinator", avatar: "/team/jane.jpg" },
+    {
+      name: "Jane Smith",
+      title: "Head Coordinator",
+      avatar: "",
+      instagramURL: "",
+    },
     {
       name: "Alex Carter",
       title: "Head Coordinator",
       avatar: "/team/alex.jpg",
+      instagramURL: "",
     },
-    { name: "Sara Khan", title: "Head Coordinator", avatar: "/team/sara.jpg" },
+    {
+      name: "Sara Khan",
+      title: "Head Coordinator",
+      avatar: "",
+      instagramURL: "",
+    },
   ];
 
   const core = [
@@ -65,34 +79,60 @@ export default function Page() {
 
       image: "https://i.scdn.co/image/ab67616d0000b273d9985092cd88bffd97653b58",
     },
+    {
+      name: "Steve Lacy",
+      title: "Voalist",
+
+      image: "https://i.scdn.co/image/ab67616d0000b273d9985092cd88bffd97653b58",
+    },
   ];
 
+  const exes = [
+    { name: "George Washington", title: "Vocalist" },
+    { name: "Abraham Lincoln", title: "Instrumentalist" },
+    { name: "Theodore Roosevelt", title: "Instrumentalist" },
+    { name: "Franklin D. Roosevelt", title: "Vocalist" },
+    { name: "John F. Kennedy", title: "Vocalist" },
+    { name: "Thomas Jefferson", title: "Instrumentalist" },
+    { name: "James Madison", title: "Vocalist" },
+    { name: "Andrew Jackson", title: "Instrumentalist" },
+    { name: "Ulysses S. Grant", title: "Instrumentalist" },
+    { name: "Dwight D. Eisenhower", title: "Vocalist" },
+  ];
+  const management = [
+    { name: "Aarav Sharma" },
+    { name: "Riya Mehta" },
+    { name: "Kabir Verma" },
+    { name: "Ananya Gupta" },
+    { name: "Rahul Nair" },
+    { name: "Ishita Jain" },
+  ];
+
+  const anchoring = [
+    { name: "Arjun Kapoor" },
+    { name: "Sneha Iyer" },
+    { name: "Dev Malhotra" },
+    { name: "Kavya Singh" },
+    { name: "Rohan Das" },
+  ];
   const colors = { c1: "#722f37", c2: "#bd9398", c3: "#18022e" };
   return (
     <div className="relative w-full min-h-screen overflow-hidden">
-     <div className="fixed bottom-0 left-[6rem] sm:top-5 top-0 sm:left-1/2 sm:-translate-x-1/2 z-50">
-        <div
-          className="relative w-fit bg-black 
-                sm:rounded-tr-none 
-                sm:rounded-bl-2xl rounded-br-2xl 
-                px-4 pb-2 sm:pt-0 pt-2"
-        >
+      <div className="absolute sm:fixed left-18 top-0 sm:top-3 lg:top-5 sm:left-1/2 sm:-translate-x-1/2 z-50">
+        <div className="flex">
           <img
             src="/svg-path.svg"
-            className="absolute sm:left-[0.5] bottom-3 left-[9.1rem] sm:top-0 h-9 w-auto -translate-x-full sm:rotate-90"
+            className="hidden sm:block scale-x-[-1] h-9 w-auto max-h-full"
           />
-
-          <h1
-            className="text-center font-bold text-2xl sm:text-4xl bg-gradient-to-br from-yellow-200 to-white
-                 bg-clip-text text-transparent drop-shadow-[0_8px_25px_rgba(0,0,0,0.9)]"
-          >
-            TEAM
-          </h1>
-
-          <img
-            src="/svg-path.svg"
-            className="absolute right-37 sm:right-[0.5] sm:top-0 -top-[1.45rem] h-6 w-auto translate-x-full sm:rotate-0 -rotate-90"
-          />
+          <div className="bg-black sm:rounded-bl-2xl rounded-br-2xl px-2 sm:px-4 pb-0 sm:pb-2 pl-4 sm:pl-4 ">
+            <h1
+              className="text-center font-bold text-2xl sm:text-4xl bg-gradient-to-br from-yellow-200 to-white
+        bg-clip-text text-transparent drop-shadow-[0_8px_25px_rgba(0,0,0,0.9)]"
+            >
+              TEAM
+            </h1>
+          </div>
+          <img src="/svg-path.svg" className="h-9 w-auto max-h-full" />
         </div>
       </div>
 
@@ -124,48 +164,52 @@ export default function Page() {
       </div>
 
       <div className="relative mb-10 z-10 flex flex-col items-center h-full">
-        <div className="sm:w-[75%] w-[90%] mt-20">
-          <h1 className="text-white font-medium text-3xl  sm:text-6xl text-center mb-5 sm:mb-10">
+        <div className="sm:w-[75%] w-full mt-20">
+          <h1 className="text-white font-medium text-3xl  sm:text-6xl text-center sm:mb-10">
             Head Coordinators
           </h1>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 justify-items-center">
+          <div className="flex flex-wrap justify-center gap-8 mt-5">
             {heads.map((person, i) => (
-              <ProfileCard
-                key={i}
-                name={person.name}
-                title={person.title}
-                avatarUrl={person.avatar}
-                handle="shruti"
-                status="Online"
-                contactText="Contact"
-                showUserInfo={false}
-                enableTilt
-                enableMobileTilt
-                behindGlowColor="hsla(353, 41%, 32%, 0.6)"
-                iconUrl="/assets/demo/iconpattern.png"
-                behindGlowEnabled
-                innerGradient="linear-gradient(145deg, hsla(353, 41%, 32%, 0.55) 0%, hsla(350, 21%, 66%, 0.45) 50%, hsla(352, 79%, 20%, 0.27) 100%)"
-              />
+              <div key={i} className="w-full lg:w-[22%] flex justify-center">
+                <ProfileCard
+                  name={person.name}
+                  title={person.title}
+                  avatarUrl={person.avatar}
+                  handle="shruti"
+                  status="Online"
+                  contactText="Contact"
+                  showUserInfo={false}
+                  enableTilt
+                  enableMobileTilt
+                  behindGlowColor="hsla(353, 41%, 32%, 0.6)"
+                  iconUrl="/assets/demo/iconpattern.png"
+                  behindGlowEnabled
+                  innerGradient="linear-gradient(145deg, hsla(353, 41%, 32%, 0.55) 0%, hsla(350, 21%, 66%, 0.45) 50%, hsla(352, 79%, 20%, 0.27) 100%)"
+                  instagram={person.instagramURL}
+                />
+              </div>
             ))}
           </div>
         </div>
-        <div className="w-[80%] border-t-2 pt-8 mt-24">
+        <div className="w-[70%] sm:w-[80%] border-t-2 pt-8 mt-10 mb-20">
           <h1 className="text-white text-3xl sm:text-6xl text-center mb-7 sm:mb-10">
             Core Coordinators
           </h1>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-y-10 justify-items-center">
+          <div className="flex flex-wrap justify-center gap-y-20 gap-x-7">
             {core.map((person, i) => (
-              <div key={i} className="relative sm:w-[300px] h-[400px]">
+              <div
+                key={i}
+                className="relative h-[300px] w-full sm:w-[45%] lg:w-[22%] flex justify-center"
+              >
                 <TiltedCard
                   imageSrc={person.image}
                   altText={person.title}
                   captionText={person.name}
-                  containerHeight="300px"
-                  containerWidth="300px"
-                  imageHeight="400px"
-                  imageWidth="350px"
+                  containerHeight="200px"
+                  containerWidth="100%"
+                  imageHeight="350px"
                   rotateAmplitude={12}
                   scaleOnHover={1.05}
                   showMobileWarning={false}
@@ -177,6 +221,67 @@ export default function Page() {
                 />
               </div>
             ))}
+          </div>
+        </div>
+        <div className="w-[70%] sm:w-[80%] border-t-2 pt-8 mt-10 mb-20">
+          <h1 className="text-white text-3xl sm:text-6xl text-center mb-7 sm:mb-10">
+            Executives
+          </h1>
+
+          <div className="flex flex-wrap justify-center gap-8">
+  {exes.map((person, i) => (
+    <div
+      key={i}
+      className="w-full sm:w-[45%] lg:w-[22%] h-[130px] flex flex-col items-center justify-center rounded-2xl
+      bg-white/10 backdrop-blur-lg border border-white/20 text-white"
+    >
+      <p className="text-lg sm:text-xl font-semibold">
+        {person.name}
+      </p>
+      <p className="text-sm sm:text-base text-white/70 mt-1">
+        {person.title}
+      </p>
+    </div>
+  ))}
+</div>
+        </div>
+        <div className="w-[100%] sm:w-[80%] flex justify-center border-t pt-8 mt-10 mb-20">
+          <div className="w-[80%] sm:w-full flex flex-col justify-center items-center">
+            <h1 className="text-white font-medium text-3xl sm:text-6xl text-center mb-10">
+              Domains
+            </h1>
+
+            <div className="flex flex-col gap-y-5 w-full sm:flex-row justify-evenly">
+              {/* Management */}
+              <div>
+                <h2 className="text-white font-medium pb-2 border-b-1 border-zinc-100 text-xl sm:text-3xl text-center mb-5">
+                  Management
+                </h2>
+
+                <ul className="flex flex-col items-center gap-2 text-white/80 text-lg">
+                  {management.map((person, i) => (
+                    <li key={i} className="px-4 py-1">
+                      {person.name}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* Anchoring */}
+              <div>
+                <h2 className="text-white font-medium pb-2 border-b-1 border-zinc-100 text-xl sm:text-3xl text-center mb-5">
+                  Anchoring
+                </h2>
+
+                <ul className="flex flex-col items-center gap-2 text-white/80 text-lg">
+                  {anchoring.map((person, i) => (
+                    <li key={i} className="px-4 py-1">
+                      {person.name}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
           </div>
         </div>
       </div>

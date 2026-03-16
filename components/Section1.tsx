@@ -22,7 +22,7 @@ export default function Section1() {
         className="object-cover scale-105"
       />
       <div className="absolute inset-0 bg-gradient-to-b from-[#722f37] via-[#722f37]/40 to-transparent z-10" />
-      <div className="relative sm:pt-0  z-20 sm:max-w-3xl">
+      <div className="relative flex flex-col items-center sm:pt-0  z-20 sm:max-w-3xl">
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -30,8 +30,8 @@ export default function Section1() {
             duration: 1.25,
             ease: [0.22, 1, 0.36, 1],
           }}
-          viewport={{ margin: "-100px" }}
-          className="sm:text-[4rem] mt-40 text-3xl font-bold text-left leading-[1.1]
+          viewport={{ margin: "-100px", once: true }}
+          className="sm:text-[4rem] sm:mt-0 mt-20 text-3xl font-bold text-left leading-[1.1]
 bg-gradient-to-br from-yellow-200 to-white
 bg-clip-text text-transparent
 drop-shadow-[0_8px_25px_rgba(0,0,0,0.9)]"
@@ -50,10 +50,7 @@ drop-shadow-[0_8px_25px_rgba(0,0,0,0.9)]"
           move, and inspire, making Shruti not just a showcase of talent but a
           celebration of music as a living, shared experience.
         </p>
-        <Button
-          text="View Gallery"
-          onClick={() => router.push("/gallery")}
-        />
+        <Button text="View Gallery" onClick={() => router.push("/gallery")} />
       </div>
     </div>
   );

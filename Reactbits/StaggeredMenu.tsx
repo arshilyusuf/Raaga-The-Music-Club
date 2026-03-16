@@ -1,5 +1,11 @@
 "use client";
-import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import { gsap } from "gsap";
 
 export interface StaggeredMenuItem {
@@ -56,7 +62,6 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
     const timer = window.setTimeout(() => setIsReady(true), 1000);
     return () => window.clearTimeout(timer);
   }, []);
-
 
   const panelRef = useRef<HTMLDivElement | null>(null);
   const preLayersRef = useRef<HTMLDivElement | null>(null);
@@ -498,9 +503,8 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
 
           <button
             ref={toggleBtnRef}
-            className={`sm-toggle relative inline-flex items-center gap-[0.3rem] bg-transparent border-0 cursor-pointer font-medium leading-none overflow-visible pointer-events-auto ${
-              open ? "text-black" : "text-[#e9e9ef]"
-            }`}
+            className={`sm-toggle absolute -top-2 -right-2 sm:relative inline-flex items-center gap-[0.3rem] border-0 cursor-pointer font-medium leading-none overflow-visible pointer-events-auto backdrop-blur-md bg-white/20 px-3 py-2 sm:px-5 sm:py-3 rounded-full hover:bg-white/50 hover:scale-[1.04] transition-all duration-400 ${open ? "text-black" : "text-[#e9e9ef]"}`}
+            style={{ WebkitBackdropFilter: "blur(12px)" }}
             aria-label={open ? "Close menu" : "Open menu"}
             aria-expanded={open}
             aria-controls="staggered-menu-panel"
