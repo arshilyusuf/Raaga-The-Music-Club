@@ -141,7 +141,6 @@ export default function Page() {
                 contactText="Contact"
                 showUserInfo={false}
                 enableTilt
-                enableMobileTilt
                 behindGlowColor="hsla(353, 41%, 32%, 0.6)"
                 iconUrl="/assets/demo/iconpattern.png"
                 behindGlowEnabled
@@ -155,7 +154,7 @@ export default function Page() {
             Core Coordinators
           </h1>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-y-10 justify-items-center">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-y-1 sm:gap-y-10 justify-items-center">
             {core.map((person, i) => (
               <div key={i} className="relative sm:w-[300px] h-[400px]">
                 <TiltedCard
