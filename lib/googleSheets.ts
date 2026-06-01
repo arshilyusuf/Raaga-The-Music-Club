@@ -3,10 +3,16 @@ import { google } from 'googleapis'
 const SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
 
 function getAuth() {
+  // Cleans quotes and literal \n formatting added by serverless providers
+  const rawKey = process.env.GOOGLE_PRIVATE_KEY;
+  const formattedKey = rawKey 
+    ? rawKey.replace(/["']/g, '').replace(/\\n/g, '\n') 
+    : undefined;
+
   return new google.auth.GoogleAuth({
     credentials: {
       client_email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
-      private_key: process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+      private_key: formattedKey,
     },
     scopes: SCOPES,
   })
@@ -44,7 +50,6 @@ async function ensureHeaders(
   spreadsheetId: string,
   headers: string[]
 ) {
-  // Read the first row to check if headers already exist
   const res = await sheets.spreadsheets.values.get({
     spreadsheetId,
     range: 'Sheet1!A1:Z1',
@@ -52,7 +57,6 @@ async function ensureHeaders(
 
   const firstRow = res.data.values?.[0]
   if (!firstRow || firstRow.length === 0) {
-    // Sheet is empty — write headers first
     await sheets.spreadsheets.values.update({
       spreadsheetId,
       range: 'Sheet1!A1',
@@ -72,7 +76,6 @@ export async function appendToSheet(data: RegistrationRow) {
     : process.env.GOOGLE_SHEET_ID_INSTRUMENTALISTS!
   const headers = isVocalist ? VOCALIST_HEADERS : INSTRUMENTALIST_HEADERS
 
-  // Auto-create headers if the sheet is empty
   await ensureHeaders(sheets, spreadsheetId, headers)
 
   const row = isVocalist
@@ -101,8 +104,6 @@ export async function appendToSheet(data: RegistrationRow) {
         new Date(data.submitted_at).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' }),
       ]
 
-  // IMPORTANT: range must be a single column "A:A" not "A:Z"
-  // This tells Sheets to find the next empty ROW starting at column A
   await sheets.spreadsheets.values.append({
     spreadsheetId,
     range: 'Sheet1!A:A',
@@ -113,7 +114,6 @@ export async function appendToSheet(data: RegistrationRow) {
     },
   })
 
-  // Mark as synced in Supabase
   try {
     const { createClient } = await import('@supabase/supabase-js')
     const supabase = createClient(

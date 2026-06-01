@@ -85,55 +85,58 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
-    // --- 3. Sync to Google Sheets (non-blocking) ---
-    appendToSheet(data).catch((err) =>
-      console.error('Google Sheets sync failed (non-fatal):', err)
-    )
-
-    // --- 4. Send Confirmation Email via Gmail (non-blocking) ---
+    // --- 3. Run Sync & Email concurrently and wait for execution before runtime freeze ---
     const auditionDate = "October 15, 2026, at 10:00 AM"
-
     const textFallback = `Hello ${full_name},\n\nYour registration for the upcoming Raaga: The Music Club auditions has been received.\n\nRegistration Summary:\n- Category: ${registration_type.toUpperCase()}\n- Roll Number: ${data.roll_number}\n- Branch / Year: ${data.branch} (Year ${data.year})\n\nAudition Schedule:\nPlease report directly to the main auditorium on: ${auditionDate}\n\nIf you have any questions or need to reschedule, reply to this email or reach our support team at 98357828123 or 7808361946.\n\nBest regards,\nRaaga Auditions Coordination Team`
 
-    transporter.sendMail({
-      from: `"Raaga The Music Club"<${process.env.GMAIL_USER}>`,
-      to: email,
-      replyTo: process.env.GMAIL_USER, 
-      subject: `Audition Registration Confirmation - ${full_name}`,
-      text: textFallback,
-      headers: {
-        'X-Auto-Response-Suppress': 'OOF, AutoReply',
-        'Precedence': 'bulk'
-      },
-      html: `
-        <div style="font-family: Arial, sans-serif; line-height: 1.6; max-width: 550px; color: #222222;">
-          <p>Hello <strong>${full_name}</strong>,</p>
-          <p>Your registration for the upcoming <strong>Raaga: The Music Club</strong> auditions has been received.</p>
-          
-          <hr style="border: 0; border-top: 1px solid #eeeeee; margin: 15px 0;" />
-          
-          <p><strong>Registration Summary:</strong></p>
-          <ul>
-            <li><strong>Category:</strong> ${registration_type.toUpperCase()}</li>
-            <li><strong>Roll Number:</strong> ${data.roll_number}</li>
-            <li><strong>Branch / Year:</strong> ${data.branch} (Year ${data.year})</li>
-            ${data.instruments ? `<li><strong>Instruments:</strong> ${data.instruments}</li>` : ''}
-            ${data.languages ? `<li><strong>Languages:</strong> ${data.languages}</li>` : ''}
-          </ul>
+    await Promise.allSettled([
+      appendToSheet(data),
+      transporter.sendMail({
+        from: `"Raaga The Music Club"<${process.env.GMAIL_USER}>`,
+        to: email,
+        replyTo: process.env.GMAIL_USER, 
+        subject: `Audition Registration Confirmation - ${full_name}`,
+        text: textFallback,
+        headers: {
+          'X-Auto-Response-Suppress': 'OOF, AutoReply',
+          'Precedence': 'bulk'
+        },
+        html: `
+          <div style="font-family: Arial, sans-serif; line-height: 1.6; max-width: 550px; color: #222222;">
+            <p>Hello <strong>${full_name}</strong>,</p>
+            <p>Your registration for the upcoming <strong>Raaga: The Music Club</strong> auditions has been received.</p>
+            
+            <hr style="border: 0; border-top: 1px solid #eeeeee; margin: 15px 0;" />
+            
+            <p><strong>Registration Summary:</strong></p>
+            <ul>
+              <li><strong>Category:</strong> ${registration_type.toUpperCase()}</li>
+              <li><strong>Roll Number:</strong> ${data.roll_number}</li>
+              <li><strong>Branch / Year:</strong> ${data.branch} (Year ${data.year})</li>
+              ${data.instruments ? `<li><strong>Instruments:</strong> ${data.instruments}</li>` : ''}
+              ${data.languages ? `<li><strong>Languages:</strong> ${data.languages}</li>` : ''}
+            </ul>
 
-          <hr style="border: 0; border-top: 1px solid #eeeeee; margin: 15px 0;" />
+            <hr style="border: 0; border-top: 1px solid #eeeeee; margin: 15px 0;" />
 
-          <p><strong>Audition Schedule:</strong><br />
-          Please report directly to the main auditorium on: <strong>${auditionDate}</strong></p>
+            <p><strong>Audition Schedule:</strong><br />
+            Please report directly to the main auditorium on: <strong>${auditionDate}</strong></p>
 
-          <p>If you have any questions, reply to this email or contact us at 98357828123 or 7808361946.</p>
-          
-          <p>Best regards,<br />Raaga Auditions Coordination Team</p>
-        </div>
-      `,
-    }).catch((err) =>
-      console.error('Gmail dispatch failed (non-fatal):', err)
-    )
+            <p>If you have any questions, reply to this email or contact us at 98357828123 or 7808361946.</p>
+            
+            <p>Best regards,<br />Raaga Auditions Coordination Team</p>
+          </div>
+        `,
+      })
+    ]).then((results) => {
+      // Debug log details if anything breaks down in production
+      if (results[0].status === 'rejected') {
+        console.error('Google Sheets sync failed:', results[0].reason)
+      }
+      if (results[1].status === 'rejected') {
+        console.error('Gmail dispatch failed:', results[1].reason)
+      }
+    })
 
     return NextResponse.json({ success: true, id: data.id }, { status: 201 })
 
