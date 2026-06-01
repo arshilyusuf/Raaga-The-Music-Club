@@ -17,7 +17,7 @@ import { FolderClockIcon } from "@/components/ui/FolderClockIcon";
 import { ArchiveIcon } from "@/components/ui/ArchiveIcon";
 import { LoginScreen } from "@/components/admin/auditions/LoginScreen";
 import { UsersRoundIcon } from "@/components/ui/UserRoundIcon";
-
+import { Suspense } from 'react';
 type TeamMember = {
   id: string;
   name: string;
@@ -128,7 +128,7 @@ const emptyHistoryMember = (): HistoryMemberDraft => ({
 
 // ─── Main dashboard ───────────────────────────────────────────────────────────
 
-export default function AdminDashboard() {
+export function AdminDashboardContent() {
   const supabase = createBrowserSupabaseClient();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -855,5 +855,15 @@ if (!session) {
         </Modal>
       )}
     </div>
+  );
+}
+
+
+
+export default function AdminDashboardPage() {
+  return (
+    <Suspense fallback={<div className="bg-black min-h-screen" />}>
+      <AdminDashboardContent />
+    </Suspense>
   );
 }
