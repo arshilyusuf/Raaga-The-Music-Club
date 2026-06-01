@@ -1,130 +1,77 @@
+'use client';
+
+import { useEffect, useState } from 'react';
+import { createBrowserSupabaseClient } from '@/lib/supabase/client'; // Adjust path based on your folder structure
 import Event from "@/components/Event";
 import Footer from "@/components/Footer";
 import Grainient from "@/Reactbits/Grainient";
 
+interface AcademicYearRelation {
+  label: string;
+}
+
+interface DbPhoto {
+  id: string;
+  cloudinary_url: string;
+  caption: string | null;
+  academic_years: AcademicYearRelation | null;
+}
+
 export default function Page() {
-  const items = [
-    {
-      id: "1",
-      img: "https://picsum.photos/id/1015/600/900?grayscale",
-      url: "https://example.com/1",
-      height: 400,
-    },
-    {
-      id: "2",
-      img: "https://picsum.photos/id/1011/600/750?grayscale",
-      url: "https://example.com/2",
-      height: 250,
-    },
-    {
-      id: "3",
-      img: "https://picsum.photos/id/1020/600/800?grayscale",
-      url: "https://example.com/3",
-      height: 600,
-    },
-    {
-      id: "4",
-      img: "https://picsum.photos/id/1035/600/850?grayscale",
-      url: "https://example.com/4",
-      height: 500,
-    },
-    {
-      id: "5",
-      img: "https://picsum.photos/id/1041/600/700?grayscale",
-      url: "https://example.com/5",
-      height: 300,
-    },
-    {
-      id: "6",
-      img: "https://picsum.photos/id/1050/600/900?grayscale",
-      url: "https://example.com/6",
-      height: 450,
-    },
-    {
-      id: "7",
-      img: "https://picsum.photos/id/1060/600/750?grayscale",
-      url: "https://example.com/7",
-      height: 350,
-    },
-    {
-      id: "8",
-      img: "https://picsum.photos/id/1074/600/820?grayscale",
-      url: "https://example.com/8",
-      height: 550,
-    },
-    {
-      id: "9",
-      img: "https://picsum.photos/id/1084/600/900?grayscale",
-      url: "https://example.com/9",
-      height: 480,
-    },
-    {
-      id: "10",
-      img: "https://picsum.photos/id/1080/600/760?grayscale",
-      url: "https://example.com/10",
-      height: 320,
-    },
-    {
-      id: "11",
-      img: "https://picsum.photos/id/109/600/800?grayscale",
-      url: "https://example.com/11",
-      height: 600,
-    },
-    {
-      id: "12",
-      img: "https://picsum.photos/id/110/600/850?grayscale",
-      url: "https://example.com/12",
-      height: 420,
-    },
-    {
-      id: "13",
-      img: "https://picsum.photos/id/111/600/900?grayscale",
-      url: "https://example.com/13",
-      height: 470,
-    },
-    {
-      id: "14",
-      img: "https://picsum.photos/id/112/600/780?grayscale",
-      url: "https://example.com/14",
-      height: 360,
-    },
-    {
-      id: "15",
-      img: "https://picsum.photos/id/113/600/840?grayscale",
-      url: "https://example.com/15",
-      height: 510,
-    },
-    {
-      id: "16",
-      img: "https://picsum.photos/id/114/600/920?grayscale",
-      url: "https://example.com/16",
-      height: 580,
-    },
-    {
-      id: "17",
-      img: "https://picsum.photos/id/115/600/760?grayscale",
-      url: "https://example.com/17",
-      height: 340,
-    },
-    {
-      id: "18",
-      img: "https://picsum.photos/id/116/600/810?grayscale",
-      url: "https://example.com/18",
-      height: 440,
-    },
-    {
-      id: "19",
-      img: "https://picsum.photos/id/117/600/870?grayscale",
-      url: "https://example.com/19",
-      height: 520,
-    },
-    {
-      id: "20",
-      img: "https://picsum.photos/id/118/600/790?grayscale",
-      url: "https://example.com/20",
-      height: 380,
-    },
-  ];
+  const [shruti25Items, setShruti25Items] = useState<any[]>([]);
+  const [shruti24Items, setShruti24Items] = useState<any[]>([]);
+  const [shruti23Items, setShruti23Items] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const supabase = createBrowserSupabaseClient();
+
+  useEffect(() => {
+    async function fetchGalleryPhotos() {
+      try {
+        setLoading(true);
+
+        const { data, error } = await supabase
+          .from('history_photos')
+          .select(`
+            id,
+            cloudinary_url,
+            caption,
+            academic_years (
+              label
+            )
+          `);
+
+        if (error) throw error;
+
+        if (data) {
+          const rawPhotos = data as unknown as DbPhoto[];
+
+          const mapPhotosByYearLabel = (label: string) => {
+            const fallbackHeights = [400, 250, 600, 500, 300, 450, 350, 550, 480, 320, 600, 420, 470, 360, 510, 580, 340, 440, 520, 380];
+            
+            return rawPhotos
+              .filter((photo) => photo.academic_years?.label === label)
+              .map((photo, index) => ({
+                id: photo.id,
+                img: photo.cloudinary_url,
+                url: photo.cloudinary_url,
+                height: fallbackHeights[index % fallbackHeights.length],
+              }));
+          };
+
+          setShruti25Items(mapPhotosByYearLabel('2025-26'));
+          setShruti24Items(mapPhotosByYearLabel('2024-25'));
+          setShruti23Items(mapPhotosByYearLabel('2023-24'));
+        }
+      } catch (err) {
+        console.error('Error fetching gallery photos:', err);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchGalleryPhotos();
+  }, []);
 
   return (
     <div className="relative flex flex-col justify-center w-full min-h-full">
@@ -145,31 +92,6 @@ export default function Page() {
           <img src="/svg-path.svg" className="h-9 w-auto max-h-full" />
         </div>
       </div>
-      {/* <div className="fixed bottom-0 left-[6rem] sm:top-5 top-0 sm:left-1/2 sm:-translate-x-1/2 z-50">
-        <div
-          className="relative w-fit bg-black 
-                sm:rounded-tr-none 
-                sm:rounded-bl-2xl rounded-br-2xl 
-                px-4 pb-2 sm:pt-0 pt-2"
-        >
-          <img
-            src="/svg-path.svg"
-            className="absolute sm:left-[0.5] bottom-3 left-[12rem] sm:top-0 h-9 w-auto -translate-x-full sm:rotate-90"
-          />
-
-          <h1
-            className="text-center font-bold text-2xl sm:text-4xl bg-gradient-to-br from-yellow-200 to-white
-                 bg-clip-text text-transparent drop-shadow-[0_8px_25px_rgba(0,0,0,0.9)]"
-          >
-            GALLERY
-          </h1>
-
-          <img
-            src="/svg-path.svg"
-            className="absolute right-37 sm:right-[0.5] sm:top-0 -top-[1.45rem] h-6 w-auto translate-x-full sm:rotate-0 -rotate-90"
-          />
-        </div>
-      </div> */}
 
       <div className="absolute inset-0 -z-10">
         <Grainient
@@ -197,17 +119,24 @@ export default function Page() {
           zoom={1.6}
         />
       </div>
-      <div className="mt-10">
-        <div className="mb-5 border-b border-zinc-50">
-          <Event eventName="Shruti'25" date="January 9, 2026" items={items} />
+      
+      {loading ? (
+        <div className="text-center py-40 text-sm text-zinc-400">
+          Loading gallery...
         </div>
-        <div className="mb-5 border-b border-zinc-50">
-          <Event eventName="Shruti'24" date="November 13, 2024" items={items} />
+      ) : (
+        <div className="mt-10">
+          <div className="mb-5 border-b border-zinc-50">
+            <Event eventName="Shruti'25" date="January 9, 2026" items={shruti25Items} />
+          </div>
+          <div className="mb-5 border-b border-zinc-50">
+            <Event eventName="Shruti'24" date="November 13, 2024" items={shruti24Items} />
+          </div>
+          <div className="">
+            <Event eventName="Shruti'23" date="October 12, 2023" items={shruti23Items} />
+          </div>
         </div>
-        <div className="">
-          <Event eventName="Shruti'23" date="October 12, 2023" items={items} />
-        </div>
-      </div>
+      )}
     </div>
   );
 }

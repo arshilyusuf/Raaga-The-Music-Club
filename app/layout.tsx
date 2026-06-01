@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import "./globals.css";
+import "@/app/globals.css";
 import localFont from "next/font/local";
 import StaggeredMenu from "@/Reactbits/StaggeredMenu";
 import ZoomWrapper from "@/components/ZoomWrapper";

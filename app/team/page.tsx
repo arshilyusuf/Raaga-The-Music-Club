@@ -1,120 +1,110 @@
-import ColorBends from "@/Reactbits/ColorBends";
+"use client";
 import Grainient from "@/Reactbits/Grainient";
 import ProfileCard from "@/Reactbits/ProfileCard";
 import TiltedCard from "@/Reactbits/TiltedCard";
+import { createBrowserSupabaseClient } from "@/lib/supabase/client";
+import { useEffect, useState } from "react";
 
+type DbTeamMember = {
+  name: string;
+  role: string | null;
+  domain: string;
+  year: number;
+  photo_url: string | null;
+  instagram: string | null;
+};
 export default function Page() {
-  const heads = [
-    {
-      name: "Arshil Yusuf",
-      title: "Instrumentalist",
-      avatar: "/pictures/Untitled (1).png",
-      instagramURL: "https://www.instagram.com/arrshilyusuf",
-    },
-    {
-      name: "Siddharth Phatak",
-      title: "Vocalist",
-      avatar: "",
-      instagramURL: "",
-    },
-    {
-      name: "Tanishq Roy Chowdhary",
-      title: "Head Coordinator",
-      avatar: "",
-      instagramURL: "",
-    },
-    {
-      name: "Jane Smith",
-      title: "Head Coordinator",
-      avatar: "",
-      instagramURL: "",
-    },
-    {
-      name: "Alex Carter",
-      title: "Head Coordinator",
-      avatar: "/team/alex.jpg",
-      instagramURL: "",
-    },
-    {
-      name: "Sara Khan",
-      title: "Head Coordinator",
-      avatar: "",
-      instagramURL: "",
-    },
-  ];
+  const [heads, setHeads] = useState<any[]>([]);
+  const [core, setCore] = useState<any[]>([]);
+  const [exes, setExes] = useState<any[]>([]);
+  const [management, setManagement] = useState<any[]>([]);
+  const [anchoring, setAnchoring] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const supabase = createBrowserSupabaseClient();
 
-  const core = [
-    {
-      name: "Satyam Trivedi",
-      title: "Vocalist",
-      image: "https://i.scdn.co/image/ab67616d0000b273d9985092cd88bffd97653b58",
-    },
-    {
-      name: "Tyler Durden",
-      title: "Voalist",
+  useEffect(() => {
+    async function loadTeamRoster() {
+      try {
+        setLoading(true);
 
-      image: "https://i.scdn.co/image/ab67616d0000b273d9985092cd88bffd97653b58",
-    },
-    {
-      name: "Naman Ahuja",
-      title: "Instrumentalist",
+        // Fetch active members from the database
+        const { data, error } = await supabase
+          .from("team_members")
+          .select("name, role, domain, year, photo_url, instagram")
+          .eq("is_active", true);
 
-      image: "https://i.scdn.co/image/ab67616d0000b273d9985092cd88bffd97653b58",
-    },
-    {
-      name: "Frank Ocean",
-      title: "Voalist",
+        if (error) throw error;
 
-      image: "https://i.scdn.co/image/ab67616d0000b273d9985092cd88bffd97653b58",
-    },
-    {
-      name: "Daniel Caesar",
-      title: "Voalist",
+        if (data) {
+          const members = data as DbTeamMember[];
 
-      image: "https://i.scdn.co/image/ab67616d0000b273d9985092cd88bffd97653b58",
-    },
-    {
-      name: "Steve Lacy",
-      title: "Voalist",
+          // 1. Map Heads (year = 4)
+          setHeads(
+            members
+              .filter((m) => m.year === 4)
+              .map((m) => ({
+                name: m.name,
+                title: m.role || "Head Coordinator",
+                avatar: m.photo_url || "",
+                instagramURL: m.instagram || "",
+              })),
+          );
 
-      image: "https://i.scdn.co/image/ab67616d0000b273d9985092cd88bffd97653b58",
-    },
-    {
-      name: "Steve Lacy",
-      title: "Voalist",
+          // 2. Map Core Team (year = 3)
+          setCore(
+            members
+              .filter((m) => m.year === 3)
+              .map((m) => ({
+                name: m.name,
+                title: m.role || "Vocalist",
+                image:
+                  m.photo_url ||
+                  "https://i.scdn.co/image/ab67616d0000b273d9985092cd88bffd97653b58",
+              })),
+          );
 
-      image: "https://i.scdn.co/image/ab67616d0000b273d9985092cd88bffd97653b58",
-    },
-  ];
+          // 3. Map Executives (year = 2, domain = 'musician')
+          setExes(
+            members
+              .filter((m) => m.year === 2 && m.domain === "musician")
+              .map((m) => ({
+                name: m.name,
+                title: m.role || "Vocalist",
+              })),
+          );
 
-  const exes = [
-    { name: "George Washington", title: "Vocalist" },
-    { name: "Abraham Lincoln", title: "Instrumentalist" },
-    { name: "Theodore Roosevelt", title: "Instrumentalist" },
-    { name: "Franklin D. Roosevelt", title: "Vocalist" },
-    { name: "John F. Kennedy", title: "Vocalist" },
-    { name: "Thomas Jefferson", title: "Instrumentalist" },
-    { name: "James Madison", title: "Vocalist" },
-    { name: "Andrew Jackson", title: "Instrumentalist" },
-    { name: "Ulysses S. Grant", title: "Instrumentalist" },
-    { name: "Dwight D. Eisenhower", title: "Vocalist" },
-  ];
-  const management = [
-    { name: "Aarav Sharma" },
-    { name: "Riya Mehta" },
-    { name: "Kabir Verma" },
-    { name: "Ananya Gupta" },
-    { name: "Rahul Nair" },
-    { name: "Ishita Jain" },
-  ];
+          // 4. Map Management (domain = 'management')
+          setManagement(
+            members
+              .filter((m) => m.domain === "management")
+              .map((m) => ({
+                name: m.name,
+              })),
+          );
 
-  const anchoring = [
-    { name: "Arjun Kapoor" },
-    { name: "Sneha Iyer" },
-    { name: "Dev Malhotra" },
-    { name: "Kavya Singh" },
-    { name: "Rohan Das" },
-  ];
+          // 5. Map Anchoring (domain = 'anchoring')
+          setAnchoring(
+            members
+              .filter((m) => m.domain === "anchoring")
+              .map((m) => ({
+                name: m.name,
+              })),
+          );
+        }
+      } catch (err) {
+        console.error("Error fetching data from database:", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadTeamRoster();
+  }, []);
+  if (loading) {
+    return (
+      <div className="text-center py-12 text-sm text-gray-500">Loading...</div>
+    );
+  }
   const colors = { c1: "#722f37", c2: "#bd9398", c3: "#18022e" };
   return (
     <div className="relative w-full min-h-screen overflow-hidden">
@@ -162,14 +152,13 @@ export default function Page() {
           zoom={1.6}
         />{" "}
       </div>
-
       <div className="relative mb-10 z-10 flex flex-col items-center h-full">
         <div className="sm:w-[75%] w-full mt-20">
           <h1 className="text-white font-medium text-3xl  sm:text-6xl text-center sm:mb-10">
             Head Coordinators
           </h1>
 
-          <div className="flex flex-wrap justify-center gap-8 mt-5">
+          <div className="flex flex-wrap justify-center gap-14 mt-5">
             {heads.map((person, i) => (
               <div key={i} className="w-full lg:w-[22%] flex justify-center">
                 <ProfileCard
@@ -229,21 +218,21 @@ export default function Page() {
           </h1>
 
           <div className="flex flex-wrap justify-center gap-8">
-  {exes.map((person, i) => (
-    <div
-      key={i}
-      className="w-full sm:w-[45%] lg:w-[22%] h-[130px] flex flex-col items-center justify-center rounded-2xl
+            {exes.map((person, i) => (
+              <div
+                key={i}
+                className="w-full sm:w-[45%] lg:w-[22%] h-[130px] flex flex-col items-center justify-center rounded-2xl
       bg-white/10 backdrop-blur-lg border border-white/20 text-white"
-    >
-      <p className="text-lg sm:text-xl font-semibold">
-        {person.name}
-      </p>
-      <p className="text-sm sm:text-base text-white/70 mt-1">
-        {person.title}
-      </p>
-    </div>
-  ))}
-</div>
+              >
+                <p className="text-lg sm:text-xl font-semibold">
+                  {person.name}
+                </p>
+                <p className="text-sm sm:text-base text-white/70 mt-1">
+                  {person.title}
+                </p>
+              </div>
+            ))}
+          </div>
         </div>
         <div className="w-[100%] sm:w-[80%] flex justify-center border-t pt-8 mt-10 mb-20">
           <div className="w-[80%] sm:w-full flex flex-col justify-center items-center">
