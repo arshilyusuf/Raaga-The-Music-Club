@@ -58,11 +58,11 @@ export function StatsFilters({
                 <SquircleIconButton
                   size="sm"
                   label="Open in Sheets"
-                  icon={<FileTextIcon />}
+                  icon={<FileTextIcon size={20} />}
                   bgColor={
                     isSelected
-                      ? " !text-gray-700 "
-                      : " !text-gray-300  hover:!text-white"
+                      ? " bg-gray-800 !text-white "
+                      : " bg-white !text-gray-800  hover:!text-black"
                   }
                   onClick={async (e) => {
                     e.stopPropagation(); // Stops the active tab filter from toggling
