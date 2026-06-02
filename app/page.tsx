@@ -9,7 +9,8 @@ import ScrollTimeline from "@/components/ScrollTimeline";
 import { useEffect, useState } from "react";
 import DomeGallery from "@/Reactbits/DomeGallery";
 import CircularText from "@/Reactbits/CircularText";
-
+import Button from "@/components/Button";
+import { CartoonButton } from "@/components/ui/CartoonButton";
 export default function Home() {
   const items = [
     {
@@ -51,7 +52,7 @@ export default function Home() {
 
   return (
     <main className="relative min-h-screen w-full text-zinc-50 overflow-hidden ">
-      {isMobile ? (
+      {/* {isMobile ? (
         <div className="absolute w-full h-screen mt-20 flex items-center justify-center z-[300] pointer-events-none">
           <CircularText
             text="AUDITIONS ✦ COMING ✦ SOON ✦ "
@@ -71,7 +72,7 @@ export default function Home() {
             className="w-full"
           />
         </div>
-      )}
+      )} */}
       <section className="relative z-10 flex min-h-screen items-center justify-center px-4">
         <div
           className="absolute inset-0 bg-cover bg-center bg-no-repeat -z-10"
@@ -161,7 +162,7 @@ export default function Home() {
             }}
           ></motion.div>
           <motion.p
-            className="sm:-mt-4 text-lg sm:text-xl md:text-lg text-zinc-200/90"
+            className="sm:-mt-4 text-lg sm:text-xl md:text-lg font-medium text-zinc-200/90"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{
@@ -170,9 +171,40 @@ export default function Home() {
               ease: [0.22, 1, 0.36, 1],
             }}
           >
-            The official music community of <br className="block sm:hidden" />{" "}
-            NIT Raipur{" "}
+            The official music club of <br className="block sm:hidden " /> NIT
+            Raipur{" "}
           </motion.p>
+          <div className="mt-6">
+            <motion.p
+              className=" text-md sm:text-lg md:text-md text-zinc-100"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{
+                delay: 2.5,
+                duration: 5.7,
+                ease: [0.22, 1, 0.36, 1],
+              }}
+            >
+              Auditions are now open!
+            </motion.p>
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{
+                delay: 3.0,
+                duration: 6.7,
+                ease: [0.22, 1, 0.36, 1],
+              }}
+            >
+              <CartoonButton
+                label="REGISTER NOW"
+                color="mt-3 bg-[#6b0527]/30 backdrop-blur font-semibold text-white border-white"
+                onClick={() => {
+                  window.location.href = "/auditions";
+                }}
+              />
+            </motion.div>
+          </div>
         </motion.div>
       </section>
       <section className="h-[100vh] sm:min-h-fit w-full bg-[#722f37] relative">

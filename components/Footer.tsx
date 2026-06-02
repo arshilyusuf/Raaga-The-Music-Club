@@ -53,7 +53,9 @@ export default function Footer() {
         <div>
           <h3 className="text-xl font-semibold mb-4">Contact</h3>
           <div className="flex flex-col gap-2 text-gray-300">
-            <p>raagathemusicclubnitrr@gmail.com</p>
+            <a href="mailto:raagathemusicclubnitrr@gmail.com" className="hover:text-white transition">
+              raagathemusicclubnitrr@gmail.com
+            </a>
           </div>
         </div>
       </div>
