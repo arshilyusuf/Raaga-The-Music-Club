@@ -1,4 +1,5 @@
 "use client";
+import { InstagramIcon } from "@/components/ui/InstagramIcon";
 import React, {
   useEffect,
   useRef,
@@ -508,16 +509,9 @@ const ProfileCardComponent: React.FC<ProfileCardProps> = ({
           href={instagram}
           target="_blank"
           rel="noopener noreferrer"
-          className="absolute bottom-4 right-4 flex items-center z-[1000] justify-center w-7 h-7 rounded-full bg-white/20 backdrop-blur-md border border-white/20 hover:bg-white/30 transition"
+          className="absolute bottom-4 right-4 flex items-center z-[1000] justify-center w-fit h-fit p-[0.5rem] rounded-full bg-white/20 backdrop-blur-md border border-white/20 hover:bg-white/30 transition"
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="currentColor"
-            className="w-4 h-4 text-white"
-          >
-            <path d="M7.75 2h8.5A5.75 5.75 0 0 1 22 7.75v8.5A5.75 5.75 0 0 1 16.25 22h-8.5A5.75 5.75 0 0 1 2 16.25v-8.5A5.75 5.75 0 0 1 7.75 2Zm4.25 5.5A4.75 4.75 0 1 0 16.75 12 4.76 4.76 0 0 0 12 7.5Zm0 7.7A2.95 2.95 0 1 1 14.95 12 2.96 2.96 0 0 1 12 15.2Zm4.8-8.9a1.1 1.1 0 1 1 1.1-1.1 1.1 1.1 0 0 1-1.1 1.1Z" />
-          </svg>
+          <InstagramIcon size={20} />
         </a>
       )}
       <div ref={shellRef} className="relative z-[1] group">

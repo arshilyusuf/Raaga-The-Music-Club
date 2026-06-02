@@ -285,17 +285,28 @@ export function AdminDashboardContent() {
 
   // ── Team CRUD ────────────────────────────────────────────────────────────────
 
-  async function addMember(data: Omit<TeamMember, "id" | "is_active">) {
-    setSaving(true);
-    const { error } = await supabase
-      .from("team_members")
-      .insert([{ ...data, is_active: true }]);
-    setSaving(false);
-    if (!error) {
-      setModal(null);
-      loadAll();
-    }
+async function addMember(data: Omit<TeamMember, "id" | "is_active">) {
+  // Enforce strict validation guards before execution
+  if ((data as any).phone && (data as any).phone.length !== 10) {
+    alert("Validation Error: Phone number must be exactly 10 digits.");
+    return;
   }
+  
+  if ((data as any).roll_number && (data as any).roll_number.length !== 8) {
+    alert("Validation Error: Roll number must be exactly 8 digits.");
+    return;
+  }
+
+  setSaving(true);
+  const { error } = await supabase
+    .from("team_members")
+    .insert([{ ...data, is_active: true }]);
+  setSaving(false);
+  if (!error) {
+    setModal(null);
+    loadAll();
+  }
+}
 
   async function updateMember(
     id: string,

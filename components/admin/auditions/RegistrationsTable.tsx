@@ -68,28 +68,121 @@ export function RegistrationsTable({
       setProcessingIds((prev) => ({ ...prev, [reg.id]: false }));
     }
   };
+  // 1. Updated sorting keys signature typing
+  const [sortField, setSortField] = useState<
+    "branch" | "year" | "submitted_at" | null
+  >(null);
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
 
+  const handleSort = (field: "branch" | "year" | "submitted_at") => {
+    if (sortField === field) {
+      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+    } else {
+      setSortField(field);
+      setSortOrder("asc");
+    }
+  };
+
+  // 2. Compute sorted array inclusive of timeline parsing
+  const sortedRegistrations = [...registrations].sort((a, b) => {
+    if (!sortField) return 0;
+
+    // Handle Date comparison operations
+    if (sortField === "submitted_at") {
+      const timeA = new Date(a.submitted_at).getTime();
+      const timeB = new Date(b.submitted_at).getTime();
+      return sortOrder === "asc" ? timeA - timeB : timeB - timeA;
+    }
+
+    // Handle Numerical Year comparisons
+    if (sortField === "year") {
+      return sortOrder === "asc"
+        ? Number(a.year) - Number(b.year)
+        : Number(b.year) - Number(a.year);
+    }
+
+    // Handle Alphabetical Branch comparisons
+    const valA = a[sortField] ? String(a[sortField]).toLowerCase() : "";
+    const valB = b[sortField] ? String(b[sortField]).toLowerCase() : "";
+
+    if (valA < valB) return sortOrder === "asc" ? -1 : 1;
+    if (valA > valB) return sortOrder === "asc" ? 1 : -1;
+    return 0;
+  });
   return (
     <div className="bg-gray-900 rounded-2xl overflow-hidden w-full overflow-x-auto">
       <table className="w-full text-sm" style={{ minWidth: 1100 }}>
-        <thead className="bg-gray-800 text-gray-400 uppercase text-xs">
+        <thead className="bg-gray-800 text-gray-400 uppercase text-xs select-none">
           <tr>
             <th className="px-4 py-3 text-left w-6"></th>
             <th className="px-4 py-3 text-left">Name</th>
-            {/* <th className="px-4 py-3 text-left">Email</th> */}
-            {/* <th className="px-4 py-3 text-left">Roll No.</th> */}
-            <th className="px-4 py-3 text-left">Branch</th>
-            <th className="px-4 py-3 text-left">Year</th>
+
+            {/* --- BRANCH HEADER WITH SORT BUTTON --- */}
+            <th className="px-4 py-3 text-left">
+              <button
+                onClick={() => handleSort("branch")}
+                className="flex items-center gap-1 hover:text-white transition uppercase font-bold text-xs tracking-wider"
+              >
+                Branch
+                <div className="flex flex-col -space-y-1 text-gray-500">
+                  <ChevronUpIcon
+                    size={12}
+                    className={`transition ${sortField === "branch" && sortOrder === "asc" ? "text-indigo-400 font-black scale-110" : "opacity-40"}`}
+                  />
+                  <ChevronDownIcon
+                    size={12}
+                    className={`transition ${sortField === "branch" && sortOrder === "desc" ? "text-indigo-400 font-black scale-110" : "opacity-40"}`}
+                  />
+                </div>
+              </button>
+            </th>
+
+            {/* --- YEAR HEADER WITH SORT BUTTON --- */}
+            <th className="px-4 py-3 text-left">
+              <button
+                onClick={() => handleSort("year")}
+                className="flex items-center gap-1 hover:text-white transition uppercase font-bold text-xs tracking-wider"
+              >
+                Year
+                <div className="flex flex-col -space-y-1 text-gray-500">
+                  <ChevronUpIcon
+                    size={12}
+                    className={`transition ${sortField === "year" && sortOrder === "asc" ? "text-indigo-400 font-black scale-110" : "opacity-40"}`}
+                  />
+                  <ChevronDownIcon
+                    size={12}
+                    className={`transition ${sortField === "year" && sortOrder === "desc" ? "text-indigo-400 font-black scale-110" : "opacity-40"}`}
+                  />
+                </div>
+              </button>
+            </th>
+
             <th className="px-4 py-3 text-left">Phone</th>
             <th className="px-4 py-3 text-left">Type</th>
             <th className="px-4 py-3 text-left">Synced</th>
-            <th className="px-4 py-3 text-left">Date</th>
-            {/* Added table header action column */}
-            <th className="px-4 py-3 text-center bg-gray-800 ">Actions</th>
+            <th className="px-4 py-3 text-left">
+              <button
+                onClick={() => handleSort("submitted_at")}
+                className="flex items-center gap-1 hover:text-white transition uppercase font-bold text-xs tracking-wider"
+              >
+                Date
+                <div className="flex flex-col -space-y-1 text-gray-500">
+                  <ChevronUpIcon
+                    size={12}
+                    className={`transition ${sortField === "submitted_at" && sortOrder === "asc" ? "text-indigo-400 font-black scale-110" : "opacity-40"}`}
+                  />
+                  <ChevronDownIcon
+                    size={12}
+                    className={`transition ${sortField === "submitted_at" && sortOrder === "desc" ? "text-indigo-400 font-black scale-110" : "opacity-40"}`}
+                  />
+                </div>
+              </button>
+            </th>
+            <th className="px-4 py-3 text-center bg-gray-800">Actions</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-800">
-          {registrations.map((reg) => {
+          {sortedRegistrations.map((reg) => {
             const colorClass =
               yearColors[Number(reg.year)] || "bg-gray-800/40 text-gray-200";
             const isProcessing = processingIds[reg.id];
@@ -144,8 +237,12 @@ export function RegistrationsTable({
                     />
                   </td>
                   <td className="px-4 py-3 text-gray-400">
-                    {new Date(reg.submitted_at).toLocaleDateString()}
-                  </td>
+  {new Date(reg.submitted_at).toLocaleDateString("en-GB", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  })}
+</td>
                   {/* Added Interactive Action Button Cell (Pinned to right side for horizontal scroll viewports) */}
                   <td className="px-4 py-3 text-center bg-gray-900/95 backdrop-blur-sm ">
                     <button

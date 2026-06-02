@@ -16,7 +16,7 @@ export function SquircleIconButton({
   icon,
   label,
   onClick,
-  bgColor = "bg-amber-700 hover:bg-amber-600",
+  bgColor = "",
   size = "md",
   disabled = false,
 }: SquircleIconButtonProps) {

@@ -139,33 +139,42 @@ export function AuditionsSection({
       </div>
 
       {/* Sliding Confirmation Banner */}
-      <div
-        className={`fixed top-4 left-1/2 -translate-x-1/2 z-50 w-full max-w-md px-4 py-3 rounded-xl shadow-2xl border backdrop-blur-md bg-amber-950/95 border-amber-800 text-amber-200 transition-all duration-300 ease-out ${
-          showConfirm
-            ? "translate-y-0 opacity-100"
-            : "-translate-y-12 opacity-0 pointer-events-none"
-        }`}
+<div
+  className={`fixed z-50 px-4 py-3 rounded-xl shadow-2xl border backdrop-blur-md bg-amber-950/95 border-amber-800 text-amber-200 transition-all duration-300 ease-out ${
+    // PC Layout Strategy: Centered top banner positioning
+    "sm:top-4 sm:left-1/2 sm:-translate-x-1/2 sm:w-full sm:max-w-md " +
+    // Mobile Layout Strategy: Full-width bottom card overlay with margins
+    "max-sm:bottom-4 max-sm:left-0 max-sm:right-0 max-sm:w-[calc(100%-2rem)] max-sm:mx-4 " +
+    // Unified Toggle Transition Logic
+    (showConfirm
+      ? "translate-y-0 opacity-100"
+      : "opacity-0 pointer-events-none sm:-translate-y-12 max-sm:translate-y-12")
+  }`}
+>
+  <div className="flex flex-col gap-3 text-sm text-center sm:text-left">
+    <p className="font-medium px-2 sm:px-0">
+      ⚠️&nbsp; &nbsp; Archive all current registrations?
+    </p>
+   <p className="text-xs text-amber-300 px-2 sm:px-0">
+      NOTE: &nbsp; This action cannot be undone. All the current registration data will be moved to an archival table and cleared from the active roster. Please ensure you have exported any necessary data before confirming.
+    </p>
+    
+    <div className="grid grid-cols-1 gap-2 sm:flex sm:justify-end sm:gap-2 sm:mt-1">
+      <button
+        onClick={() => setShowConfirm(false)}
+        className="w-full sm:w-auto px-3 py-2 sm:py-1 text-xs rounded-lg sm:rounded border-1 border-amber-700 hover:bg-amber-900 transition text-white font-medium sm:font-normal"
       >
-        <div className="flex flex-col gap-2 text-sm">
-          <p className="font-medium">
-            ⚠️ Archive all current registrations and clear live roster?
-          </p>
-          <div className="flex justify-end gap-2 mt-1">
-            <button
-              onClick={() => setShowConfirm(false)}
-              className="px-2.5 py-1 text-xs rounded bg-gray-800 hover:bg-gray-700 transition text-gray-300"
-            >
-              Cancel
-            </button>
-            <button
-              onClick={executeArchival}
-              className="px-2.5 py-1 text-xs rounded bg-amber-700 hover:bg-amber-600 transition font-medium text-white"
-            >
-              Confirm Archive
-            </button>
-          </div>
-        </div>
-      </div>
+        Cancel
+      </button>
+      <button
+        onClick={executeArchival}
+        className="w-full sm:w-auto px-3 py-2 sm:py-1 text-xs rounded-lg sm:rounded bg-amber-700 hover:bg-amber-600 transition font-medium text-white"
+      >
+        Archive
+      </button>
+    </div>
+  </div>
+</div>
 
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold">Auditions</h2>

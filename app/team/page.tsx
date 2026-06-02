@@ -2,6 +2,7 @@
 import Grainient from "@/Reactbits/Grainient";
 import ProfileCard from "@/Reactbits/ProfileCard";
 import TiltedCard from "@/Reactbits/TiltedCard";
+import { InstagramIcon } from "@/components/ui/InstagramIcon";
 import { createBrowserSupabaseClient } from "@/lib/supabase/client";
 import { useEffect, useState } from "react";
 
@@ -51,17 +52,18 @@ export default function Page() {
           );
 
           // 2. Map Core Team (year = 3)
-          setCore(
-            members
-              .filter((m) => m.year === 3)
-              .map((m) => ({
-                name: m.name,
-                title: m.role || "Vocalist",
-                image:
-                  m.photo_url ||
-                  "https://i.scdn.co/image/ab67616d0000b273d9985092cd88bffd97653b58",
-              })),
-          );
+         setCore(
+  members
+    .filter((m) => m.year === 3)
+    .map((m) => ({
+      ...m, // Spreads all original fields (id, email, phone_number, roll_number, branch, instagram, etc.)
+      name: m.name,
+      title: m.role || "Vocalist",
+      image:
+        m.photo_url ||
+        "https://i.scdn.co/image/ab67616d0000b273d9985092cd88bffd97653b58",
+    })),
+);
 
           // 3. Map Executives (year = 2, domain = 'musician')
           setExes(
@@ -105,6 +107,7 @@ export default function Page() {
       <div className="text-center py-12 text-sm text-gray-500">Loading...</div>
     );
   }
+  console.log({ heads, core, exes, management, anchoring });
   const colors = { c1: "#722f37", c2: "#bd9398", c3: "#18022e" };
   return (
     <div className="relative w-full min-h-screen overflow-hidden">
@@ -192,6 +195,14 @@ export default function Page() {
                 key={i}
                 className="relative h-[300px] w-full sm:w-[45%] lg:w-[22%] flex justify-center"
               >
+                {person.instagram && (
+                  <div
+                    onClick={() => window.open(person.instagram, "_blank")}
+                    className="absolute z-2 top-2 right-2 cursor-pointer opacity-80 hover:opacity-100 transition-opacity bg-black/30 rounded-full p-2"
+                  >
+                    <InstagramIcon size={26} />
+                  </div>
+                )}
                 <TiltedCard
                   imageSrc={person.image}
                   altText={person.title}

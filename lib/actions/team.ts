@@ -42,7 +42,7 @@ export async function addRegistrationToTeam(reg: AddToTeamInput) {
 
     // Check club_members
     const { data: existingClubMember, error: clubCheckError } = await supabase
-      .from('club_members')
+      .from('team_members')
       .select('id')
       .eq('roll_number', reg.roll_number)
       .maybeSingle()
