@@ -40,10 +40,10 @@ export default function Footer() {
         <div>
           <h3 className="text-xl font-semibold mb-4">Connect With Us</h3>
           <div className="flex flex-col gap-3 text-gray-300">
-            <a href="#" className="hover:text-white transition">
+            <a href="https://www.instagram.com/raaga.nitrr/" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">
               Instagram
             </a>
-            <a href="#" className="hover:text-white transition">
+            <a href="https://www.youtube.com/@raagathemusicclub" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">
               YouTube
             </a>
           </div>
@@ -53,7 +53,7 @@ export default function Footer() {
         <div>
           <h3 className="text-xl font-semibold mb-4">Contact</h3>
           <div className="flex flex-col gap-2 text-gray-300">
-            <p>xyz@gmail.com</p>
+            <p>raagathemusicclubnitrr@gmail.com</p>
           </div>
         </div>
       </div>
