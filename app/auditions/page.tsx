@@ -454,7 +454,7 @@ export default function Page() {
                                 handleInstrumentChange(inst, e.target.checked)
                               }
                             />
-                            <span className="w-5 h-5 rounded border-2 border-white flex-shrink-0 flex items-center justify-center peer-checked:bg-white transition-colors duration-200">
+                            <span className="w-5 h-5 rounded border-2 border-white shrink-0 flex items-center justify-center peer-checked:bg-white transition-colors duration-200">
                               <span
                                 className="w-2.5 h-2.5 rounded"
                                 style={{ backgroundColor: colors.c1 }}

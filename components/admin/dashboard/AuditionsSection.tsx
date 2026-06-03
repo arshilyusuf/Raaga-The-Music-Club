@@ -68,6 +68,7 @@ export function AuditionsSection({
 
   const handleAddToTeam = async (registration: any, parsedYear: number) => {
     try {
+      // 1. Execute the Server Action with the raw registration fields
       await addRegistrationToTeam({
         full_name: registration.full_name,
         email: registration.email,
@@ -79,17 +80,20 @@ export function AuditionsSection({
         instruments: registration.instruments,
       });
 
+      // 3. Fire success notification banner
       setBanner({
         message: `${registration.full_name} added to the current team!`,
         type: "success",
       });
     } catch (error: any) {
+      // 4. Fire error notification banner if mutations or constraints fail
       setBanner({
         message: error.message || "An error occurred",
         type: "error",
       });
     }
 
+    // 5. Clear notification layout tracking state after timeout expiration
     setTimeout(() => setBanner(null), 3000);
   };
 
@@ -139,44 +143,47 @@ export function AuditionsSection({
       </div>
 
       {/* Sliding Confirmation Banner */}
-<div
-  className={`fixed z-50 px-4 py-3 rounded-xl shadow-2xl border backdrop-blur-md bg-amber-950/95 border-amber-800 text-amber-200 transition-all duration-300 ease-out ${
-    // PC Layout Strategy: Centered top banner positioning
-    "sm:top-4 sm:left-1/2 sm:-translate-x-1/2 sm:w-full sm:max-w-md " +
-    // Mobile Layout Strategy: Full-width bottom card overlay with margins
-    "max-sm:bottom-4 max-sm:left-0 max-sm:right-0 max-sm:w-[calc(100%-2rem)] max-sm:mx-4 " +
-    // Unified Toggle Transition Logic
-    (showConfirm
-      ? "translate-y-0 opacity-100"
-      : "opacity-0 pointer-events-none sm:-translate-y-12 max-sm:translate-y-12")
-  }`}
->
-  <div className="flex flex-col gap-3 text-sm text-center sm:text-left">
-    <p className="font-medium px-2 sm:px-0">
-      ⚠️&nbsp; &nbsp; Archive all current registrations?
-    </p>
-   <p className="text-xs text-amber-300 px-2 sm:px-0">
-      NOTE: &nbsp; This action cannot be undone. All the current registration data will be moved to an archival table and cleared from the active roster. Please ensure you have exported any necessary data before confirming.
-    </p>
-    
-    <div className="grid grid-cols-1 gap-2 sm:flex sm:justify-end sm:gap-2 sm:mt-1">
-      <button
-        onClick={() => setShowConfirm(false)}
-        className="w-full sm:w-auto px-3 py-2 sm:py-1 text-xs rounded-lg sm:rounded border-1 border-amber-700 hover:bg-amber-900 transition text-white font-medium sm:font-normal"
+      <div
+        className={`fixed z-50 px-4 py-3 rounded-xl shadow-2xl border backdrop-blur-md bg-amber-950/95 border-amber-800 text-amber-200 transition-all duration-300 ease-out ${
+          // PC Layout Strategy: Centered top banner positioning
+          "sm:top-4 sm:left-1/2 sm:-translate-x-1/2 sm:w-full sm:max-w-md " +
+          // Mobile Layout Strategy: Full-width bottom card overlay with margins
+          "max-sm:bottom-4 max-sm:left-0 max-sm:right-0 max-sm:w-[calc(100%-2rem)] max-sm:mx-4 " +
+          // Unified Toggle Transition Logic
+          (showConfirm
+            ? "translate-y-0 opacity-100"
+            : "opacity-0 pointer-events-none sm:-translate-y-12 max-sm:translate-y-12")
+        }`}
       >
-        Cancel
-      </button>
-      <button
-        onClick={executeArchival}
-        className="w-full sm:w-auto px-3 py-2 sm:py-1 text-xs rounded-lg sm:rounded bg-amber-700 hover:bg-amber-600 transition font-medium text-white"
-      >
-        Archive
-      </button>
-    </div>
-  </div>
-</div>
+        <div className="flex flex-col gap-3 text-sm text-center sm:text-left">
+          <p className="font-medium px-2 sm:px-0">
+            ⚠️&nbsp; &nbsp; Archive all current registrations?
+          </p>
+          <p className="text-xs text-amber-300 px-2 sm:px-0">
+            NOTE: &nbsp; This action cannot be undone. All the current
+            registration data will be moved to an archival table and cleared
+            from the active roster. Please ensure you have exported any
+            necessary data before confirming.
+          </p>
 
-      <div className="flex items-center justify-between">
+          <div className="grid grid-cols-1 gap-2 sm:flex sm:justify-end sm:gap-2 sm:mt-1">
+            <button
+              onClick={() => setShowConfirm(false)}
+              className="w-full sm:w-auto px-3 py-2 sm:py-1 text-xs rounded-lg sm:rounded border border-amber-700 hover:bg-amber-900 transition text-white font-medium sm:font-normal"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={executeArchival}
+              className="w-full sm:w-auto px-3 py-2 sm:py-1 text-xs rounded-lg sm:rounded bg-amber-700 hover:bg-amber-600 transition font-medium text-white"
+            >
+              Archive
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div className="flex mx-2 items-center justify-between">
         <h2 className="text-2xl font-bold">Auditions</h2>
         <SquircleIconButton
           icon={

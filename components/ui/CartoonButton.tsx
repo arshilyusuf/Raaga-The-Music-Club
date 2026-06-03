@@ -35,7 +35,7 @@ export function CartoonButton({
       >
         <span className="relative z-10 whitespace-nowrap">{label}</span>
         {hasHighlight && !disabled && (
-          <div className="absolute top-1/2 left-[-100%] w-16 h-24 bg-white/50 -translate-y-1/2 rotate-12 transition-all duration-500 ease-in-out group-hover:left-[200%]"></div>
+          <div className="absolute top-1/2 -left-full w-16 h-24 bg-white/50 -translate-y-1/2 rotate-12 transition-all duration-500 ease-in-out group-hover:left-[200%]"></div>
         )}
       </button>
     </div>

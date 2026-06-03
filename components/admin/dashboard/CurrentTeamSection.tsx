@@ -8,6 +8,7 @@ import { SquarePenIcon } from "@/components/ui/SquarePenIcon";
 
 type TeamMember = {
   id: string;
+  membership_id?: string;
   name: string;
   email?: string;
   phone?: string;
@@ -94,7 +95,7 @@ export function CurrentTeamSection({
 }: CurrentTeamSectionProps) {
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex mx-2 items-center justify-between">
         <h2 className="text-2xl font-bold">Current Team</h2>
         <div className="flex gap-3">
           <SquircleIconButton
@@ -155,7 +156,6 @@ export function CurrentTeamSection({
                         icon={<SquarePenIcon size={16} />}
                         label="Edit Member"
                         onClick={(e: any) => {
-                          // If your SquircleIconButton passes the event through natively:
                           if (e?.stopPropagation) e.stopPropagation();
                           onEditMember(member);
                         }}
@@ -197,8 +197,12 @@ export function CurrentTeamSection({
 
                   {expandedMember === member.id && (
                     <div className="mt-1 mb-2 px-4 py-3 bg-gray-800/30 rounded-xl text-xs grid grid-cols-2 gap-x-6 gap-y-2">
-                      <D label="Admin Email" value={member.email} />
-                      <D label="Phone" value={member.phone} />
+                      <D
+                        label="Admin Email"
+                        isLink={true}
+                        value={member.email}
+                      />
+                      <D label="Phone" isLink={true} value={member.phone} />
                       <D label="Roll No." value={member.roll_number} />
                       <D label="Branch" value={member.branch} />
                       <D label="Domain" value={member.domain} />
@@ -250,11 +254,20 @@ export function CurrentTeamSection({
                       Edit
                     </button>
                     <button
-                      onClick={() => onDeleteMember(member.id)}
-                      disabled={actionLoading === member.id}
+                      // FIX: Pass membership_id instead of core profile user id
+                      onClick={() =>
+                        onDeleteMember(member.membership_id || member.id)
+                      }
+                      disabled={
+                        actionLoading === member.membership_id ||
+                        actionLoading === member.id
+                      }
                       className="text-xs text-red-400 hover:text-red-300 disabled:opacity-50"
                     >
-                      {actionLoading === member.id ? "..." : "Delete"}
+                      {actionLoading === member.membership_id ||
+                      actionLoading === member.id
+                        ? "..."
+                        : "Delete"}
                     </button>
                   </div>
                 </div>

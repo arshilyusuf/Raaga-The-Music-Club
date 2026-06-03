@@ -58,7 +58,7 @@ export function StatsFilters({
                 <SquircleIconButton
                   size="sm"
                   label="Open in Sheets"
-                  icon={<FileTextIcon size={20} />}
+                  icon={<FileTextIcon size={18} />}
                   bgColor={
                     isSelected
                       ? " bg-gray-800 !text-white "
@@ -88,9 +88,9 @@ export function StatsFilters({
               </div>
             )}
 
-            <div className="text-base sm:text-2xl font-bold">{item.count}</div>
+            <div className="text-2xl sm:text-4xl font-bold">{item.count}</div>
             <div
-              className={`text-[1rem] sm:text-sm capitalize truncate ${
+              className={`text-[0.7rem] sm:text-sm capitalize truncate ${
                 isSelected ? "text-gray-800" : "text-gray-300"
               }`}
             >

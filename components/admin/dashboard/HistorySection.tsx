@@ -1,10 +1,13 @@
 import { HistoryMemberCard } from "@/components/admin/dashboard/HistoryMemberCard";
 import { SquircleIconButton } from "@/components/SquircleIconButton";
+import { BookTextIcon } from "@/components/ui/BookTextIcon";
 import { ChevronDownIcon } from "@/components/ui/ChevronDownIcon";
 import { ChevronUpIcon } from "@/components/ui/ChevronUpIcon";
 import { DeleteIcon } from "@/components/ui/DeleteIcon";
 import { GalleryVerticalEndIcon } from "@/components/ui/GalleryVerticalEndIcon";
 import { PlusIcon } from "@/components/ui/PlusIcon";
+import { useState } from "react";
+import { HistoryDrawer } from "../HistoryDrawer";
 
 type AcademicYear = {
   id: string;
@@ -24,6 +27,7 @@ type HistoryMember = {
   role?: string;
   instagram?: string;
   photo_url?: string;
+  is_active?: boolean;
 };
 
 type HistoryPhoto = {
@@ -41,6 +45,7 @@ type HistorySectionProps = {
   actionLoading: string | null;
   yearLabel: (year: number) => string;
   onAddYear: () => void;
+  onEditMember: (member: HistoryMember) => void;
   onToggleYear: (yearId: string) => void;
   onAddMember: (yearId: string) => void;
   onAddPhoto: (yearId: string) => void;
@@ -63,7 +68,10 @@ export function HistorySection({
   onDeleteYear,
   onDeleteHistoryMember,
   onDeletePhoto,
+  onEditMember,
 }: HistorySectionProps) {
+  // 1. Add this state variable alongside your other modal definitions:
+  const [isHistoryDrawerOpen, setIsHistoryDrawerOpen] = useState(false);
   const groupBadgeColor = (year: number) => {
     const map: Record<number, string> = {
       4: "text-yellow-300 bg-yellow-900/30 border-1 border-yellow-700",
@@ -73,18 +81,33 @@ export function HistorySection({
     };
     return map[year] ?? "text-gray-300 bg-gray-800";
   };
-
+  console.log("Rendering HistorySection with academicYears:", academicYears);
+  console.log("Rendering HistorySection with historyMembers:", historyMembers);
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <HistoryDrawer
+        isOpen={isHistoryDrawerOpen}
+        onClose={() => setIsHistoryDrawerOpen(false)}
+        onEditMember={onEditMember}
+      />
+      <div className="flex mx-2 items-center justify-between">
         <h2 className="text-2xl font-bold">History</h2>
-        <SquircleIconButton
-          icon={<PlusIcon size={18} className="text-black" />}
-          label="Add Academic Year"
-          onClick={onAddYear}
-          bgColor="bg-white hover:bg-indigo-200"
-          size="md"
-        />
+        <div className="flex items-center gap-3">
+          <SquircleIconButton
+            icon={<BookTextIcon size={18} className="text-black" />}
+            label="View All History"
+            onClick={() => setIsHistoryDrawerOpen(true)}
+            bgColor="bg-white hover:bg-indigo-200"
+            size="md"
+          />
+          <SquircleIconButton
+            icon={<PlusIcon size={18} className="text-black" />}
+            label="Add Academic Year"
+            onClick={onAddYear}
+            bgColor="bg-white hover:bg-indigo-200"
+            size="md"
+          />
+        </div>
       </div>
 
       {academicYears.length === 0 && (
@@ -96,22 +119,24 @@ export function HistorySection({
       <div className="space-y-4">
         {academicYears.map((year) => {
           const members = historyMembers.filter(
-            (member) => member.academic_year_id === year.id,
+            (member: any) => member.academic_year === year.label,
           );
+
           const photos = historyPhotos.filter(
             (photo) => photo.academic_year_id === year.id,
           );
+
           const isOpen = expandedHistYear === year.id;
+
           const groupedMembers = [4, 3, 2, 1]
             .map((studyYear) => ({
               year: studyYear,
               label: yearLabel(studyYear),
               members: members.filter(
-                (member) => member.study_year === studyYear,
+                (member: any) => member.year === studyYear,
               ),
             }))
             .filter((group) => group.members.length > 0);
-
           return (
             <div
               key={year.id}
@@ -187,9 +212,9 @@ export function HistorySection({
               </div>
 
               {isOpen && (
-                <div className="px-6 pb-6 space-y-6 border-t border-gray-800">
+                <div className="px-3 sm:px-6 pb-6 space-y-6 border-t border-gray-800">
                   <div className="pt-4">
-                    <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wide mb-3">
+                    <h3 className="text-sm pl-2 font-semibold text-gray-400 uppercase tracking-wide mb-3">
                       Team
                     </h3>
                     {members.length === 0 ? (
@@ -197,11 +222,11 @@ export function HistorySection({
                         No members recorded for this year.
                       </p>
                     ) : (
-                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                      <div className="grid sm:px-0 grid-cols-1 lg:grid-cols-2 gap-6">
                         {groupedMembers.map((group) => (
                           <div
                             key={group.year}
-                            className="rounded-2xl p-5 bg-gray-800/40"
+                            className="rounded-2xl p-3 sm:p-5 bg-gray-800/40"
                           >
                             <div className="flex items-center justify-between mb-4">
                               <span
@@ -210,11 +235,12 @@ export function HistorySection({
                                 {group.label}s &nbsp;{group.members.length}
                               </span>
                             </div>
-                            <div className="space-y-2">
+                            <div className="space-y-2 ">
                               {group.members.map((member) => (
                                 <HistoryMemberCard
                                   key={member.id}
                                   member={member}
+                                  onEditMember={onEditMember}
                                   academicYearLabel={year.label}
                                   onDelete={() =>
                                     onDeleteHistoryMember(member.id)
