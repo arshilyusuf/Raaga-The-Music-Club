@@ -1,199 +1,100 @@
 "use client";
+
+import { useEffect, useState } from "react";
 import Grainient from "@/Reactbits/Grainient";
 import ProfileCard from "@/Reactbits/ProfileCard";
 import TiltedCard from "@/Reactbits/TiltedCard";
 import { InstagramIcon } from "@/components/ui/InstagramIcon";
-import { createBrowserSupabaseClient } from "@/lib/supabase/client";
-import { useEffect, useState } from "react";
 
-type DbTeamMember = {
-  name: string;
-  role: string | null;
-  domain: string;
-  year: number;
-  photo_url: string | null;
-  instagram: string | null;
+type RosterState = {
+  heads: any[];
+  core: any[];
+  exes: any[];
+  management: any[];
+  anchoring: any[];
 };
+
 export default function Page() {
-  const [heads, setHeads] = useState<any[]>([]);
-  const [core, setCore] = useState<any[]>([]);
-  const [exes, setExes] = useState<any[]>([]);
-  const [management, setManagement] = useState<any[]>([]);
-  const [anchoring, setAnchoring] = useState<any[]>([]);
+  const [roster, setRoster] = useState<RosterState>({
+    heads: [],
+    core: [],
+    exes: [],
+    management: [],
+    anchoring: [],
+  });
   const [loading, setLoading] = useState(true);
-  const supabase = createBrowserSupabaseClient();
 
-useEffect(() => {
-  async function loadTeamRoster() {
-    try {
-      setLoading(true);
+  useEffect(() => {
+    async function fetchRosterData() {
+      try {
+        setLoading(true);
+        const response = await fetch("/api/team/roster");
+        const data = await response.json();
 
-      // 1. Calculate the active academic year string (Current Year: 2026 -> "2026-27")
-      const currentCalendarYear = new Date().getFullYear();
-      const shortNextYear = String(currentCalendarYear + 1).slice(-2);
-      const activeAcademicYearStr = `${currentCalendarYear}-${shortNextYear}`;
+        if (!response.ok) throw new Error(data.error || "Roster connection breakdown");
 
-      // 2. Query club_memberships but pull instagram from the joined team_members relation selection block
-      const { data, error } = await supabase
-        .from("club_memberships")
-        .select(`
-          id,
-          year_of_study,
-          domain,
-          role,
-          is_active,
-          academic_year,
-          team_members (
-            name,
-            photo_url,
-            instagram
-          )
-        `)
-        .eq("is_active", true)
-        .eq("academic_year", activeAcademicYearStr);
-
-      if (error) throw error;
-
-      if (data) {
-        // 3. Extract properties correctly from the nested team_members relational row objects
-        const activeMembers = data
-          .filter((item) => item.team_members !== null)
-          .map((item: any) => ({
-            name: item.team_members.name,
-            photo_url: item.team_members.photo_url,
-            instagram: item.team_members.instagram, // FIXED: Now pulling correctly from team_members object
-            domain: item.domain,
-            role: item.role,
-            year: item.year_of_study,
-          }));
-
-        // 1. Map Heads (year = 4)
-        setHeads(
-          activeMembers
-            .filter((m) => m.year === 4)
-            .map((m) => ({
-              name: m.name,
-              title: m.role || "Head Coordinator",
-              avatar: m.photo_url || "",
-              instagramURL: m.instagram || "",
-            }))
-        );
-
-        // 2. Map Core Team (year = 3)
-        setCore(
-          activeMembers
-            .filter((m) => m.year === 3)
-            .map((m) => ({
-              name: m.name,
-              title: m.role || "Vocalist",
-              image: m.photo_url || "https://i.scdn.co/image/ab67616d0000b273d9985092cd88bffd97653b58",
-              instagramURL: m.instagram || "",
-            }))
-        );
-
-        // 3. Map Executives (year = 2, domain variations)
-        setExes(
-          activeMembers
-            .filter((m) => m.year === 2 && (m.domain.toLowerCase() === "musician" || m.domain.toLowerCase() === "instrumentals" || m.domain.toLowerCase() === "vocals"))
-            .map((m) => ({
-              name: m.name,
-              title: m.role || "Vocalist",
-            }))
-        );
-
-        // 4. Map Management (domain = 'management')
-        setManagement(
-          activeMembers
-            .filter((m) => m.domain.toLowerCase() === "management")
-            .map((m) => ({
-              name: m.name,
-            }))
-        );
-
-        // 5. Map Anchoring (domain = 'anchoring')
-        setAnchoring(
-          activeMembers
-            .filter((m) => m.domain.toLowerCase() === "anchoring")
-            .map((m) => ({
-              name: m.name,
-            }))
-        );
+        setRoster({
+          heads: data.heads || [],
+          core: data.core || [],
+          exes: data.exes || [],
+          management: data.management || [],
+          anchoring: data.anchoring || [],
+        });
+      } catch (err) {
+        console.error("Failed loading active public team roster maps:", err);
+      } finally {
+        setLoading(false);
       }
-    } catch (err: any) {
-      console.error("❌ Database Fetch Error Details:", {
-        message: err?.message,
-        code: err?.code,
-        details: err?.details,
-      });
-    } finally {
-      setLoading(false);
     }
-  }
 
-  loadTeamRoster();
-}, []);
+    fetchRosterData();
+  }, []);
 
   if (loading) {
     return (
-      <div className="text-center py-12 text-sm text-gray-500">Loading...</div>
+      <div className="flex min-h-screen items-center justify-center text-sm text-gray-500 bg-black">
+        <span className="animate-pulse">Loading active team logs...</span>
+      </div>
     );
   }
-  console.log({ heads, core, exes, management, anchoring });
+
   const colors = { c1: "#722f37", c2: "#bd9398", c3: "#18022e" };
+
   return (
     <div className="relative w-full min-h-screen overflow-hidden">
+      {/* Dynamic Header Block Element */}
       <div className="absolute sm:fixed left-14 top-0 sm:top-3 lg:top-5 sm:left-1/2 sm:-translate-x-1/2 z-50">
         <div className="flex">
-          <img
-            src="/svg-path.svg"
-            className="hidden sm:block scale-x-[-1] h-9 w-auto max-h-full"
-          />
-          <div className="bg-black sm:rounded-bl-2xl rounded-br-2xl px-2 sm:px-4 pb-0 sm:pb-2 pl-4 sm:pl-4 ">
-            <h1
-              className="text-center font-bold text-2xl sm:text-4xl bg-linear-to-br from-yellow-200 to-white
-        bg-clip-text text-transparent drop-shadow-[0_8px_25px_rgba(0,0,0,0.9)]"
-            >
+          <img src="/svg-path.svg" alt="" className="hidden sm:block scale-x-[-1] h-9 w-auto max-h-full" />
+          <div className="bg-black sm:rounded-bl-2xl rounded-br-2xl px-2 sm:px-4 pb-0 sm:pb-2 pl-4 sm:pl-4">
+            <h1 className="text-center font-bold text-2xl sm:text-4xl bg-linear-to-br from-yellow-200 to-white bg-clip-text text-transparent drop-shadow-[0_8px_25px_rgba(0,0,0,0.9)]">
               TEAM
             </h1>
           </div>
-          <img src="/svg-path.svg" className="h-9 w-auto max-h-full" />
+          <img src="/svg-path.svg" alt="" className="h-9 w-auto max-h-full" />
         </div>
       </div>
 
+      {/* Grainient Background Matrix */}
       <div className="absolute inset-0 -z-10">
         <Grainient
-          color1={colors.c1}
-          color2={colors.c2}
-          color3={colors.c3}
-          timeSpeed={0.02}
-          colorBalance={0}
-          warpStrength={3.35}
-          warpFrequency={5}
-          warpSpeed={0}
-          warpAmplitude={50}
-          blendAngle={114}
-          blendSoftness={0.05}
-          rotationAmount={500}
-          noiseScale={3.3}
-          grainAmount={0.1}
-          grainScale={2}
-          grainAnimated={false}
-          contrast={1.5}
-          gamma={1}
-          saturation={1}
-          centerX={0}
-          centerY={0}
-          zoom={1.6}
-        />{" "}
+          color1={colors.c1} color2={colors.c2} color3={colors.c3}
+          timeSpeed={0.02} colorBalance={0} warpStrength={3.35} warpFrequency={5}
+          warpSpeed={0} warpAmplitude={50} blendAngle={114} blendSoftness={0.05}
+          rotationAmount={500} noiseScale={3.3} grainAmount={0.1} grainScale={2}
+          grainAnimated={false} contrast={1.5} gamma={1} saturation={1}
+          centerX={0} centerY={0} zoom={1.6}
+        />
       </div>
+
       <div className="relative mb-10 z-10 flex flex-col items-center h-full">
+        {/* Section A: Head Coordinators Layout */}
         <div className="sm:w-[75%] w-full mt-20">
-          <h1 className="text-white font-medium text-3xl  sm:text-6xl text-center sm:mb-10">
+          <h1 className="text-white font-medium text-3xl sm:text-6xl text-center sm:mb-10">
             Head Coordinators
           </h1>
-
           <div className="flex flex-wrap justify-center gap-14 mt-5">
-            {heads.map((person, i) => (
+            {roster.heads.map((person, i) => (
               <div key={i} className="w-full lg:w-[22%] flex justify-center">
                 <ProfileCard
                   name={person.name}
@@ -203,11 +104,8 @@ useEffect(() => {
                   status="Online"
                   contactText="Contact"
                   showUserInfo={false}
-                  enableTilt
-                  enableMobileTilt
-                  behindGlowColor="hsla(353, 41%, 32%, 0.6)"
-                  
-                  behindGlowEnabled
+                  enableTilt enableMobileTilt
+                  behindGlowEnabled behindGlowColor="hsla(353, 41%, 32%, 0.6)"
                   innerGradient="linear-gradient(145deg, hsla(353, 41%, 32%, 0.55) 0%, hsla(350, 21%, 66%, 0.45) 50%, hsla(352, 79%, 20%, 0.27) 100%)"
                   instagram={person.instagramURL}
                 />
@@ -215,103 +113,87 @@ useEffect(() => {
             ))}
           </div>
         </div>
-        <div className="w-[70%] sm:w-[80%] border-t-2 pt-8 mt-10 mb-20">
+
+        {/* Section B: Core Coordinators Layout */}
+        <div className="w-[70%] sm:w-[80%] border-t-2 border-white/10 pt-8 mt-10 mb-20">
           <h1 className="text-white text-3xl sm:text-6xl text-center mb-7 sm:mb-10">
             Core Coordinators
           </h1>
-
           <div className="flex flex-wrap justify-center gap-y-20 gap-x-7">
-            {core.map((person, i) => (
-              <div
-                key={i}
-                className="relative h-75 w-full sm:w-[45%] lg:w-[22%] flex justify-center"
-              >
+            {roster.core.map((person, i) => (
+              <div key={i} className="relative h-75 w-full sm:w-[45%] lg:w-[22%] flex justify-center">
                 {person.instagramURL && (
                   <div
                     onClick={() => window.open(person.instagramURL, "_blank")}
-                    className="absolute z-2 top-2 right-2 cursor-pointer opacity-80 hover:opacity-100 transition-opacity bg-black/30 rounded-full p-2"
+                    className="absolute z-10 top-2 right-2 cursor-pointer opacity-80 hover:opacity-100 transition-opacity bg-black/30 rounded-full p-2"
                   >
                     <InstagramIcon size={26} />
                   </div>
                 )}
                 <TiltedCard
-                  imageSrc={person.image}
-                  altText={person.title}
-                  captionText={person.name}
-                  containerHeight="200px"
-                  containerWidth="100%"
-                  imageHeight="350px"
-                  rotateAmplitude={12}
-                  scaleOnHover={1.05}
-                  showMobileWarning={false}
-                  showTooltip={false}
-                  displayOverlayContent
-                  overlayContent={
-                    <p className="tilted-card-demo-text">{person.name}</p>
-                  }
+                  imageSrc={person.image} altText={person.title} captionText={person.name}
+                  containerHeight="200px" containerWidth="100%" imageHeight="350px"
+                  rotateAmplitude={12} scaleOnHover={1.05} showMobileWarning={false}
+                  showTooltip={false} displayOverlayContent
+                  overlayContent={<p className="tilted-card-demo-text">{person.name}</p>}
                 />
               </div>
             ))}
           </div>
         </div>
-        <div className="w-[70%] sm:w-[80%] border-t-2 pt-8 mt-10 mb-20">
+
+        {/* Section C: Executives Grid */}
+        <div className="w-[70%] sm:w-[80%] border-t-2 border-white/10 pt-8 mt-10 mb-20">
           <h1 className="text-white text-3xl sm:text-6xl text-center mb-7 sm:mb-10">
             Executives
           </h1>
-
           <div className="flex flex-wrap justify-center gap-8">
-            {exes.map((person, i) => (
+            {roster.exes.map((person, i) => (
               <div
                 key={i}
-                className="w-full sm:w-[45%] lg:w-[22%] h-32.5 flex flex-col items-center justify-center rounded-2xl
-      bg-white/10 backdrop-blur-lg border border-white/20 text-white"
+                className="w-full sm:w-[45%] lg:w-[22%] h-32.5 flex flex-col items-center justify-center rounded-2xl bg-white/10 backdrop-blur-lg border border-white/20 text-white"
               >
-                <p className="text-lg sm:text-xl font-semibold">
-                  {person.name}
-                </p>
-                <p className="text-sm sm:text-base text-white/70 mt-1">
-                  {person.title}
-                </p>
+                <p className="text-lg sm:text-xl font-semibold">{person.name}</p>
+                <p className="text-sm sm:text-base text-white/70 mt-1">{person.title}</p>
               </div>
             ))}
           </div>
         </div>
-        <div className="w-full sm:w-[80%] flex justify-center border-t pt-8 mt-10 mb-20">
+
+        {/* Section D: Functional Domains Lists */}
+        <div className="w-full sm:w-[80%] flex justify-center border-t border-white/10 pt-8 mt-10 mb-20">
           <div className="w-[80%] sm:w-full flex flex-col justify-center items-center">
             <h1 className="text-white font-medium text-3xl sm:text-6xl text-center mb-10">
               Domains
             </h1>
-
             <div className="flex flex-col gap-y-5 w-full sm:flex-row justify-evenly">
-              {/* Management */}
+              {/* Management Segment */}
               <div>
                 <h2 className="text-white font-medium pb-2 border-b border-zinc-100 text-xl sm:text-3xl text-center mb-5">
                   Management
                 </h2>
-
                 <ul className="flex flex-col items-center gap-2 text-white/80 text-lg">
-                  {management.map((person, i) => (
-                    <li key={i} className="px-4 py-1">
-                      {person.name}
-                    </li>
+                  {roster.management.map((person, i) => (
+                    <li key={i} className="px-4 py-1">{person.name}</li>
                   ))}
                 </ul>
               </div>
+
+              {/* Anchoring Segment */}
               <div>
                 <h2 className="text-white font-medium pb-2 border-b border-zinc-100 text-xl sm:text-3xl text-center mb-5">
                   Anchoring
                 </h2>
                 <ul className="flex flex-col items-center gap-2 text-white/80 text-lg">
-                  {anchoring.map((person, i) => (
-                    <li key={i} className="px-4 py-1">
-                      {person.name}
-                    </li>
+                  {roster.anchoring.map((person, i) => (
+                    <li key={i} className="px-4 py-1">{person.name}</li>
                   ))}
                 </ul>
               </div>
             </div>
           </div>
         </div>
+
       </div>
     </div>
   );
