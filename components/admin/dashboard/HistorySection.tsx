@@ -6,8 +6,6 @@ import { ChevronUpIcon } from "@/components/ui/ChevronUpIcon";
 import { DeleteIcon } from "@/components/ui/DeleteIcon";
 import { GalleryVerticalEndIcon } from "@/components/ui/GalleryVerticalEndIcon";
 import { PlusIcon } from "@/components/ui/PlusIcon";
-import { useState } from "react";
-import { HistoryDrawer } from "../HistoryDrawer";
 
 type AcademicYear = {
   id: string;
@@ -22,6 +20,7 @@ type HistoryMember = {
   phone?: string;
   roll_number?: string;
   study_year?: number;
+  year_of_study?: number; // Added to match the data model explicitly
   branch?: string;
   domain?: string;
   role?: string;
@@ -43,6 +42,7 @@ type HistorySectionProps = {
   historyPhotos: HistoryPhoto[];
   expandedHistYear: string | null;
   actionLoading: string | null;
+  memberCounts: Record<string, number>;
   yearLabel: (year: number) => string;
   onAddYear: () => void;
   onEditMember: (member: HistoryMember) => void;
@@ -60,6 +60,7 @@ export function HistorySection({
   historyPhotos,
   expandedHistYear,
   actionLoading,
+  memberCounts,
   yearLabel,
   onAddYear,
   onToggleYear,
@@ -70,8 +71,6 @@ export function HistorySection({
   onDeletePhoto,
   onEditMember,
 }: HistorySectionProps) {
-  // 1. Add this state variable alongside your other modal definitions:
-  const [isHistoryDrawerOpen, setIsHistoryDrawerOpen] = useState(false);
   const groupBadgeColor = (year: number) => {
     const map: Record<number, string> = {
       4: "text-yellow-300 bg-yellow-900/30 border-1 border-yellow-700",
@@ -81,25 +80,12 @@ export function HistorySection({
     };
     return map[year] ?? "text-gray-300 bg-gray-800";
   };
-  console.log("Rendering HistorySection with academicYears:", academicYears);
-  console.log("Rendering HistorySection with historyMembers:", historyMembers);
+
   return (
     <div className="space-y-6">
-      <HistoryDrawer
-        isOpen={isHistoryDrawerOpen}
-        onClose={() => setIsHistoryDrawerOpen(false)}
-        onEditMember={onEditMember}
-      />
       <div className="flex mx-2 items-center justify-between">
         <h2 className="text-2xl font-bold">History</h2>
         <div className="flex items-center gap-3">
-          <SquircleIconButton
-            icon={<BookTextIcon size={18} className="text-black" />}
-            label="View All History"
-            onClick={() => setIsHistoryDrawerOpen(true)}
-            bgColor="bg-white hover:bg-indigo-200"
-            size="md"
-          />
           <SquircleIconButton
             icon={<PlusIcon size={18} className="text-black" />}
             label="Add Academic Year"
@@ -118,25 +104,29 @@ export function HistorySection({
 
       <div className="space-y-4">
         {academicYears.map((year) => {
-          const members = historyMembers.filter(
-            (member: any) => member.academic_year === year.label,
-          );
+          const totalMembersCount = memberCounts[year.label] || 0;
+
+          const isOpen = expandedHistYear === year.id;
+
+          // FIXED: Instead of mapping/filtering data globally across closed accordions,
+          // consume the state payload directly if the panel is open.
+          const members = isOpen ? historyMembers : [];
 
           const photos = historyPhotos.filter(
             (photo) => photo.academic_year_id === year.id,
           );
 
-          const isOpen = expandedHistYear === year.id;
-
+          // Grouping logic remains clean and isolated to looking up year_of_study parameters
           const groupedMembers = [4, 3, 2, 1]
             .map((studyYear) => ({
               year: studyYear,
               label: yearLabel(studyYear),
               members: members.filter(
-                (member: any) => member.year === studyYear,
+                (member: any) => Number(member.year_of_study) === studyYear,
               ),
             }))
             .filter((group) => group.members.length > 0);
+
           return (
             <div
               key={year.id}
@@ -151,7 +141,7 @@ export function HistorySection({
                     {year.label}
                   </span>
                   <span className="text-[11px] sm:text-xs text-gray-400">
-                    {members.length} members
+                    {totalMembersCount} members
                   </span>
                   <span className="text-[11px] sm:text-xs text-gray-400">
                     {photos.length} photos

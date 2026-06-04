@@ -13,7 +13,7 @@ type TeamMember = {
   email?: string;
   phone?: string;
   roll_number?: string;
-  year: number;
+  year: number; // Sourced straight from team_members (current year)
   branch?: string;
   domain: string;
   role?: string;
@@ -93,6 +93,7 @@ export function CurrentTeamSection({
   onMoveToHistory,
   onAddMember,
 }: CurrentTeamSectionProps) {
+ 
   return (
     <div className="space-y-6">
       <div className="flex mx-2 items-center justify-between">
@@ -102,7 +103,7 @@ export function CurrentTeamSection({
             icon={<CornerDownRightIcon size={18} />}
             label="Move to History"
             onClick={onMoveToHistory}
-            bgColor="bg-amber-700 hover:bg-amber-600" // Optional, can be changed dynamically
+            bgColor="bg-amber-700 hover:bg-amber-600"
             size="md"
           />
           <SquircleIconButton
@@ -160,11 +161,11 @@ export function CurrentTeamSection({
                           onEditMember(member);
                         }}
                         bgColor="bg-blue-900/40 hover:bg-blue-900/60 text-blue-400"
-                        size="sm" // Using small size since your original design used a compact px-2 py-1 text-xs layout
+                        size="sm"
                       />
                       <SquircleIconButton
                         icon={
-                          actionLoading === member.id ? (
+                          actionLoading === member.id || actionLoading === member.membership_id ? (
                             <span className="text-xs">...</span>
                           ) : (
                             <DeleteIcon size={16} />
@@ -173,9 +174,10 @@ export function CurrentTeamSection({
                         label="Delete Member"
                         onClick={(e) => {
                           e.stopPropagation();
-                          onDeleteMember(member.id);
+                          // Changed to use the active membership_id token mapping identifier 
+                          onDeleteMember(member.membership_id || member.id);
                         }}
-                        disabled={actionLoading === member.id}
+                        disabled={actionLoading === member.id || actionLoading === member.membership_id}
                         bgColor="bg-red-900/40 hover:bg-red-900/60 text-red-400"
                         size="sm"
                       />
@@ -196,7 +198,7 @@ export function CurrentTeamSection({
                   </div>
 
                   {expandedMember === member.id && (
-                    <div className="mt-1 mb-2 px-4 py-3 bg-gray-800/30 rounded-xl text-xs grid grid-cols-2 gap-x-6 gap-y-2">
+                    <div className="mt-1 mb-2 px-4 py-3 bg-gray-800/30 rounded-xl text-xs grid grid-cols-2 gap-x-6 gap-y-2 animate-in fade-in slide-in-from-top-1 duration-150">
                       <D
                         label="Admin Email"
                         isLink={true}
@@ -213,7 +215,7 @@ export function CurrentTeamSection({
                       />{" "}
                       {member.photo_url && (
                         <div className="col-span-2">
-                          <span className="text-gray-500 uppercase tracking-wide">
+                          <span className="text-gray-500 uppercase tracking-wide text-[10px]">
                             Photo URL
                           </span>
                           <p className="text-indigo-400 truncate">
@@ -254,7 +256,6 @@ export function CurrentTeamSection({
                       Edit
                     </button>
                     <button
-                      // FIX: Pass membership_id instead of core profile user id
                       onClick={() =>
                         onDeleteMember(member.membership_id || member.id)
                       }

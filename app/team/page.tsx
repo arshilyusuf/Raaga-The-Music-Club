@@ -23,85 +23,116 @@ export default function Page() {
   const [loading, setLoading] = useState(true);
   const supabase = createBrowserSupabaseClient();
 
-  useEffect(() => {
-    async function loadTeamRoster() {
-      try {
-        setLoading(true);
+useEffect(() => {
+  async function loadTeamRoster() {
+    try {
+      setLoading(true);
 
-        // Fetch active members from the database
-        const { data, error } = await supabase
-          .from("team_members")
-          .select("name, role, domain, year, photo_url, instagram")
-          .eq("is_active", true);
+      // 1. Calculate the active academic year string (Current Year: 2026 -> "2026-27")
+      const currentCalendarYear = new Date().getFullYear();
+      const shortNextYear = String(currentCalendarYear + 1).slice(-2);
+      const activeAcademicYearStr = `${currentCalendarYear}-${shortNextYear}`;
 
-        if (error) throw error;
+      // 2. Query club_memberships but pull instagram from the joined team_members relation selection block
+      const { data, error } = await supabase
+        .from("club_memberships")
+        .select(`
+          id,
+          year_of_study,
+          domain,
+          role,
+          is_active,
+          academic_year,
+          team_members (
+            name,
+            photo_url,
+            instagram
+          )
+        `)
+        .eq("is_active", true)
+        .eq("academic_year", activeAcademicYearStr);
 
-        if (data) {
-          const members = data as DbTeamMember[];
+      if (error) throw error;
 
-          // 1. Map Heads (year = 4)
-          setHeads(
-            members
-              .filter((m) => m.year === 4)
-              .map((m) => ({
-                name: m.name,
-                title: m.role || "Head Coordinator",
-                avatar: m.photo_url || "",
-                instagramURL: m.instagram || "",
-              })),
-          );
+      if (data) {
+        // 3. Extract properties correctly from the nested team_members relational row objects
+        const activeMembers = data
+          .filter((item) => item.team_members !== null)
+          .map((item: any) => ({
+            name: item.team_members.name,
+            photo_url: item.team_members.photo_url,
+            instagram: item.team_members.instagram, // FIXED: Now pulling correctly from team_members object
+            domain: item.domain,
+            role: item.role,
+            year: item.year_of_study,
+          }));
 
-          // 2. Map Core Team (year = 3)
-         setCore(
-  members
-    .filter((m) => m.year === 3)
-    .map((m) => ({
-      ...m, // Spreads all original fields (id, email, phone_number, roll_number, branch, instagram, etc.)
-      name: m.name,
-      title: m.role || "Vocalist",
-      image:
-        m.photo_url ||
-        "https://i.scdn.co/image/ab67616d0000b273d9985092cd88bffd97653b58",
-    })),
-);
+        // 1. Map Heads (year = 4)
+        setHeads(
+          activeMembers
+            .filter((m) => m.year === 4)
+            .map((m) => ({
+              name: m.name,
+              title: m.role || "Head Coordinator",
+              avatar: m.photo_url || "",
+              instagramURL: m.instagram || "",
+            }))
+        );
 
-          // 3. Map Executives (year = 2, domain = 'musician')
-          setExes(
-            members
-              .filter((m) => m.year === 2 && m.domain === "musician")
-              .map((m) => ({
-                name: m.name,
-                title: m.role || "Vocalist",
-              })),
-          );
+        // 2. Map Core Team (year = 3)
+        setCore(
+          activeMembers
+            .filter((m) => m.year === 3)
+            .map((m) => ({
+              name: m.name,
+              title: m.role || "Vocalist",
+              image: m.photo_url || "https://i.scdn.co/image/ab67616d0000b273d9985092cd88bffd97653b58",
+              instagramURL: m.instagram || "",
+            }))
+        );
 
-          // 4. Map Management (domain = 'management')
-          setManagement(
-            members
-              .filter((m) => m.domain === "management")
-              .map((m) => ({
-                name: m.name,
-              })),
-          );
+        // 3. Map Executives (year = 2, domain variations)
+        setExes(
+          activeMembers
+            .filter((m) => m.year === 2 && (m.domain.toLowerCase() === "musician" || m.domain.toLowerCase() === "instrumentals" || m.domain.toLowerCase() === "vocals"))
+            .map((m) => ({
+              name: m.name,
+              title: m.role || "Vocalist",
+            }))
+        );
 
-          // 5. Map Anchoring (domain = 'anchoring')
-          setAnchoring(
-            members
-              .filter((m) => m.domain === "anchoring")
-              .map((m) => ({
-                name: m.name,
-              })),
-          );
-        }
-      } catch (err) {
-        console.error("Error fetching data from database:", err);
-      } finally {
-        setLoading(false);
+        // 4. Map Management (domain = 'management')
+        setManagement(
+          activeMembers
+            .filter((m) => m.domain.toLowerCase() === "management")
+            .map((m) => ({
+              name: m.name,
+            }))
+        );
+
+        // 5. Map Anchoring (domain = 'anchoring')
+        setAnchoring(
+          activeMembers
+            .filter((m) => m.domain.toLowerCase() === "anchoring")
+            .map((m) => ({
+              name: m.name,
+            }))
+        );
       }
+    } catch (err: any) {
+      console.error("❌ Database Fetch Error Details:", {
+        message: err?.message,
+        code: err?.code,
+        details: err?.details,
+      });
+    } finally {
+      setLoading(false);
     }
+  }
 
-    loadTeamRoster();
-  }, []);
+  loadTeamRoster();
+}, []);
+
   if (loading) {
     return (
       <div className="text-center py-12 text-sm text-gray-500">Loading...</div>
@@ -119,7 +150,7 @@ export default function Page() {
           />
           <div className="bg-black sm:rounded-bl-2xl rounded-br-2xl px-2 sm:px-4 pb-0 sm:pb-2 pl-4 sm:pl-4 ">
             <h1
-              className="text-center font-bold text-2xl sm:text-4xl bg-gradient-to-br from-yellow-200 to-white
+              className="text-center font-bold text-2xl sm:text-4xl bg-linear-to-br from-yellow-200 to-white
         bg-clip-text text-transparent drop-shadow-[0_8px_25px_rgba(0,0,0,0.9)]"
             >
               TEAM
@@ -175,7 +206,7 @@ export default function Page() {
                   enableTilt
                   enableMobileTilt
                   behindGlowColor="hsla(353, 41%, 32%, 0.6)"
-                  iconUrl="/assets/demo/iconpattern.png"
+                  
                   behindGlowEnabled
                   innerGradient="linear-gradient(145deg, hsla(353, 41%, 32%, 0.55) 0%, hsla(350, 21%, 66%, 0.45) 50%, hsla(352, 79%, 20%, 0.27) 100%)"
                   instagram={person.instagramURL}
@@ -193,11 +224,11 @@ export default function Page() {
             {core.map((person, i) => (
               <div
                 key={i}
-                className="relative h-[300px] w-full sm:w-[45%] lg:w-[22%] flex justify-center"
+                className="relative h-75 w-full sm:w-[45%] lg:w-[22%] flex justify-center"
               >
-                {person.instagram && (
+                {person.instagramURL && (
                   <div
-                    onClick={() => window.open(person.instagram, "_blank")}
+                    onClick={() => window.open(person.instagramURL, "_blank")}
                     className="absolute z-2 top-2 right-2 cursor-pointer opacity-80 hover:opacity-100 transition-opacity bg-black/30 rounded-full p-2"
                   >
                     <InstagramIcon size={26} />
@@ -232,7 +263,7 @@ export default function Page() {
             {exes.map((person, i) => (
               <div
                 key={i}
-                className="w-full sm:w-[45%] lg:w-[22%] h-[130px] flex flex-col items-center justify-center rounded-2xl
+                className="w-full sm:w-[45%] lg:w-[22%] h-32.5 flex flex-col items-center justify-center rounded-2xl
       bg-white/10 backdrop-blur-lg border border-white/20 text-white"
               >
                 <p className="text-lg sm:text-xl font-semibold">
@@ -245,7 +276,7 @@ export default function Page() {
             ))}
           </div>
         </div>
-        <div className="w-[100%] sm:w-[80%] flex justify-center border-t pt-8 mt-10 mb-20">
+        <div className="w-full sm:w-[80%] flex justify-center border-t pt-8 mt-10 mb-20">
           <div className="w-[80%] sm:w-full flex flex-col justify-center items-center">
             <h1 className="text-white font-medium text-3xl sm:text-6xl text-center mb-10">
               Domains
@@ -254,7 +285,7 @@ export default function Page() {
             <div className="flex flex-col gap-y-5 w-full sm:flex-row justify-evenly">
               {/* Management */}
               <div>
-                <h2 className="text-white font-medium pb-2 border-b-1 border-zinc-100 text-xl sm:text-3xl text-center mb-5">
+                <h2 className="text-white font-medium pb-2 border-b border-zinc-100 text-xl sm:text-3xl text-center mb-5">
                   Management
                 </h2>
 
@@ -266,13 +297,10 @@ export default function Page() {
                   ))}
                 </ul>
               </div>
-
-              {/* Anchoring */}
               <div>
-                <h2 className="text-white font-medium pb-2 border-b-1 border-zinc-100 text-xl sm:text-3xl text-center mb-5">
+                <h2 className="text-white font-medium pb-2 border-b border-zinc-100 text-xl sm:text-3xl text-center mb-5">
                   Anchoring
                 </h2>
-
                 <ul className="flex flex-col items-center gap-2 text-white/80 text-lg">
                   {anchoring.map((person, i) => (
                     <li key={i} className="px-4 py-1">

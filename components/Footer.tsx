@@ -9,7 +9,8 @@ export default function Footer() {
         alt=""
         width={24}
         height={24}
-        className="absolute z-100 sm:-top-6 -top-[1.45rem] left-0 rotate-[270deg] pointer-events-none"
+        className="absolute z-100 sm:-top-6 -top-[1.45rem] left-0 rotate-270 pointer-events-none"
+        
       />
 
       {/* Right inverted border */}
@@ -30,6 +31,7 @@ export default function Footer() {
             width={128}
             height={128}
             className="w-32 mb-5 h-auto"
+            priority
           />
           <p className="text-lg text-gray-300">
             Where melody meets passion and performers find their stage.

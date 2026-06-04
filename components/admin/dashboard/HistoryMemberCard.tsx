@@ -131,7 +131,7 @@ export function HistoryMemberCard({
             bgColor="bg-red-900/40 hover:bg-red-900/60 text-red-400"
             size="sm"
           />
-          <SquircleIconButton
+          {/* <SquircleIconButton
             icon={<SquarePenIcon size={16} />}
             label="Edit Member"
             // Pass the current member object into the handler function on click
@@ -142,7 +142,7 @@ export function HistoryMemberCard({
             disabled={loading}
             bgColor="bg-blue-900/40 hover:bg-blue-900/60 text-blue-400"
             size="sm"
-          />
+          /> */}
           <span className="text-gray-600">
             {expanded ? (
               <ChevronUpIcon

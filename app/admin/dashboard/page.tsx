@@ -5,7 +5,8 @@ import { useRouter, useSearchParams } from "next/navigation";
 import {
   Modal,
   MemberForm,
-  HistoryMemberForm,
+  MemberAddForm,
+  HistoryMemberAddForm,
 } from "@/components/admin/dashboard/MemberForms";
 import { CurrentTeamSection } from "@/components/admin/dashboard/CurrentTeamSection";
 import { HistorySection } from "@/components/admin/dashboard/HistorySection";
@@ -18,6 +19,8 @@ import { ArchiveIcon } from "@/components/ui/ArchiveIcon";
 import { LoginScreen } from "@/components/admin/auditions/LoginScreen";
 import { UsersRoundIcon } from "@/components/ui/UserRoundIcon";
 import { Suspense } from "react";
+import DatabaseSection from "@/components/admin/dashboard/DatabaseSection";
+import { DatabaseBackupIcon } from "@/components/ui/DatabaseBackupIcon";
 type TeamMember = {
   id: string;
   name: string;
@@ -127,8 +130,6 @@ const emptyHistoryMember = (): HistoryMemberDraft => ({
   photo_url: "",
 });
 
-// ─── Main dashboard ───────────────────────────────────────────────────────────
-
 export function AdminDashboardContent() {
   const supabase = createBrowserSupabaseClient();
   const router = useRouter();
@@ -146,7 +147,7 @@ export function AdminDashboardContent() {
   const [historyPhotos, setHistoryPhotos] = useState<HistoryPhoto[]>([]);
   const [archiveEntries, setArchiveEntries] = useState<ArchiveEntry[]>([]);
   const [registrations, setRegistrations] = useState<Registration[]>([]);
-
+  const [memberCounts, setMemberCounts] = useState<Record<string, number>>({});
   // UI state
   const [expandedMember, setExpandedMember] = useState<string | null>(null);
   const [expandedHistYear, setExpandedHistYear] = useState<string | null>(null);
@@ -156,10 +157,14 @@ export function AdminDashboardContent() {
   );
   const [expandedRow, setExpandedRow] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<
-    "team" | "history" | "archive" | "auditions"
+    "team" | "history" | "archive" | "auditions" | "database"
   >(
-    (searchParams.get("tab") as "team" | "history" | "archive" | "auditions") ||
-      "team",
+    (searchParams.get("tab") as
+      | "team"
+      | "history"
+      | "archive"
+      | "auditions"
+      | "database") || "team",
   );
 
   // Modal state
@@ -192,148 +197,134 @@ export function AdminDashboardContent() {
     string | null
   >(null);
   const [moveToHistoryYear, setMoveToHistoryYear] = useState<string>("");
+  const [historyLoading, setHistoryLoading] = useState(false);
+  const loadTeamRoster = useCallback(async () => {
+    try {
+      const response = await fetch("/api/dashboard/team-roster");
+      if (!response.ok) throw new Error(`Roster status: ${response.status}`);
 
-  // ── Auth ────────────────────────────────────────────────────────────────────
+      const data = await response.json();
+      setTeamMembers(data);
+    } catch (error) {
+      console.error("Failed loading team roster stream:", error);
+    }
+  }, []);
+  const loadHistoryMeta = useCallback(async () => {
+    try {
+      const response = await fetch("/api/dashboard/history-meta");
+      if (!response.ok) throw new Error(`History status: ${response.status}`);
 
+      const data = await response.json();
+      setAcademicYears(data.academicYears);
+      setHistoryPhotos(data.historyPhotos);
+      setMemberCounts(data.memberCounts || {});
+    } catch (error) {
+      console.error("Failed loading historical metadata profiles:", error);
+    }
+  }, []);
+  const loadAuditionsMeta = useCallback(async () => {
+    try {
+      const response = await fetch("/api/dashboard/auditions-meta");
+      if (!response.ok) throw new Error(`Auditions status: ${response.status}`);
+
+      const data = await response.json();
+      setArchiveEntries(data.archiveEntries);
+      setRegistrations(data.registrations);
+    } catch (error) {
+      console.error("Failed loading archival auditing sheets:", error);
+    }
+  }, []);
+  const loadAll = useCallback(async () => {
+    setLoading(true);
+    await Promise.all([
+      loadTeamRoster(),
+      loadHistoryMeta(),
+      loadAuditionsMeta(),
+    ]);
+    setLoading(false);
+  }, [loadTeamRoster, loadHistoryMeta, loadAuditionsMeta]);
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
       setSession(data.session);
-      if (data.session) loadAll();
     });
   }, []);
+  useEffect(() => {
+    if (!session) return;
 
-  const loadAll = useCallback(async () => {
-    setLoading(true);
+    const loadTabData = async () => {
+      setLoading(true);
 
-    // 1. Dynamically calculate the current academic cycle string (e.g., 2026 -> "2026-27")
-    const currentCalendarYear = new Date().getFullYear();
-    const shortNextYear = String(currentCalendarYear + 1).slice(-2);
-    const currentActiveAcademicYearStr = `${currentCalendarYear}-${shortNextYear}`; // Result: "2026-27"
+      try {
+        if (activeTab === "team") {
+          await loadTeamRoster();
+        } else if (activeTab === "history" || activeTab === "database") {
+          await loadHistoryMeta();
+        } else if (activeTab === "auditions" || activeTab === "archive") {
+          await loadAuditionsMeta();
+        }
+      } catch (err) {
+        console.error(
+          "Error contextualizing modular viewport load pipeline:",
+          err,
+        );
+      } finally {
+        setLoading(false);
+      }
+    };
 
-    const [activeMembersQuery, ay, allMembershipsQuery, hp, ae, regs] =
-      await Promise.all([
-        // Fetch current active team members for the active academic cycle
-        supabase
-          .from("club_memberships")
-          .select(
-            `
-          id,
-          academic_year,
-          year_of_study,
-          domain,
-          role,
-          is_active,
-          team_members (*)
-        `,
-          )
-          .eq("academic_year", currentActiveAcademicYearStr)
-          .eq("is_active", true)
-          .order("year_of_study", { ascending: true }),
+    loadTabData();
+  }, [activeTab, session, loadTeamRoster, loadHistoryMeta, loadAuditionsMeta]);
+  const loadHistoryByYear = useCallback(async (selectedYear: string) => {
+    setHistoryLoading(true);
+    try {
+      const response = await fetch(`/api/history/${selectedYear}`);
 
-        // Fetch academic years list
-        supabase
-          .from("academic_years")
-          .select("*")
-          .order("start_year", { ascending: false }),
+      if (!response.ok) {
+        throw new Error(
+          `HTTP error fetching history for ${selectedYear}: ${response.status}`,
+        );
+      }
 
-        // Fetch all memberships for historical records
-        supabase.from("club_memberships").select(`
-        id,
-        academic_year,
-        year_of_study,
-        domain,
-        role,
-        is_active,
-        team_members (*)
-      `),
+      const payload = await response.json();
 
-        // Remaining independent tables
-        supabase.from("history_photos").select("*").order("created_at"),
-        supabase
-          .from("audition_archive")
-          .select("*")
-          .order("archived_at", { ascending: false }),
-        supabase
-          .from("audition_registrations")
-          .select("*")
-          .order("submitted_at", { ascending: false }),
-      ]);
+      // Ensure our array map accounts for the structural data shift explicitly
+      const structuredMembers = (payload.members || []).map((member: any) => ({
+        ...member,
+        // Ensure year_of_study handles both potential aliases for safety
+        year_of_study: member.year_of_study || member.year,
+      }));
 
-    // Format active members for the current active cycle layout view
-    if (activeMembersQuery.data) {
-      const formattedActive = activeMembersQuery.data
-        .filter((item: any) => item.team_members !== null)
-        .map((item: any) => ({
-          id: item.team_members?.id,
-          membership_id: item.id,
-          name: item.team_members?.name,
-          branch: item.team_members?.branch,
-          email: item.team_members?.email,
-          phone: item.team_members?.phone,
-          roll_number: item.team_members?.roll_number,
-          instagram: item.team_members?.instagram,
-          photo_url: item.team_members?.photo_url,
-          year: item.year_of_study,
-          domain: item.domain,
-          role: item.role,
-          is_active: item.is_active,
-          academic_year: item.academic_year,
-        }));
-      setTeamMembers(formattedActive);
-      console.log("Fetched active team members:", formattedActive);
+      // Dynamically update the history viewer state with the correct properties
+      setHistoryMembers(structuredMembers);
+
+      console.log(
+        `Fetched historical data for cycle: ${selectedYear}`,
+        structuredMembers,
+      );
+    } catch (error) {
+      console.error(
+        `Failed pulling historical rosters for ${selectedYear}:`,
+        error,
+      );
+    } finally {
+      setHistoryLoading(false);
     }
-
-    // Format historical records (Excludes current active cycle rows)
-    if (allMembershipsQuery.data) {
-      const formattedHistory = allMembershipsQuery.data
-        .filter(
-          (item: any) =>
-            item.team_members !== null &&
-            !(
-              item.academic_year === currentActiveAcademicYearStr &&
-              item.is_active === true
-            ),
-        )
-        .map((item: any) => ({
-          id: item.team_members?.id, // Profile ID
-          membership_id: item.id,
-          name: item.team_members.name,
-          email: item.team_members.email,
-          phone: item.team_members.phone,
-          roll_number: item.team_members.roll_number,
-          branch: item.team_members.branch,
-          instagram: item.team_members.instagram,
-          photo_url: item.team_members.photo_url,
-          year: item.year_of_study,
-          domain: item.domain,
-          role: item.role,
-          is_active: item.is_active,
-          academic_year: item.academic_year,
-          academic_year_id: item.academic_year,
-        }));
-      setHistoryMembers(formattedHistory);
-    }
-
-    if (ay.data) setAcademicYears(ay.data);
-    if (hp.data) setHistoryPhotos(hp.data);
-    if (ae.data) setArchiveEntries(ae.data);
-    if (regs.data) setRegistrations(regs.data);
-
-    setLoading(false);
   }, []);
-
   useEffect(() => {
     const tab = searchParams.get("tab") as
       | "team"
       | "history"
       | "archive"
       | "auditions"
+      | "database"
       | null;
-    if (tab && ["team", "history", "archive", "auditions"].includes(tab)) {
+    if (
+      tab &&
+      ["team", "history", "archive", "auditions", "database"].includes(tab)
+    ) {
       setActiveTab(tab);
     }
   }, [searchParams]);
-
   async function login() {
     setLoginError("");
     setLoginLoading(true);
@@ -346,7 +337,6 @@ export function AdminDashboardContent() {
     setSession(data.session);
     loadAll();
   }
-
   async function logout() {
     try {
       setLoading(true);
@@ -372,257 +362,213 @@ export function AdminDashboardContent() {
       setLoading(false);
     }
   }
-
-  function switchTab(tab: "team" | "history" | "archive" | "auditions") {
+  function switchTab(
+    tab: "team" | "history" | "archive" | "auditions" | "database",
+  ) {
     setActiveTab(tab);
     router.push(`/admin/dashboard?tab=${tab}`);
   }
-
   async function addMember(
     data: Omit<TeamMember, "id" | "is_active"> & {
       is_existing_member?: boolean;
       member_id?: string;
-      academic_year: string; // Dynamic academic year string passed from the form state (e.g., "2026-27")
-      is_active?: boolean; // Accepts the active toggle status value from the form wrapper state
+      academic_year: string;
+      is_active?: boolean;
+      year?: number;
     },
   ) {
-    // 1. Run validation rules exclusively for brand new member profiles
-    if (!data.is_existing_member) {
-      if (data.phone && data.phone.length !== 10) {
-        alert("Validation Error: Phone number must be exactly 10 digits.");
+    setSaving(true);
+    try {
+      const response = await fetch("/api/dashboard/team", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+
+      const result = await response.json();
+      if (!response.ok) {
+        alert(result.error || "An error occurred while saving.");
         return;
       }
 
-      if (data.roll_number && data.roll_number.length !== 8) {
-        alert("Validation Error: Roll number must be exactly 8 digits.");
+      setModal(null);
+      await loadTeamRoster();
+    } catch (error: any) {
+      console.error("Failed to sync profile:", error);
+      alert(`Network Error: ${error.message}`);
+    } finally {
+      setSaving(false);
+    }
+  }
+  async function updateMember(id: string, data: any) {
+    setSaving(true);
+    try {
+      const response = await fetch("/api/dashboard/team", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, data }),
+      });
+
+      const result = await response.json();
+      if (!response.ok) {
+        alert(result.error || "An error occurred while updating.");
         return;
       }
+
+      await loadTeamRoster();
+      setModal(null);
+      setEditingMember(null);
+    } catch (error: any) {
+      console.error("❌ Failed to commit database modifications:", error);
+      alert(`Update Failed: ${error.message}`);
+    } finally {
+      setSaving(false);
+    }
+  }
+  async function deleteMember(membershipId: string) {
+    if (
+      !confirm(
+        "Are you sure you want to remove this member from the current team roster? (Their profile will remain intact in the system)",
+      )
+    )
+      return;
+
+    setActionLoading(membershipId);
+    try {
+      const response = await fetch(
+        `/api/dashboard/team?membershipId=${membershipId}`,
+        {
+          method: "DELETE",
+        },
+      );
+
+      const result = await response.json();
+      if (!response.ok) {
+        alert(result.error || "Removal Failed.");
+        return;
+      }
+    } catch (error: any) {
+      console.error(
+        "❌ Failed to remove member from current team:",
+        error.message,
+      );
+      alert(`Removal Failed: ${error.message}`);
+    } finally {
+      await loadTeamRoster();
+      setActionLoading(null);
+    }
+  }
+  async function moveTeamToHistory() {
+    if (!moveToHistoryYear) {
+      alert(
+        "Please select a target historical academic year from the dropdown.",
+      );
+      return;
+    }
+
+    if (!teamMembers || teamMembers.length === 0) {
+      alert(
+        "There are no active team members in the current roster to migrate.",
+      );
+      return;
     }
 
     setSaving(true);
-    let finalMemberId = data.member_id;
 
-    // 2. Scenario A: Insert profile variables strictly into the baseline information table
-    if (!data.is_existing_member) {
-      const { data: newProfile, error: profileError } = await supabase
-        .from("team_members")
-        .insert([
-          {
-            name: data.name,
-            email: data.email,
-            phone: data.phone,
-            roll_number: data.roll_number,
-            branch: data.branch,
-            instagram: data.instagram,
-            photo_url: data.photo_url,
-            // Removed redundant 'is_active' field here to stay aligned with your normalized schemas
-          },
-        ])
-        .select("id")
-        .single();
+    const currentCalendarYear = new Date().getFullYear();
+    const shortNextYear = String(currentCalendarYear + 1).slice(-2);
+    const currentActiveAcademicYearStr = `${currentCalendarYear}-${shortNextYear}`;
+    const matchedYearRecord = academicYears.find(
+      (ay) => ay.id === moveToHistoryYear || ay.label === moveToHistoryYear,
+    );
 
-      if (profileError) {
-        console.error(
-          "Failed to create baseline profile:",
-          profileError.message,
-        );
-        alert(`Database Error: ${profileError.message}`);
-        setSaving(false);
+    const targetHistoryYearLabel = matchedYearRecord
+      ? matchedYearRecord.label
+      : moveToHistoryYear;
+
+    if (targetHistoryYearLabel === currentActiveAcademicYearStr) {
+      alert(
+        "Validation Error: You cannot archive the current active team into the current active academic year.",
+      );
+      setSaving(false);
+      return;
+    }
+
+    try {
+      const response = await fetch("/api/dashboard/team", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          teamMembers,
+          moveToHistoryYear,
+          currentActiveAcademicYearStr,
+          targetHistoryYearLabel,
+        }),
+      });
+
+      const result = await response.json();
+      if (!response.ok) {
+        alert(result.error || "Migration failed.");
         return;
       }
-      finalMemberId = newProfile.id;
-    } else {
-      // Scenario B: If re-activating an old profile on an active year, switch off other historical cycles
-      if (data.is_active !== false) {
-        await supabase
-          .from("club_memberships")
-          .update({ is_active: false })
-          .eq("member_id", finalMemberId);
-      }
-    }
 
-    // 3. Final Step: Bind the resolved profile directory ID onto the historical structural log entry
-    const { error: membershipError } = await supabase
-      .from("club_memberships")
-      .insert([
-        {
-          member_id: finalMemberId,
-          academic_year: data.academic_year, // Saves the chosen selection string safely to tracking tables
-          year_of_study: data.year || 1, // Maps frontend UI grouping field key 'year' onto your tracking column
-          domain: data.domain || "musician",
-          role: data.role || "Member",
-          is_active: data.is_active ?? true, // Passes status strictly inside the cyclic tracking structure
-        },
-      ]);
-
-    setSaving(false);
-
-    if (!membershipError) {
-      setModal(null);
-      loadAll(); // Re-runs your custom filtering split on complete configuration blocks
-    } else {
-      console.error(
-        "Failed to add member to the current team roster:",
-        membershipError.message,
+      console.log(
+        `Successfully migrated members to ${targetHistoryYearLabel} and cleared the current roster.`,
       );
-      alert(`Membership Configuration Error: ${membershipError.message}`);
+      await loadTeamRoster();
+      setModal(null);
+      setMoveToHistoryYear("");
+    } catch (error: any) {
+      console.error("Failed to migrate team setup:", error.message);
+      alert(`Database Migration Error: ${error.message}`);
+    } finally {
+      setSaving(false);
     }
   }
-// Add this temporary line directly inside your AdminDashboardContent component:
+  async function deleteHistoryMember(memberId: string) {
+    if (!memberId) return;
 
- async function updateMember(
-  id: string, // Unique core profile UUID (team_members.id)
-  data: any,
-) {
-  setSaving(true);
-
-  // 1. Structural update values for core profile registry
-  const profileUpdates = {
-    name: data.name,
-    email: data.email,        
-    phone: data.phone,        
-    roll_number: data.roll_number, 
-    branch: data.branch,
-    instagram: data.instagram,
-    photo_url: data.photo_url,
-    updated_at: new Date().toISOString(),
-  };
-
-  // 2. Normalizes status parameters to clean literal database booleans
-  const isMemberActive = data.is_active === true || data.is_active === "true";
-
-  const membershipUpdates = {
-    year_of_study: Number(data.year), 
-    domain: data.domain,
-    role: data.role,
-    academic_year: data.academic_year,
-    is_active: isMemberActive, 
-  };
-
-  // 3. Concurrently alter both database rows using direct ID identifiers
-  const [profileResult, membershipResult] = await Promise.all([
-    supabase.from("team_members").update(profileUpdates).eq("id", id),
-    supabase
-      .from("club_memberships")
-      .update(membershipUpdates)
-      .eq("id", data.membership_id),
-  ]);
-
-  if (profileResult.error || membershipResult.error) {
-    const errMsg = profileResult.error?.message || membershipResult.error?.message;
-    console.error("❌ Failed to commit database modifications:", errMsg);
-    alert(`Update Failed: ${errMsg}`);
-    setSaving(false);
-    return;
-  }
-
-  // 4. Await data refetch so downstream view states render updated values instantly
-  await loadAll(); 
-
-  // 5. Terminate overlay presentation layout components smoothly
-  setModal(null);
-  setEditingMember(null);
-  setSaving(false);
-}
-async function deleteMember(membershipId: string) {
-  if (!confirm("Are you sure you want to set this member to Inactive?")) return;
-
-  setActionLoading(membershipId);
-
-  const currentCalendarYear = new Date().getFullYear();
-  const shortNextYear = String(currentCalendarYear + 1).slice(-2);
-  const currentActiveAcademicYearStr = `${currentCalendarYear}-${shortNextYear}`;
-
-  // 1. Try updating by direct membership row key
-  const { data: updatedData, error } = await supabase
-    .from("club_memberships")
-    .update({ is_active: false })
-    .eq("id", membershipId)
-    .select();
-
-  // 2. Fallback: If 0 rows altered, treat the argument as the profile user UUID
-  if (!error && (!updatedData || updatedData.length === 0)) {
-    await supabase
-      .from("club_memberships")
-      .update({ is_active: false })
-      .eq("member_id", membershipId) 
-      .eq("academic_year", currentActiveAcademicYearStr);
-  }
-
-  await loadAll();
-  setActionLoading(null);
-}
-
-async function moveTeamToHistory() {
-  if (!moveToHistoryYear) {
-    alert("Please select a target historical academic year from the dropdown.");
-    return;
-  }
-  
-  setSaving(true);
-
-  // 1. Dynamically calculate the active academic year string (e.g., "2026-27")
-  const currentCalendarYear = new Date().getFullYear();
-  const shortNextYear = String(currentCalendarYear + 1).slice(-2);
-  const currentActiveAcademicYearStr = `${currentCalendarYear}-${shortNextYear}`;
-
-  // 2. Resolve the target history text label from your academicYears state array.
-  // This handles instances where the dropdown passes a database UUID instead of the raw text label.
-  const matchedYearRecord = academicYears.find(
-    (ay) => ay.id === moveToHistoryYear || ay.label === moveToHistoryYear
-  );
-  
-  const targetHistoryYearLabel = matchedYearRecord ? matchedYearRecord.label : moveToHistoryYear;
-
-  // Safety block: Prevent users from accidentally archiving the current year onto itself
-  if (targetHistoryYearLabel === currentActiveAcademicYearStr) {
-    alert("Validation Error: You cannot archive the current active team into the current active academic year.");
-    setSaving(false);
-    return;
-  }
-
-  // 3. Update all current season rows to be inactive AND stamp them with the chosen history cycle year
-  const { error } = await supabase
-    .from("club_memberships")
-    .update({ 
-      is_active: false,                       // Moves them out of active roster lists
-      academic_year: targetHistoryYearLabel   // Seals them into the targeted historical folder view
-    })
-    .eq("academic_year", currentActiveAcademicYearStr)
-    .eq("is_active", true);
-
-  if (!error) {
-    // 4. Await data refetch so the layout partitions re-calculate instantly
-    await loadAll();
-    setModal(null);
-    setMoveToHistoryYear("");
-  } else {
-    console.error("Failed to archive current team setup:", error.message);
-    alert(`Database Archival Error: ${error.message}`);
-  }
-
-  setSaving(false);
-}
-
-  async function deleteHistoryMember(membershipId: string) {
     if (
       !confirm("Remove this member from this specific academic year's history?")
     )
       return;
 
-    setActionLoading(membershipId);
+    // Find the text label (e.g., "2024-25") using the active expanded accordion state ID
+    const activeYearObj = academicYears.find(
+      (ay) => ay.id === expandedHistYear,
+    );
+    const academicYearLabel = activeYearObj ? activeYearObj.label : null;
 
-    const { error } = await supabase
-      .from("club_memberships")
-      .delete()
-      .eq("id", membershipId); // Wipes out just the historical entry for that year
+    if (!academicYearLabel) {
+      alert("Error: Could not resolve the active academic year context.");
+      return;
+    }
 
-    setActionLoading(null);
+    setActionLoading(memberId);
 
-    if (!error) {
-      loadAll();
-    } else {
-      console.error("Failed to delete historical record:", error.message);
+    try {
+      const response = await fetch(
+        `/api/dashboard/history?memberId=${memberId}&academicYear=${encodeURIComponent(academicYearLabel)}`,
+        { method: "DELETE" },
+      );
+
+      const result = await response.json();
+      if (!response.ok) {
+        alert(result.error || "Failed to delete historical record.");
+        return;
+      }
+
+      // Re-fetch historical context maps cleanly
+      await loadHistoryMeta();
+
+      // If your UI requires a localized refresh for the accordion contents, re-trigger it:
+      if (activeYearObj?.label) {
+        loadHistoryByYear(activeYearObj.label);
+      }
+    } catch (error) {
+      console.error("Network Error deleting historical record:", error);
+    } finally {
+      setActionLoading(null);
     }
   }
   async function addHistoryMember(
@@ -631,166 +577,186 @@ async function moveTeamToHistory() {
       member_id?: string;
       academic_year?: string;
       study_year?: number;
+      year?: number;
+      domain?: string;
+      role?: string;
     },
   ) {
     setSaving(true);
+    const targetYearLabel = historyMemberTargetYear;
 
-    let finalMemberId = data.member_id;
+    try {
+      const response = await fetch("/api/dashboard/history", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          data,
+          historyMemberTargetYear: targetYearLabel,
+        }),
+      });
 
-    // 1. Core Profile Layer Insertion
-    if (!data.is_existing_member) {
-      const { data: newProfile, error: profileError } = await supabase
-        .from("team_members")
-        .insert([
-          {
-            name: data.name,
-            email: data.email, // Added
-            phone: data.phone, // Added
-            roll_number: data.roll_number, // Added
-            branch: data.branch,
-            instagram: data.instagram,
-            photo_url: data.photo_url,
-          },
-        ])
-        .select("id")
-        .single();
-
-      if (profileError) {
-        console.error(
-          "Failed to create historical profile:",
-          profileError.message,
+      const result = await response.json();
+      if (!response.ok) {
+        alert(
+          result.error || "An error occurred while saving historical profile.",
         );
-        setSaving(false);
         return;
       }
 
-      finalMemberId = newProfile.id;
-    }
-
-    // 2. Resolve target year from form input fallback to modal target variable
-    const targetedYear = data.academic_year || historyMemberTargetYear;
-
-    if (!targetedYear) {
-      console.error(
-        "Historical Context Error: Academic Year string is missing.",
-      );
-      setSaving(false);
-      alert("Please select an Academic Year before saving.");
-      return;
-    }
-
-    // 3. Structural Membership Record Insertion
-    const { error: membershipError } = await supabase
-      .from("club_memberships")
-      .insert([
-        {
-          member_id: finalMemberId,
-          academic_year: targetedYear,
-          // Fallback check maps frontend 'study_year' or 'year' safely to database
-          year_of_study: data.study_year || data.year || 1,
-          domain: data.domain || "musician",
-          role: data.role || "Member",
-          // Fallback checks form state value toggled by user status dot button
-          is_active: data.is_active ?? false,
-        },
-      ]);
-
-    setSaving(false);
-
-    if (!membershipError) {
       setModal(null);
       setHistoryMemberTargetYear(null);
-      loadAll();
-    } else {
-      console.error(
-        "Failed to add historical membership record:",
-        membershipError.message,
-      );
-      alert(`Database Error: ${membershipError.message}`);
+
+      if (targetYearLabel) {
+        // Append the target year string label to the URL hash (e.g., #year-2025-26)
+        // This acts as a persistent browser flag across the hard page reload
+        window.location.hash = `year-${targetYearLabel}`;
+      }
+
+      // Execute full browser page reload to completely clear all corrupted state loops
+      window.location.reload();
+    } catch (error: any) {
+      console.error("Failed updating historical configurations:", error);
+      alert(`Network Error: ${error.message}`);
+    } finally {
+      setSaving(false);
     }
   }
-
-  /**
-   * Fetches existing team members matching a search query.
-   * Limits results to 10 for rapid UI rendering and performance.
-   */
-  async function searchExistingMembers(searchQuery: string) {
-    if (!searchQuery.trim()) return [];
-
-    const { data, error } = await supabase
-      .from("team_members")
-      .select("id, name, email, roll_number, branch, instagram, photo_url")
-      // Searches across both name and roll number columns safely
-      // Using ilike makes the search case-insensitive
-      .or(`name.ilike.%${searchQuery}%,roll_number.ilike.%${searchQuery}%`)
-      .limit(10);
-
-    if (error) {
-      console.error("Error searching profiles:", error.message);
-      throw error;
-    }
-
-    return data;
-  }
-  // ── Academic years ───────────────────────────────────────────────────────────
-
   async function addAcademicYear() {
     if (!newYearLabel) return;
     setSaving(true);
-    await supabase
-      .from("academic_years")
-      .insert([{ label: newYearLabel, start_year: newYearStart }]);
-    setSaving(false);
-    setModal(null);
-    setNewYearLabel("");
-    loadAll();
-  }
 
+    try {
+      const response = await fetch("/api/dashboard/history", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          actionType: "addYear",
+          newYearLabel,
+          newYearStart,
+        }),
+      });
+
+      const result = await response.json();
+      if (!response.ok) {
+        alert(
+          result.error ||
+            "Failed to create academic year timeline configuration.",
+        );
+        return;
+      }
+
+      setModal(null);
+      setNewYearLabel("");
+      await loadHistoryMeta();
+    } catch (error: any) {
+      console.error("Network Error configuring academic year:", error);
+    } finally {
+      setSaving(false);
+    }
+  }
   async function deleteAcademicYear(id: string) {
     if (!confirm("Delete this year and all its history/photos?")) return;
     setActionLoading(id);
-    await supabase.from("academic_years").delete().eq("id", id);
-    setActionLoading(null);
-    loadAll();
-  }
 
+    try {
+      const response = await fetch(
+        `/api/dashboard/history?type=year&id=${id}`,
+        {
+          method: "PATCH",
+        },
+      );
+
+      const result = await response.json();
+      if (!response.ok) {
+        alert(result.error || "Failed to delete academic year.");
+        return;
+      }
+
+      await loadTeamRoster();
+    } catch (error: any) {
+      console.error("Network Error deleting academic year:", error);
+    } finally {
+      setActionLoading(null);
+    }
+  }
   async function addPhoto() {
     if (!newPhotoUrl || !photoTargetYear) return;
     setSaving(true);
-    await supabase.from("history_photos").insert([
-      {
-        academic_year_id: photoTargetYear,
-        cloudinary_url: newPhotoUrl,
-        caption: newPhotoCaption || null,
-      },
-    ]);
-    setSaving(false);
-    setModal(null);
-    setNewPhotoUrl("");
-    setNewPhotoCaption("");
-    loadAll();
-  }
 
+    try {
+      const response = await fetch("/api/dashboard/history", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          photoTargetYear,
+          newPhotoUrl,
+          newPhotoCaption,
+        }),
+      });
+
+      const result = await response.json();
+      if (!response.ok) {
+        alert(result.error || "Failed to upload photo index.");
+        return;
+      }
+
+      setModal(null);
+      setNewPhotoUrl("");
+      setNewPhotoCaption("");
+      await loadHistoryMeta();
+    } catch (error: any) {
+      console.error("Network Error adding historical photo:", error);
+    } finally {
+      setSaving(false);
+    }
+  }
   async function deletePhoto(id: string) {
     if (!confirm("Delete this photo?")) return;
     setActionLoading(id);
-    await supabase.from("history_photos").delete().eq("id", id);
-    setActionLoading(null);
-    loadAll();
+
+    try {
+      const response = await fetch(
+        `/api/dashboard/history?type=photo&id=${id}`,
+        {
+          method: "PATCH",
+        },
+      );
+
+      const result = await response.json();
+      if (!response.ok) {
+        alert(result.error || "Failed to remove photo.");
+        return;
+      }
+
+      await loadHistoryMeta();
+    } catch (error: any) {
+      console.error("Network Error deleting photo entry:", error);
+    } finally {
+      setActionLoading(null);
+    }
   }
-
-  // ── Archive ──────────────────────────────────────────────────────────────────
-
   async function deleteArchiveEntry(id: string) {
     if (!confirm("Permanently delete this archive entry?")) return;
     setActionLoading(id);
-    await supabase.from("audition_archive").delete().eq("id", id);
-    setActionLoading(null);
-    loadAll();
+
+    try {
+      const response = await fetch(`/api/dashboard/archive?id=${id}`, {
+        method: "DELETE",
+      });
+
+      const result = await response.json();
+      if (!response.ok) {
+        alert(result.error || "Failed to clear archive entry.");
+        return;
+      }
+
+      await loadAuditionsMeta();
+    } catch (error: any) {
+      console.error("Network Error removing archive row:", error);
+    } finally {
+      setActionLoading(null);
+    }
   }
-
-  // ── Helpers ──────────────────────────────────────────────────────────────────
-
   const yearLabel = (y: number) => {
     const map: Record<number, string> = {
       4: "Head Coordinator",
@@ -800,7 +766,6 @@ async function moveTeamToHistory() {
     };
     return map[y] ?? `${y}th Year`;
   };
-
   const yearColor = (y: number) => {
     const map: Record<number, string> = {
       4: "text-yellow-300 bg-yellow-900/30 border-1 border-yellow-700",
@@ -810,21 +775,17 @@ async function moveTeamToHistory() {
     };
     return map[y] ?? "text-gray-300 bg-gray-800";
   };
-
   const groupedTeam = [4, 3, 2, 1]
     .map((y) => ({
       year: y,
       label: yearLabel(y),
-      // FIX: Add m.domain === "musician" condition here
       members: teamMembers.filter(
-        (m) => m.year === y && m.domain === "musician",
+        (m) => Number(m.year) === y && m.domain === "musician",
       ),
     }))
     .filter((g) => g.members.length > 0);
 
-  // This remains the same—it correctly catches management and other domains
   const otherDomainMembers = teamMembers.filter((m) => m.domain !== "musician");
-
   if (!session) {
     return (
       <LoginScreen
@@ -847,8 +808,6 @@ async function moveTeamToHistory() {
   }
   return (
     <div className="mt-12 sm:mt-0 min-h-screen bg-gray-950 overflow-hidden text-white">
-      
-
       <div className=" border-gray-800 py-4 flex items-center sticky bg-gray-950 z-40">
         <div className=" flex justify-center items-center w-full">
           <nav className="flex justify-center items-center gap-1">
@@ -856,6 +815,7 @@ async function moveTeamToHistory() {
               [
                 { id: "team", icon: <UsersRoundIcon size={16} /> },
                 { id: "history", icon: <FolderClockIcon size={16} /> },
+                { id: "database", icon: <DatabaseBackupIcon size={16} /> },
                 { id: "auditions", icon: <UserRoundPlusIcon size={16} /> },
                 { id: "archive", icon: <ArchiveIcon size={16} /> },
               ] as const
@@ -888,7 +848,6 @@ async function moveTeamToHistory() {
       </div>
 
       <div className="px-3 py-4 sm:p-8 max-w-7xl mx-auto">
-        {/* ══════════════════════════════════════════════════════════ CURRENT TEAM */}
         {activeTab === "team" && (
           <CurrentTeamSection
             groupedTeam={groupedTeam}
@@ -921,12 +880,36 @@ async function moveTeamToHistory() {
               setModal("editMember");
             }}
             expandedHistYear={expandedHistYear}
-            actionLoading={actionLoading}
+            memberCounts={memberCounts}
+            actionLoading={
+              actionLoading || (historyLoading ? expandedHistYear : null)
+            }
             yearLabel={yearLabel}
             onAddYear={() => setModal("addYear")}
-            onToggleYear={(yearId) =>
-              setExpandedHistYear(expandedHistYear === yearId ? null : yearId)
-            }
+            onToggleYear={(yearId) => {
+              const isOpening = expandedHistYear !== yearId;
+
+              if (isOpening) {
+                // ONLY clear the list if we are genuinely moving to a completely different year.
+                // If the year is already open (e.g., during an update or meta sync), DO NOT clear it.
+                if (!expandedHistYear) {
+                  setHistoryMembers([]);
+                }
+
+                setExpandedHistYear(yearId);
+
+                const targetYearObj = academicYears.find(
+                  (ay: any) => ay.id === yearId,
+                );
+                if (targetYearObj?.label) {
+                  loadHistoryByYear(targetYearObj.label);
+                }
+              } else {
+                // Closing the accordion entirely
+                setExpandedHistYear(null);
+                setHistoryMembers([]);
+              }
+            }}
             onAddMember={(yearId) => {
               setHistoryMemberTargetYear(yearId);
               setModal("addHistoryMember");
@@ -974,11 +957,11 @@ async function moveTeamToHistory() {
         )}
       </div>
 
-      {/* ══════════════════════════════════════════════════════════ MODALS */}
+      {activeTab === "database" && <DatabaseSection />}
 
       {modal === "addMember" && (
         <Modal title="Add Team Member" onClose={() => setModal(null)}>
-          <MemberForm
+          <MemberAddForm
             initial={emptyMember()}
             onSave={(formData: any) =>
               addMember({
@@ -993,9 +976,9 @@ async function moveTeamToHistory() {
         </Modal>
       )}
 
-      {modal === "editMember" && editingMember && (
+      {modal === "editMember" && editingMember && activeTab === "team" && (
         <Modal
-          title="Edit Member"
+          title="Edit Current Team Member"
           onClose={() => {
             setModal(null);
             setEditingMember(null);
@@ -1007,7 +990,7 @@ async function moveTeamToHistory() {
               email: editingMember.email || "",
               phone: editingMember.phone || "",
               roll_number: editingMember.roll_number || "",
-              year: editingMember.year || 1,
+              year: editingMember.year || 1, // Reflects the current year from team_members
               branch: editingMember.branch || "",
               domain: editingMember.domain || "musician",
               role: editingMember.role || "Member",
@@ -1137,42 +1120,35 @@ async function moveTeamToHistory() {
             setModal(null);
             setHistoryMemberTargetYear(null);
           }}
+          academicYearLabel={
+            historyMemberTargetYear
+              ? academicYears.find((ay) => ay.id === historyMemberTargetYear)
+                  ?.label
+              : null
+          }
         >
           <div className="space-y-4">
-            {/* <div>
-              <label className="text-xs text-gray-400 mb-1 block">
-                Academic Year *
-              </label>
-              <select
-                value={historyMemberTargetYear ?? ""}
-                onChange={(e) => setHistoryMemberTargetYear(e.target.value)}
-                className="w-full bg-gray-800 rounded-lg px-3 py-2 text-sm outline-none"
-              >
-                <option value="">— Select year —</option>
-                {academicYears.map((ay) => (
-                  <option key={ay.id} value={ay.id}>
-                    {ay.label}
-                  </option>
-                ))}
-              </select>
-            </div> */}
-            <HistoryMemberForm
+            <HistoryMemberAddForm
               initial={emptyHistoryMember()}
+              academicYears={academicYears}
               onSave={(formData: any) => {
-                // 1. Find the year record in your state array that matches the selected ID
-                // (assuming your academic years state variable is named 'academicYears')
+                // 1. Find the year record matching the state variable 'historyMemberTargetYear'
+                // checking both the database ID (UUID) and the raw text string label
                 const matchedYearRecord = academicYears.find(
                   (y: any) =>
-                    y.id === formData.academic_year ||
-                    y.label === formData.academic_year,
+                    y.id === historyMemberTargetYear ||
+                    y.label === historyMemberTargetYear,
                 );
 
-                // 2. Pass the text string label ("2025-26") rather than the database UUID
+                // 2. Fall back to the raw state variable string if no database record object matches
+                const finalAcademicYearStr = matchedYearRecord
+                  ? matchedYearRecord.label
+                  : historyMemberTargetYear;
+
+                // 3. Dispatch payload with the correct text string label ("2024-25")
                 addHistoryMember({
                   ...formData,
-                  academic_year: matchedYearRecord
-                    ? matchedYearRecord.label
-                    : formData.academic_year,
+                  academic_year: finalAcademicYearStr,
                 });
               }}
               onCancel={() => {

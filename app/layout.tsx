@@ -7,6 +7,7 @@ import { Geist } from "next/font/google";
 import { cn } from "@/lib/utils";
 import Footer from "@/components/Footer";
 import ClickSpark from "@/Reactbits/ClickSpark";
+import Image from "next/image";
 
 const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -63,9 +64,13 @@ export default function RootLayout({
     <div className="flex">
       <a href="/">
         <div className="bg-black h-13 sm:h-13 w-16 sm:w-auto rounded-br-2xl p-2">
-          <img
+          <Image
             src="/pictures/Shruti26 Profile Picture-7.png"
             className="h-full w-full object-contain"
+            width={64}
+            height={64}
+            alt="Raaga Logo"
+            priority
           />
         </div>
       </a>
