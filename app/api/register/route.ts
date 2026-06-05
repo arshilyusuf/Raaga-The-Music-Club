@@ -8,12 +8,15 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 )
 
-// Configure the Nodemailer Gmail transporter
+// Configure the Nodemailer Transporter with OAuth2
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
+    type: 'OAuth2',
     user: process.env.GMAIL_USER,
-    pass: process.env.GMAIL_APP_PASSWORD,
+    clientId: process.env.OAUTH_CLIENT_ID,
+    clientSecret: process.env.OAUTH_CLIENT_SECRET,
+    refreshToken: process.env.OAUTH_REFRESH_TOKEN,
   },
 })
 
@@ -22,19 +25,18 @@ export async function POST(req: NextRequest) {
     const body = await req.json()
     const { registration_type, roll_number, email, full_name } = body
 
+    // --- Validation Rules ---
     if (!['vocalist', 'instrumentalist'].includes(registration_type)) {
       return NextResponse.json({ error: 'Invalid registration type' }, { status: 400 })
     }
-
     if (!roll_number) {
       return NextResponse.json({ error: 'Roll number is required' }, { status: 400 })
     }
-
     if (!email) {
       return NextResponse.json({ error: 'Email address is required' }, { status: 400 })
     }
 
-    // --- 1. Check for Duplicate within the same category ---
+    // --- 1. Check for Duplicate ---
     const { data: existingRegistration, error: checkError } = await supabase
       .from('audition_registrations')
       .select('id')
@@ -59,22 +61,18 @@ export async function POST(req: NextRequest) {
       .from('audition_registrations')
       .insert([
         {
-          full_name:           body.full_name,
-          email:               body.email,
-          roll_number:         body.roll_number.trim(),
-          branch:              body.branch,
-          year:                body.year,
-          phone_number:        body.phone_number,
-          remarks:             body.remarks ?? null,
-          registration_type:   body.registration_type,
-
-          // Vocalist fields
-          languages:           body.languages ?? null,
+          full_name:          body.full_name,
+          email:              body.email,
+          roll_number:        body.roll_number.trim(),
+          branch:             body.branch,
+          year:               body.year,
+          phone_number:       body.phone_number,
+          remarks:            body.remarks ?? null,
+          registration_type:  body.registration_type,
+          languages:          body.languages ?? null,
           backing_track_links: body.backing_track_links ?? null,
-
-          // Instrumentalist fields
-          instruments:         body.instruments ?? null,
-          needs_instrument:    body.needs_instrument ?? false,
+          instruments:        body.instruments ?? null,
+          needs_instrument:   body.needs_instrument ?? false,
         },
       ])
       .select()
@@ -85,22 +83,19 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
-    // --- 3. Run Sync & Email concurrently and wait for execution before runtime freeze ---
+    // --- 3. Send Email & Sync Data ---
     const auditionDate = "October 15, 2026, at 10:00 AM"
+    
     const textFallback = `Hello ${full_name},\n\nYour registration for the upcoming Raaga: The Music Club auditions has been received.\n\nRegistration Summary:\n- Category: ${registration_type.toUpperCase()}\n- Roll Number: ${data.roll_number}\n- Branch / Year: ${data.branch} (Year ${data.year})\n\nAudition Schedule:\nPlease report directly to the main auditorium on: ${auditionDate}\n\nIf you have any questions or need to reschedule, reply to this email or reach our support team at 98357828123 or 7808361946.\n\nBest regards,\nRaaga Auditions Coordination Team`
 
     await Promise.allSettled([
       appendToSheet(data),
       transporter.sendMail({
-        from: `"Raaga The Music Club"<${process.env.GMAIL_USER}>`,
+        // CRITICAL SPAM PROTECTION: The sender address MUST precisely match process.env.GMAIL_USER
+        from: `"Raaga The Music Club" <${process.env.GMAIL_USER}>`,
         to: email,
-        replyTo: process.env.GMAIL_USER, 
         subject: `Audition Registration Confirmation - ${full_name}`,
         text: textFallback,
-        headers: {
-          'X-Auto-Response-Suppress': 'OOF, AutoReply',
-          'Precedence': 'bulk'
-        },
         html: `
           <div style="font-family: Arial, sans-serif; line-height: 1.6; max-width: 550px; color: #222222;">
             <p>Hello <strong>${full_name}</strong>,</p>
@@ -129,12 +124,11 @@ export async function POST(req: NextRequest) {
         `,
       })
     ]).then((results) => {
-      // Debug log details if anything breaks down in production
       if (results[0].status === 'rejected') {
         console.error('Google Sheets sync failed:', results[0].reason)
       }
       if (results[1].status === 'rejected') {
-        console.error('Gmail dispatch failed:', results[1].reason)
+        console.error('OAuth2 Gmail dispatch failed:', results[1].reason)
       }
     })
 
