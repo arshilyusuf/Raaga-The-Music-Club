@@ -1,6 +1,7 @@
 'use server'
 
 import { createServerSupabaseClient } from '@/lib/supabase/server'
+import { enforceAdminCheck } from '@/lib/supabase/auth-guard'
 import { revalidatePath } from 'next/cache'
 
 type AddToTeamInput = {
@@ -21,6 +22,13 @@ const parseYearToInteger = (yearStr: string): number => {
 
 export async function addRegistrationToTeam(reg: AddToTeamInput) {
   const supabase = await createServerSupabaseClient()
+
+  // ─── ENFORCE SERVER-SIDE SECURITY GUARD FOR THE ACTION ───────────────────
+  const guard = await enforceAdminCheck(supabase)
+  if (!guard.authorized) {
+    throw new Error("Unauthorized Access: Administrative privileges required.")
+  }
+
   const integerYear = parseYearToInteger(reg.year)
   
   // 1. Generate the standard active academic year string (e.g., "2026-27")

@@ -1,10 +1,15 @@
 import { NextResponse } from "next/server";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { enforceAdminCheck } from "@/lib/supabase/auth-guard";
 
 export async function GET() {
+  const supabase = await createServerSupabaseClient();
+
+  // Enforce global admin check using your centralized guard file
+  const guard = await enforceAdminCheck(supabase);
+  if (!guard.authorized) return guard.errorResponse;
+
   try {
-    const supabase = await createServerSupabaseClient();
-    
     const currentCalendarYear = new Date().getFullYear();
     const shortNextYear = String(currentCalendarYear + 1).slice(-2);
     const currentActiveAcademicYearStr = `${currentCalendarYear}-${shortNextYear}`;
@@ -51,7 +56,16 @@ export async function GET() {
       return nameA.localeCompare(nameB);
     });
 
-    return NextResponse.json(sortedActive);
+    // ─── ADD CACHE HEADERS TO RESPONSE ──────────────────────────────────────
+    return NextResponse.json(sortedActive, {
+      headers: {
+        // public: Allows caching on intermediate servers/CDNs
+        // s-maxage=60: Cache at the CDN layer for 60 seconds
+        // stale-while-revalidate=30: Serve the cached data instantly while refreshing it in the background
+        "Cache-Control": "public, s-maxage=60, stale-while-revalidate=30",
+      },
+    });
+
   } catch (err: any) {
     return NextResponse.json({ error: "Internal Server Error", message: err.message }, { status: 500 });
   }

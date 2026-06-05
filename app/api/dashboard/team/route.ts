@@ -1,9 +1,15 @@
 import { NextResponse } from "next/server";
-import { createServerSupabaseClient } from "@/lib/supabase/server"; // Adjust import path based on where this helper lives
+import { createServerSupabaseClient } from "@/lib/supabase/server"; 
+import { enforceAdminCheck } from "@/lib/supabase/auth-guard";
+import { revalidatePath } from "next/cache";
 
 // POST: Add a Team Member
 export async function POST(request: Request) {
   const supabase = await createServerSupabaseClient();
+
+  // Enforce global admin check
+  const guard = await enforceAdminCheck(supabase);
+  if (!guard.authorized) return guard.errorResponse;
 
   try {
     const data = await request.json();
@@ -79,6 +85,9 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: membershipError.message }, { status: 500 });
     }
 
+    // Purge the stale CDN and browser caching segments instantly
+    revalidatePath("/admin/dashboard");
+
     return NextResponse.json({ success: true });
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 500 });
@@ -88,6 +97,10 @@ export async function POST(request: Request) {
 // PUT: Update an Existing Team Member
 export async function PUT(request: Request) {
   const supabase = await createServerSupabaseClient();
+
+  // Enforce global admin check
+  const guard = await enforceAdminCheck(supabase);
+  if (!guard.authorized) return guard.errorResponse;
 
   try {
     const { id, data } = await request.json();
@@ -122,6 +135,9 @@ export async function PUT(request: Request) {
       return NextResponse.json({ error: errMsg }, { status: 500 });
     }
 
+    // Purge the stale CDN and browser caching segments instantly
+    revalidatePath("/admin/dashboard");
+
     return NextResponse.json({ success: true });
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 500 });
@@ -131,6 +147,11 @@ export async function PUT(request: Request) {
 // DELETE: Remove Membership from Current Team Roster
 export async function DELETE(request: Request) {
   const supabase = await createServerSupabaseClient();
+
+  // Enforce global admin check
+  const guard = await enforceAdminCheck(supabase);
+  if (!guard.authorized) return guard.errorResponse;
+
   const { searchParams } = new URL(request.url);
   const membershipId = searchParams.get("membershipId");
 
@@ -148,6 +169,9 @@ export async function DELETE(request: Request) {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
+    // Purge the stale CDN and browser caching segments instantly
+    revalidatePath("/admin/dashboard");
+
     return NextResponse.json({ success: true });
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 500 });
@@ -158,8 +182,12 @@ export async function DELETE(request: Request) {
 export async function PATCH(request: Request) {
   const supabase = await createServerSupabaseClient();
 
+  // Enforce global admin check
+  const guard = await enforceAdminCheck(supabase);
+  if (!guard.authorized) return guard.errorResponse;
+
   try {
-    const { teamMembers, moveToHistoryYear, currentActiveAcademicYearStr, targetHistoryYearLabel } = await request.json();
+    const { teamMembers, currentActiveAcademicYearStr, targetHistoryYearLabel } = await request.json();
 
     const historicalSnapshots = teamMembers.map((member: any) => ({
       member_id: member.id,
@@ -183,6 +211,9 @@ export async function PATCH(request: Request) {
     if (deleteError) {
       return NextResponse.json({ error: deleteError.message }, { status: 500 });
     }
+
+    // Purge the stale CDN and browser caching segments instantly
+    revalidatePath("/admin/dashboard");
 
     return NextResponse.json({ success: true });
   } catch (err: any) {

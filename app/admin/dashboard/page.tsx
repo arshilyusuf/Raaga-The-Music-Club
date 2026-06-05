@@ -65,6 +65,7 @@ type HistoryPhoto = {
   academic_year_id: string;
   cloudinary_url: string;
   caption?: string;
+  date?: string;
 };
 
 type ArchiveEntry = {
@@ -139,7 +140,7 @@ export function AdminDashboardContent() {
   const [loginPassword, setLoginPassword] = useState("");
   const [loginLoading, setLoginLoading] = useState(false);
   const [loginError, setLoginError] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   // Data
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
   const [academicYears, setAcademicYears] = useState<AcademicYear[]>([]);
@@ -148,6 +149,8 @@ export function AdminDashboardContent() {
   const [archiveEntries, setArchiveEntries] = useState<ArchiveEntry[]>([]);
   const [registrations, setRegistrations] = useState<Registration[]>([]);
   const [memberCounts, setMemberCounts] = useState<Record<string, number>>({});
+  const [newPhotoDate, setNewPhotoDate] = useState("");
+  const [editingPhotoId, setEditingPhotoId] = useState<string | null>(null);
   // UI state
   const [expandedMember, setExpandedMember] = useState<string | null>(null);
   const [expandedHistYear, setExpandedHistYear] = useState<string | null>(null);
@@ -209,9 +212,90 @@ export function AdminDashboardContent() {
       console.error("Failed loading team roster stream:", error);
     }
   }, []);
+  useEffect(() => {
+    if (!photoTargetYear) return;
+
+    // 1. Filter photos belonging to the currently expanded year
+    const cyclePhotos = historyPhotos.filter(
+      (p) => p.academic_year_id === photoTargetYear && p.date,
+    );
+
+    if (cyclePhotos.length > 0) {
+      const dateCounts: Record<string, number> = {};
+
+      // 2. Provide a guaranteed string fallback right at initialization
+      let majorityDate: string =
+        cyclePhotos[0].date ?? new Date().toISOString().split("T")[0];
+      let maxCount = 0;
+
+      cyclePhotos.forEach((photo) => {
+        const d = photo.date;
+        if (!d) return; // Guard clause to guarantee 'd' is strictly a string
+
+        dateCounts[d] = (dateCounts[d] || 0) + 1;
+        if (dateCounts[d] > maxCount) {
+          maxCount = dateCounts[d];
+          majorityDate = d;
+        }
+      });
+
+      // 3. majorityDate is now guaranteed to be a string, resolving ts(2345)
+      setNewPhotoDate(majorityDate);
+    } else {
+      // Fallback to today's date if the year has no photos yet
+      setNewPhotoDate(new Date().toISOString().split("T")[0]);
+    }
+  }, [photoTargetYear, historyPhotos]);
+
+  // Ensure you reset these states when closing the modal or canceling
+  function handleCloseModal() {
+    setModal(null);
+    setEditingPhotoId(null);
+    setPhotoTargetYear("");
+    setNewPhotoUrl("");
+    setNewPhotoCaption("");
+    setNewPhotoDate("");
+  }
+  async function handleSavePhoto() {
+    if (!newPhotoUrl || !photoTargetYear || !newPhotoDate) return;
+    setSaving(true);
+
+    try {
+      const isEdit = !!editingPhotoId;
+
+      const response = await fetch("/api/dashboard/history", {
+        method: isEdit ? "POST" : "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: editingPhotoId,
+          photoTargetYear,
+          newPhotoUrl,
+          newPhotoCaption,
+          date: newPhotoDate,
+        }),
+      });
+
+      const result = await response.json();
+      if (!response.ok) {
+        alert(result.error || "Failed to save photo index.");
+        return;
+      }
+
+      handleCloseModal();
+      await loadHistoryMeta(); // ◄── This will now fetch fresh data immediately
+    } catch (error: any) {
+      console.error("Network Error saving historical photo:", error);
+    } finally {
+      setSaving(false);
+    }
+  }
   const loadHistoryMeta = useCallback(async () => {
     try {
-      const response = await fetch("/api/dashboard/history-meta");
+      // ─── ADD A CACHE-BUSTER TIMESTAMP ────────────────────────────────────────
+      // This stops Next.js from serving stale, cached router data on the frontend
+      const response = await fetch(
+        `/api/dashboard/history-meta?_cb=${Date.now()}`,
+      );
       if (!response.ok) throw new Error(`History status: ${response.status}`);
 
       const data = await response.json();
@@ -244,36 +328,80 @@ export function AdminDashboardContent() {
     setLoading(false);
   }, [loadTeamRoster, loadHistoryMeta, loadAuditionsMeta]);
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      setSession(data.session);
-    });
-  }, []);
-  useEffect(() => {
-    if (!session) return;
+    let isMounted = true;
 
-    const loadTabData = async () => {
-      setLoading(true);
-
+    const verifyAdminStatus = async () => {
       try {
-        if (activeTab === "team") {
-          await loadTeamRoster();
-        } else if (activeTab === "history" || activeTab === "database") {
-          await loadHistoryMeta();
-        } else if (activeTab === "auditions" || activeTab === "archive") {
-          await loadAuditionsMeta();
+        setLoading(true);
+        const authResponse = await fetch("/api/auth/check-admin");
+        const authData = await authResponse.json();
+
+        if (!isMounted) return;
+
+        if (authData.isAdmin) {
+          setSession({ isServerVerified: true });
+        } else {
+          setSession(null);
         }
       } catch (err) {
-        console.error(
-          "Error contextualizing modular viewport load pipeline:",
-          err,
-        );
+        console.error("Auth routing handshake failed:", err);
+        if (isMounted) setSession(null);
       } finally {
-        setLoading(false);
+        if (isMounted) setLoading(false);
       }
     };
 
-    loadTabData();
+    verifyAdminStatus();
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event) => {
+      if (event === "SIGNED_OUT" && isMounted) {
+        setSession(null);
+        setTeamMembers([]);
+        setAcademicYears([]);
+        setHistoryMembers([]);
+        setHistoryPhotos([]);
+        setArchiveEntries([]);
+        setRegistrations([]);
+        setMemberCounts({});
+      }
+    });
+
+    return () => {
+      isMounted = false;
+      subscription.unsubscribe();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!session) return; // Prevent fetching if user is unauthorized
+
+    if (activeTab === "team") {
+      loadTeamRoster();
+    } else if (activeTab === "history" || activeTab === "database") {
+      loadHistoryMeta();
+    } else if (activeTab === "auditions" || activeTab === "archive") {
+      loadAuditionsMeta();
+    }
   }, [activeTab, session, loadTeamRoster, loadHistoryMeta, loadAuditionsMeta]);
+
+  useEffect(() => {
+    const tab = searchParams.get("tab") as
+      | "team"
+      | "history"
+      | "archive"
+      | "auditions"
+      | "database"
+      | null;
+    if (
+      tab &&
+      ["team", "history", "archive", "auditions", "database"].includes(tab)
+    ) {
+      setActiveTab(tab);
+    }
+  }, [searchParams]);
+
   const loadHistoryByYear = useCallback(async (selectedYear: string) => {
     setHistoryLoading(true);
     try {
@@ -310,21 +438,6 @@ export function AdminDashboardContent() {
       setHistoryLoading(false);
     }
   }, []);
-  useEffect(() => {
-    const tab = searchParams.get("tab") as
-      | "team"
-      | "history"
-      | "archive"
-      | "auditions"
-      | "database"
-      | null;
-    if (
-      tab &&
-      ["team", "history", "archive", "auditions", "database"].includes(tab)
-    ) {
-      setActiveTab(tab);
-    }
-  }, [searchParams]);
   async function login() {
     setLoginError("");
     setLoginLoading(true);
@@ -333,9 +446,22 @@ export function AdminDashboardContent() {
       password: loginPassword,
     });
     setLoginLoading(false);
+
     if (error) return setLoginError(error.message);
-    setSession(data.session);
-    loadAll();
+
+    // Re-trigger the whole validation logic block to populate data arrays cleanly
+    setLoading(true);
+    const authResponse = await fetch("/api/auth/check-admin");
+    const authData = await authResponse.json();
+
+    if (authData.isAdmin) {
+      setSession({ isServerVerified: true });
+      await loadAll();
+    } else {
+      setLoginError("Access Denied: You do not have admin permissions.");
+      setSession(null);
+    }
+    setLoading(false);
   }
   async function logout() {
     try {
@@ -679,37 +805,6 @@ export function AdminDashboardContent() {
       setActionLoading(null);
     }
   }
-  async function addPhoto() {
-    if (!newPhotoUrl || !photoTargetYear) return;
-    setSaving(true);
-
-    try {
-      const response = await fetch("/api/dashboard/history", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          photoTargetYear,
-          newPhotoUrl,
-          newPhotoCaption,
-        }),
-      });
-
-      const result = await response.json();
-      if (!response.ok) {
-        alert(result.error || "Failed to upload photo index.");
-        return;
-      }
-
-      setModal(null);
-      setNewPhotoUrl("");
-      setNewPhotoCaption("");
-      await loadHistoryMeta();
-    } catch (error: any) {
-      console.error("Network Error adding historical photo:", error);
-    } finally {
-      setSaving(false);
-    }
-  }
   async function deletePhoto(id: string) {
     if (!confirm("Delete this photo?")) return;
     setActionLoading(id);
@@ -728,7 +823,7 @@ export function AdminDashboardContent() {
         return;
       }
 
-      await loadHistoryMeta();
+      await loadHistoryMeta(); // ◄── This will now fetch fresh data immediately
     } catch (error: any) {
       console.error("Network Error deleting photo entry:", error);
     } finally {
@@ -786,6 +881,16 @@ export function AdminDashboardContent() {
     .filter((g) => g.members.length > 0);
 
   const otherDomainMembers = teamMembers.filter((m) => m.domain !== "musician");
+  // 1. ALWAYS check the loading state first to allow the session token to resolve
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-950 text-white">
+        <div className="w-12 h-12 rounded-full border-4 border-white/20 border-t-white animate-spin mb-4" />
+      </div>
+    );
+  }
+
+  // 2. Once loading is done, check if a valid session actually exists
   if (!session) {
     return (
       <LoginScreen
@@ -797,13 +902,6 @@ export function AdminDashboardContent() {
         onPasswordChange={setLoginPassword}
         onLogin={login}
       />
-    );
-  }
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-950 text-white">
-        <p className="text-lg">Loading dashboard...</p>
-      </div>
     );
   }
   return (
@@ -921,6 +1019,7 @@ export function AdminDashboardContent() {
             onDeleteYear={deleteAcademicYear}
             onDeleteHistoryMember={deleteHistoryMember}
             onDeletePhoto={deletePhoto}
+            historyLoading={historyLoading}
           />
         )}
 
@@ -1063,7 +1162,10 @@ export function AdminDashboardContent() {
       )}
 
       {modal === "addPhoto" && (
-        <Modal title="Add Photo" onClose={() => setModal(null)}>
+        <Modal
+          title={editingPhotoId ? "Edit Photo Properties" : "Add Photo"}
+          onClose={handleCloseModal}
+        >
           <div className="space-y-3">
             <div>
               <label className="text-xs text-gray-400 mb-1 block">
@@ -1076,6 +1178,7 @@ export function AdminDashboardContent() {
                 className="w-full bg-gray-800 rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-indigo-500"
               />
             </div>
+
             <div>
               <label className="text-xs text-gray-400 mb-1 block">
                 Caption (optional)
@@ -1087,6 +1190,19 @@ export function AdminDashboardContent() {
                 className="w-full bg-gray-800 rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-indigo-500"
               />
             </div>
+
+            <div>
+              <label className="text-xs text-gray-400 mb-1 block">
+                Photo Event Date *
+              </label>
+              <input
+                type="date"
+                value={newPhotoDate}
+                onChange={(e) => setNewPhotoDate(e.target.value)}
+                className="w-full bg-gray-800 rounded-lg px-3 py-2 text-sm text-white outline-none focus:ring-1 focus:ring-indigo-500"
+              />
+            </div>
+
             {newPhotoUrl && (
               <img
                 src={newPhotoUrl}
@@ -1094,16 +1210,21 @@ export function AdminDashboardContent() {
                 className="w-full rounded-lg object-cover max-h-40"
               />
             )}
+
             <div className="flex gap-3 pt-2">
               <button
-                onClick={addPhoto}
-                disabled={saving || !newPhotoUrl}
+                onClick={handleSavePhoto}
+                disabled={saving || !newPhotoUrl || !newPhotoDate}
                 className="flex-1 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 rounded-lg py-2 text-sm font-semibold transition"
               >
-                {saving ? "Adding..." : "Add Photo"}
+                {saving
+                  ? "Saving..."
+                  : editingPhotoId
+                    ? "Update Photo"
+                    : "Add Photo"}
               </button>
               <button
-                onClick={() => setModal(null)}
+                onClick={handleCloseModal}
                 className="flex-1 bg-gray-700 hover:bg-gray-600 rounded-lg py-2 text-sm font-semibold transition"
               >
                 Cancel

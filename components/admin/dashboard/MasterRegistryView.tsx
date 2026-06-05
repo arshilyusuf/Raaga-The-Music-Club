@@ -3,14 +3,18 @@
 import { useEffect, useState } from "react";
 import { createBrowserSupabaseClient } from "@/lib/supabase/client";
 import { SquircleIconButton } from "@/components/SquircleIconButton";
-import { DeleteIcon } from "../ui/DeleteIcon";
-import { SquarePenIcon } from "../ui/SquarePenIcon";
-import { Modal, MemberForm, MasterEditForm } from "./dashboard/MemberForms"; // Ensure path points to your MemberForm components file
+import { DeleteIcon } from "../../ui/DeleteIcon";
+import { SquarePenIcon } from "../../ui/SquarePenIcon";
+import { Modal, MemberForm, MasterEditForm } from "./MemberForms"; // Ensure path points to your MemberForm components file
 
 const LIMIT = 10;
 
 export function MasterRegistryView() {
-const [deleteTarget, setDeleteTarget] = useState<{ membershipId: string; profileId: string } | null>(null);  const [loading, setLoading] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<{
+    membershipId: string;
+    profileId: string;
+  } | null>(null);
+  const [loading, setLoading] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
   const [groupedHistory, setGroupedHistory] = useState<any[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
@@ -127,7 +131,11 @@ const [deleteTarget, setDeleteTarget] = useState<{ membershipId: string; profile
     }
   }
 
-async function handleDeleteRecord(membershipId: string, profileId: string, e: React.MouseEvent) {
+  async function handleDeleteRecord(
+    membershipId: string,
+    profileId: string,
+    e: React.MouseEvent,
+  ) {
     e.stopPropagation();
     // Instead of browser confirm(), save target references to open our custom modal
     setDeleteTarget({ membershipId, profileId });
@@ -136,20 +144,26 @@ async function handleDeleteRecord(membershipId: string, profileId: string, e: Re
   // 2. Executed when the user clicks "Confirm Delete" inside your custom popup UI
   async function executeDelete() {
     if (!deleteTarget) return;
-    
+
     const { membershipId, profileId } = deleteTarget;
     setActionLoading(membershipId);
     setDeleteTarget(null); // Instantly close the confirmation overlay layout smoothly
 
     try {
-      const response = await fetch(`/api/dashboard/master-registry?profileId=${profileId}`, {
-        method: "DELETE",
-      });
+      const response = await fetch(
+        `/api/dashboard/master-registry?profileId=${profileId}`,
+        {
+          method: "DELETE",
+        },
+      );
 
       const result = await response.json();
-      if (!response.ok) throw new Error(result.error || "Server row removal error");
+      if (!response.ok)
+        throw new Error(result.error || "Server row removal error");
 
-      setGroupedHistory((prev) => prev.filter((item) => item.profile.id !== profileId));
+      setGroupedHistory((prev) =>
+        prev.filter((item) => item.profile.id !== profileId),
+      );
     } catch (error: any) {
       console.error("Complete deletion pipeline failed:", error.message);
       alert(`Deletion Failed: ${error.message}`);
@@ -160,62 +174,65 @@ async function handleDeleteRecord(membershipId: string, profileId: string, e: Re
 
   return (
     <div className="w-full flex flex-col rounded-2xl border border-gray-800/80 bg-gray-950 shadow-2xl overflow-hidden max-h-[75vh] min-h-100">
-     {deleteTarget && (
-  <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 overflow-x-hidden overflow-y-auto">
-    {/* Blur Backdrop Layer */}
-    <div 
-      className="fixed inset-0 bg-black/70 backdrop-blur-sm transition-opacity duration-300"
-      onClick={() => setDeleteTarget(null)} 
-    />
+      {deleteTarget && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 overflow-x-hidden overflow-y-auto">
+          {/* Blur Backdrop Layer */}
+          <div
+            className="fixed inset-0 bg-black/70 backdrop-blur-sm transition-opacity duration-300"
+            onClick={() => setDeleteTarget(null)}
+          />
 
-    {/* Modal Container Card */}
-    <div className="relative w-full max-w-[92%] xs:max-w-md transform rounded-2xl border border-gray-800/80 bg-gray-950 p-4 sm:p-6 shadow-2xl transition-all duration-300 scale-100 animate-in fade-in zoom-in-95">
-      
-      {/* Modal Heading Header */}
-      <div className="mb-3 sm:mb-4">
-        <h3 className="text-base font-bold text-white sm:text-lg">
-          Confirm Permanent Deletion
-        </h3>
-      </div>
+          {/* Modal Container Card */}
+          <div className="relative w-full max-w-[92%] xs:max-w-md transform rounded-2xl border border-gray-800/80 bg-gray-950 p-4 sm:p-6 shadow-2xl transition-all duration-300 scale-100 animate-in fade-in zoom-in-95">
+            {/* Modal Heading Header */}
+            <div className="mb-3 sm:mb-4">
+              <h3 className="text-base font-bold text-white sm:text-lg">
+                Confirm Permanent Deletion
+              </h3>
+            </div>
 
-      {/* Modal Body Info Copy */}
-      <div className="space-y-3">
-        <p className="text-xs text-gray-300 leading-relaxed sm:text-sm">
-          Are you sure you want to permanently delete this member and <span className="text-red-400 font-semibold">ALL</span> of their historical club memberships from the database?
-        </p>
-        
-        {/* Highlight Warning Alert Callout */}
-        <div className="rounded-xl border border-red-900/30 bg-red-950/20 p-3">
-          <p className="text-[11px] text-red-400/90 leading-normal sm:text-xs">
-            <span className="font-bold uppercase tracking-wider block mb-0.5 text-[10px] text-red-400">
-              Important Note:
-            </span>
-            This action is irreversible. It will wipe their master profile and cleanly clean out their associated timeline across all active past and present academic years.
-          </p>
+            {/* Modal Body Info Copy */}
+            <div className="space-y-3">
+              <p className="text-xs text-gray-300 leading-relaxed sm:text-sm">
+                Are you sure you want to permanently delete this member and{" "}
+                <span className="text-red-400 font-semibold">ALL</span> of their
+                historical club memberships from the database?
+              </p>
+
+              {/* Highlight Warning Alert Callout */}
+              <div className="rounded-xl border border-red-900/30 bg-red-950/20 p-3">
+                <p className="text-[11px] text-red-400/90 leading-normal sm:text-xs">
+                  <span className="font-bold uppercase tracking-wider block mb-0.5 text-[10px] text-red-400">
+                    Important Note:
+                  </span>
+                  This action is irreversible. It will wipe their master profile
+                  and cleanly clean out their associated timeline across all
+                  active past and present academic years.
+                </p>
+              </div>
+            </div>
+
+            {/* Action Buttons Footer Row */}
+            {/* Changed to flex-col-reverse on ultra-small viewports so the destructive action isn't accidentally clicked on mobile keyboards */}
+            <div className="mt-5 flex flex-col-reverse sm:flex-row sm:items-center sm:justify-end gap-2.5 sm:gap-3">
+              <button
+                type="button"
+                onClick={() => setDeleteTarget(null)}
+                className="w-full sm:w-auto rounded-xl border border-gray-800 bg-transparent px-4 py-2.5 sm:py-2 text-xs font-semibold text-gray-400 transition hover:bg-gray-900 hover:text-white active:scale-98 sm:text-sm h-10 sm:h-auto flex items-center justify-center"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={executeDelete}
+                className="w-full sm:w-auto rounded-xl bg-red-600 px-4 py-2.5 sm:py-2 text-xs font-semibold text-white transition hover:bg-red-500 active:scale-98 shadow-lg shadow-red-950/20 sm:text-sm h-10 sm:h-auto flex items-center justify-center"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
         </div>
-      </div>
-
-      {/* Action Buttons Footer Row */}
-      {/* Changed to flex-col-reverse on ultra-small viewports so the destructive action isn't accidentally clicked on mobile keyboards */}
-      <div className="mt-5 flex flex-col-reverse sm:flex-row sm:items-center sm:justify-end gap-2.5 sm:gap-3">
-        <button
-          type="button"
-          onClick={() => setDeleteTarget(null)}
-          className="w-full sm:w-auto rounded-xl border border-gray-800 bg-transparent px-4 py-2.5 sm:py-2 text-xs font-semibold text-gray-400 transition hover:bg-gray-900 hover:text-white active:scale-98 sm:text-sm h-10 sm:h-auto flex items-center justify-center"
-        >
-          Cancel
-        </button>
-        <button
-          type="button"
-          onClick={executeDelete}
-          className="w-full sm:w-auto rounded-xl bg-red-600 px-4 py-2.5 sm:py-2 text-xs font-semibold text-white transition hover:bg-red-500 active:scale-98 shadow-lg shadow-red-950/20 sm:text-sm h-10 sm:h-auto flex items-center justify-center"
-        >
-          Delete
-        </button>
-      </div>
-    </div>
-  </div>
-)}
+      )}
       {/* Search Bar Wrapper (Sticky Header Block) */}
       <div className="sticky top-0 z-10 border-b border-gray-800 bg-gray-950 px-4 py-4 sm:px-6">
         <input
@@ -230,10 +247,8 @@ async function handleDeleteRecord(membershipId: string, profileId: string, e: Re
       {/* Content Body Layout (Captures Internal Scroll Layer) */}
       <div className="flex-1 overflow-y-auto p-4 space-y-3 sm:p-6 scrollbar-none scrollbar-thumb-gray-800 scrollbar-track-transparent overflow-hidden">
         {loading ? (
-          <div className="flex h-48 items-center justify-center text-xs text-gray-500 sm:text-sm">
-            <span className="animate-pulse">
-              Loading core membership data logs...
-            </span>
+          <div className="flex items-center justify-center py-12">
+            <div className="w-12 h-12 rounded-full border-4 border-white/20 border-t-white animate-spin mb-4" />
           </div>
         ) : groupedHistory.length === 0 ? (
           <div className="flex h-48 items-center justify-center text-xs text-gray-600 sm:text-sm">

@@ -1,10 +1,17 @@
 import { NextResponse } from "next/server";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { enforceAdminCheck } from "@/lib/supabase/auth-guard";
+import { revalidatePath } from "next/cache";
 
 // GET: Fetch paginated, search-filtered master history membership logs
 export async function GET(request: Request) {
+  const supabase = await createServerSupabaseClient();
+
+  // Enforce global admin check
+  const guard = await enforceAdminCheck(supabase);
+  if (!guard.authorized) return guard.errorResponse;
+
   try {
-    const supabase = await createServerSupabaseClient();
     const { searchParams } = new URL(request.url);
 
     const page = parseInt(searchParams.get("page") || "0", 10);
@@ -48,7 +55,12 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
-    return NextResponse.json(data || []);
+    // ─── ADD CACHE HEADERS TO RESPONSE ──────────────────────────────────────
+    return NextResponse.json(data || [], {
+      headers: {
+        "Cache-Control": "public, s-maxage=60, stale-while-revalidate=30",
+      },
+    });
   } catch (err: any) {
     return NextResponse.json({ error: "Internal Server Error", message: err.message }, { status: 500 });
   }
@@ -56,8 +68,13 @@ export async function GET(request: Request) {
 
 // PUT: Modify core profile metadata registry properties
 export async function PUT(request: Request) {
+  const supabase = await createServerSupabaseClient();
+
+  // Enforce global admin check
+  const guard = await enforceAdminCheck(supabase);
+  if (!guard.authorized) return guard.errorResponse;
+
   try {
-    const supabase = await createServerSupabaseClient();
     const { profileId, formData } = await request.json();
 
     if (!profileId) {
@@ -86,6 +103,9 @@ export async function PUT(request: Request) {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
+    // Purge cached values across dashboard components
+    revalidatePath("/admin/dashboard");
+
     return NextResponse.json({ success: true });
   } catch (err: any) {
     return NextResponse.json({ error: "Internal Server Error", message: err.message }, { status: 500 });
@@ -94,8 +114,13 @@ export async function PUT(request: Request) {
 
 // DELETE: Completely wipe profile entry and memberships cascade
 export async function DELETE(request: Request) {
+  const supabase = await createServerSupabaseClient();
+
+  // Enforce global admin check
+  const guard = await enforceAdminCheck(supabase);
+  if (!guard.authorized) return guard.errorResponse;
+
   try {
-    const supabase = await createServerSupabaseClient();
     const { searchParams } = new URL(request.url);
     const profileId = searchParams.get("profileId");
 
@@ -111,6 +136,9 @@ export async function DELETE(request: Request) {
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
+
+    // Purge cached values across dashboard components
+    revalidatePath("/admin/dashboard");
 
     return NextResponse.json({ success: true });
   } catch (err: any) {

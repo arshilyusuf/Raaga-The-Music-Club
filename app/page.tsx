@@ -156,8 +156,8 @@ export default function Home() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{
-              delay: 1.5,
-              duration: 3.7,
+              delay: 0.5,
+              duration: 3,
               ease: [0.22, 1, 0.36, 1],
             }}
           ></motion.div>
@@ -166,8 +166,8 @@ export default function Home() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{
-              delay: 2.0,
-              duration: 4.7,
+              delay: 1,
+              duration: 2,
               ease: [0.22, 1, 0.36, 1],
             }}
           >
@@ -180,8 +180,8 @@ export default function Home() {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{
-                delay: 2.5,
-                duration: 5.7,
+                delay: 1,
+                duration: 2,
                 ease: [0.22, 1, 0.36, 1],
               }}
             >
@@ -191,8 +191,8 @@ export default function Home() {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{
-                delay: 3.0,
-                duration: 6.7,
+                delay: 1.5,
+                duration: 2,
                 ease: [0.22, 1, 0.36, 1],
               }}
             >
@@ -207,7 +207,7 @@ export default function Home() {
           </div>
         </motion.div>
       </section>
-      <section className="h-[100vh] sm:min-h-fit w-full bg-[#722f37] relative">
+      <section className="h-screen sm:min-h-fit w-full bg-[#722f37] relative">
         {/* DomeGallery for mobile */}
         <div className="block lg:hidden w-full h-screen sm:mb-0 -mb-30">
           <DomeGallery
@@ -227,10 +227,10 @@ export default function Home() {
         </div>
 
         {/* Top gradient */}
-        <div className="pointer-events-none absolute inset-x-0 top-0 h-64 bg-gradient-to-b from-[#722f37] to-transparent" />
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-64 bg-linear-to-b from-[#722f37] to-transparent" />
 
         {/* Bottom gradient */}
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-64 bg-gradient-to-t from-[#722f37] to-transparent" />
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-64 bg-linear-to-t from-[#722f37] to-transparent" />
       </section>
       <ScrollTimeline />
     </main>

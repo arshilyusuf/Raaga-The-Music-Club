@@ -1,10 +1,17 @@
 'use server'
 
 import { createServerSupabaseClient } from '@/lib/supabase/server'
+import { enforceAdminCheck } from '@/lib/supabase/auth-guard'
 import { revalidatePath } from 'next/cache'
 
 export async function archiveAuditionData() {
   const supabase = await createServerSupabaseClient()
+
+  // ─── ENFORCE SERVER-SIDE SECURITY GUARD FOR THE ACTION ───────────────────
+  const guard = await enforceAdminCheck(supabase)
+  if (!guard.authorized) {
+    throw new Error("Unauthorized Access: Administrative privileges required.")
+  }
 
   // 1. Fetch all current registrations
   const { data: registrations, error: fetchError } = await supabase
@@ -66,6 +73,7 @@ export async function archiveAuditionData() {
     console.error('Purging live roster failed:', deleteError.message)
     throw new Error(`Purging live roster failed: ${deleteError.message}`)
   }
+
   revalidatePath('/admin/auditions')
   return { success: true, count: archivedRows.length }
 }

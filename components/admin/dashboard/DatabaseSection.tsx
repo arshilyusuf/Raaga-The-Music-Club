@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { MasterRegistryView } from "../MasterRegistryView"; // Adjust the path based on your file structure
+import { MasterRegistryView } from "./MasterRegistryView"; // Adjust the path based on your file structure
 import { Database, ShieldAlert, Users } from "lucide-react";
 
 export default function DatabaseSection() {
@@ -30,10 +30,13 @@ export default function DatabaseSection() {
   }, []);
   if (loading) {
     return (
-      <div className="flex h-48 items-center justify-center text-xs text-gray-500 sm:text-sm">
+      <div className="flex flex-col gap-5 h-48 items-center justify-center text-xs text-gray-500 sm:text-sm">
         <span className="animate-pulse">
-          Analyzing system database parameters...
+          Analyzing system database...
         </span>
+        <div className="flex items-center justify-center py-12">
+            <div className="w-12 h-12 rounded-full border-4 border-white/20 border-t-white animate-spin mb-4" />
+          </div>
       </div>
     );
   }

@@ -1,8 +1,15 @@
 import { NextResponse } from "next/server";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { enforceAdminCheck } from "@/lib/supabase/auth-guard";
+import { revalidatePath } from "next/cache";
 
 export async function DELETE(request: Request) {
   const supabase = await createServerSupabaseClient();
+
+  // Enforce global admin check using your centralized guard file
+  const guard = await enforceAdminCheck(supabase);
+  if (!guard.authorized) return guard.errorResponse;
+
   const { searchParams } = new URL(request.url);
   const id = searchParams.get("id");
 
@@ -16,6 +23,9 @@ export async function DELETE(request: Request) {
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
+
+    // Purge the stale CDN and browser caching segments instantly
+    revalidatePath("/admin/dashboard");
 
     return NextResponse.json({ success: true });
   } catch (err: any) {

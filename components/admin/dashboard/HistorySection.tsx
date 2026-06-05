@@ -52,6 +52,7 @@ type HistorySectionProps = {
   onDeleteYear: (yearId: string) => void;
   onDeleteHistoryMember: (memberId: string) => void;
   onDeletePhoto: (photoId: string) => void;
+  historyLoading?: boolean;
 };
 
 export function HistorySection({
@@ -70,6 +71,7 @@ export function HistorySection({
   onDeleteHistoryMember,
   onDeletePhoto,
   onEditMember,
+  historyLoading = false,
 }: HistorySectionProps) {
   const groupBadgeColor = (year: number) => {
     const map: Record<number, string> = {
@@ -207,11 +209,19 @@ export function HistorySection({
                     <h3 className="text-sm pl-2 font-semibold text-gray-400 uppercase tracking-wide mb-3">
                       Team
                     </h3>
-                    {members.length === 0 ? (
+
+                    {historyLoading ? (
+                      /* 1. Show this clean, centered skeleton or spinner when a new year is selected */
+                      <div className="flex items-center justify-center py-12">
+                        <div className="w-12 h-12 rounded-full border-4 border-white/20 border-t-white animate-spin mb-4" />
+                      </div>
+                    ) : members.length === 0 ? (
+                      /* 2. Fallback if loading is complete but no data came back */
                       <p className="text-gray-600 text-sm">
                         No members recorded for this year.
                       </p>
                     ) : (
+                      /* 3. Render the grouped grid layouts once loaded successfully */
                       <div className="grid sm:px-0 grid-cols-1 lg:grid-cols-2 gap-6">
                         {groupedMembers.map((group) => (
                           <div
@@ -273,7 +283,7 @@ export function HistorySection({
                             <button
                               onClick={() => onDeletePhoto(photo.id)}
                               disabled={actionLoading === photo.id}
-                              className="absolute top-1 right-1 bg-red-600/80 hover:bg-red-600 text-white text-xs w-6 h-6 rounded-full opacity-0 group-hover:opacity-100 transition flex items-center justify-center"
+                              className="absolute top-1 right-1 bg-red-600/80 hover:bg-red-600 text-white text-xs w-6 h-6 rounded-full opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition flex items-center justify-center"
                             >
                               ✕
                             </button>
