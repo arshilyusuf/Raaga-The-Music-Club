@@ -104,7 +104,7 @@ export function MasterRegistryView() {
     fetchMasterHistory(nextPage, false);
   }
 
-  async function handleUpdateProfile(formData: any) {
+ async function handleUpdateProfile(formData: any) {
     setIsSavingProfile(true);
     try {
       const response = await fetch("/api/dashboard/master-registry", {
@@ -117,9 +117,24 @@ export function MasterRegistryView() {
       if (!response.ok)
         throw new Error(result.error || "Server modification error");
 
+      // OPTIMISTIC STATE UPDATE: Update local state immediately to avoid backend cache lag
+      setGroupedHistory((prevGrouped) =>
+        prevGrouped.map((item) => {
+          if (item.profile.id === editingProfile.id) {
+            return {
+              ...item,
+              profile: {
+                ...item.profile,
+                ...formData, // Injects new names, branches, status flags directly
+                is_active: formData.is_active === true || formData.is_active === "true"
+              },
+            };
+          }
+          return item;
+        })
+      );
+
       setEditingProfile(null);
-      setPage(0);
-      await fetchMasterHistory(0, true);
     } catch (err: any) {
       console.error(
         "❌ Profile modification database write failed:",
