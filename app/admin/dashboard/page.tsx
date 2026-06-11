@@ -203,6 +203,7 @@ export function AdminDashboardContent() {
   const [historyLoading, setHistoryLoading] = useState(false);
   const loadTeamRoster = useCallback(async () => {
     try {
+      setLoading(true);
       const response = await fetch("/api/dashboard/team-roster");
       if (!response.ok) throw new Error(`Roster status: ${response.status}`);
 
@@ -210,6 +211,8 @@ export function AdminDashboardContent() {
       setTeamMembers(data);
     } catch (error) {
       console.error("Failed loading team roster stream:", error);
+    }finally {
+      setLoading(false);
     }
   }, []);
   useEffect(() => {
@@ -293,6 +296,7 @@ export function AdminDashboardContent() {
     try {
       // ─── ADD A CACHE-BUSTER TIMESTAMP ────────────────────────────────────────
       // This stops Next.js from serving stale, cached router data on the frontend
+      setLoading(true);
       const response = await fetch(
         `/api/dashboard/history-meta?_cb=${Date.now()}`,
       );
@@ -304,10 +308,13 @@ export function AdminDashboardContent() {
       setMemberCounts(data.memberCounts || {});
     } catch (error) {
       console.error("Failed loading historical metadata profiles:", error);
+    }finally {
+      setLoading(false);
     }
   }, []);
   const loadAuditionsMeta = useCallback(async () => {
     try {
+      setLoading(true);
       const response = await fetch("/api/dashboard/auditions-meta");
       if (!response.ok) throw new Error(`Auditions status: ${response.status}`);
 
@@ -316,6 +323,8 @@ export function AdminDashboardContent() {
       setRegistrations(data.registrations);
     } catch (error) {
       console.error("Failed loading archival auditing sheets:", error);
+    }finally {
+      setLoading(false);
     }
   }, []);
   const loadAll = useCallback(async () => {
@@ -403,6 +412,7 @@ export function AdminDashboardContent() {
   }, [searchParams]);
 
   const loadHistoryByYear = useCallback(async (selectedYear: string) => {
+    setLoading(true);
     setHistoryLoading(true);
     try {
       const response = await fetch(`/api/history/${selectedYear}`);
@@ -436,6 +446,7 @@ export function AdminDashboardContent() {
       );
     } finally {
       setHistoryLoading(false);
+      setLoading(false);
     }
   }, []);
   async function login() {
