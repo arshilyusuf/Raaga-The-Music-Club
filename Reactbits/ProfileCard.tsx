@@ -533,13 +533,7 @@ const ProfileCardComponent: React.FC<ProfileCardProps> = ({
               }}
             >
               {/* Dark gradient at top so avatar image never shows through name text */}
-              <div
-                className="absolute inset-x-0 top-0 z-10 pointer-events-none"
-                style={{
-                  height: '100%',
-                  background: 'linear-gradient(to top, #252e08 0%, #252e08cc 10%, transparent 100%)'
-                }}
-              />
+              
 
               {avatarUrl && (
                 <img
