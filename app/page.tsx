@@ -12,6 +12,7 @@ import CircularText from "@/Reactbits/CircularText";
 import Button from "@/components/Button";
 import { CartoonButton } from "@/components/ui/CartoonButton";
 import GradualBlur from "@/Reactbits/GradualBlur";
+import Image from "next/image";
 export default function Home() {
   const items = [
     {
@@ -75,12 +76,20 @@ export default function Home() {
         </div>
       )}
       <section className="relative z-10 flex min-h-screen items-center justify-center px-4">
-        <div
-          className="absolute -top-2 inset-0 bg-cover bg-center bg-no-repeat -z-10"
-          style={{
-            backgroundImage: "url('/pictures/Raaga26BGG.png')",
-          }}
-        />
+        <div className="absolute -top-2 inset-0 -z-10">
+  <Image
+    src="/pictures/Raaga26BGG.png" // Update this extension if you converted to .webp
+    alt="Main Background"
+    fill
+    sizes="100vw"
+    style={{
+      objectFit: 'cover',
+      objectPosition: 'center',
+    }}
+    priority
+    quality={85 }
+  />
+</div>
         <div className="pointer-events-none absolute inset-0 -z-5 flex-col items-center justify-center">
           <div className="w-full h-full">
             <MagicRings
@@ -238,12 +247,13 @@ export default function Home() {
       <GradualBlur
         target="page"
         position="bottom"
-        height="7rem"
+        height="5rem"
         strength={2}
         divCount={5}
         curve="bezier"
         exponential
         opacity={1}
+        responsive={true}
       />
     </main>
   );
