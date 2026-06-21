@@ -11,6 +11,7 @@ import DomeGallery from "@/Reactbits/DomeGallery";
 import CircularText from "@/Reactbits/CircularText";
 import Button from "@/components/Button";
 import { CartoonButton } from "@/components/ui/CartoonButton";
+import GradualBlur from "@/Reactbits/GradualBlur";
 export default function Home() {
   const items = [
     {
@@ -52,7 +53,7 @@ export default function Home() {
 
   return (
     <main className="relative min-h-screen w-full text-zinc-50 overflow-hidden ">
-      {/* {isMobile ? (
+      {isMobile ? (
         <div className="absolute w-full h-screen mt-20 flex items-center justify-center z-[300] pointer-events-none">
           <CircularText
             text="AUDITIONS ✦ COMING ✦ SOON ✦ "
@@ -72,19 +73,19 @@ export default function Home() {
             className="w-full"
           />
         </div>
-      )} */}
+      )}
       <section className="relative z-10 flex min-h-screen items-center justify-center px-4">
         <div
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat -z-10"
+          className="absolute -top-2 inset-0 bg-cover bg-center bg-no-repeat -z-10"
           style={{
-            backgroundImage: "url('/pictures/Shruti25 Stage Background-2.png')",
+            backgroundImage: "url('/pictures/Raaga26BGG.png')",
           }}
         />
         <div className="pointer-events-none absolute inset-0 -z-5 flex-col items-center justify-center">
           <div className="w-full h-full">
             <MagicRings
-              color="#93343f"
-              colorTwo="#93343f"
+              color="#9ebc16"
+              colorTwo="#9ebc16"
               ringCount={6}
               speed={1}
               attenuation={8.5}
@@ -130,7 +131,9 @@ export default function Home() {
           >
             <div className="relative w-120 sm:w-full  sm:h-full h-full">
               {isMobile ? (
-                <h1 className="text-6xl mt-10 font-black text-white">RAAGA</h1>
+                <h1 className="text-6xl mt-10 font-black text-white [-webkit-text-stroke:14px_#252e08] [paint-order:stroke_fill]">
+                  RAAGA
+                </h1>
               ) : (
                 <TextPressure
                   text="RAAGA"
@@ -139,8 +142,8 @@ export default function Home() {
                   stroke
                   scale={false}
                   weight
-                  strokeColor="#722f37"
-                  strokeWidth={10}
+                  strokeColor="#252e08"
+                  strokeWidth={13}
                   width={true}
                   italic
                   textColor="#ffffff"
@@ -174,7 +177,7 @@ export default function Home() {
             The official music club of <br className="block sm:hidden " /> NIT
             Raipur{" "}
           </motion.p>
-          <div className="mt-6">
+          {/* <div className="mt-6">
             <motion.p
               className=" text-md sm:text-lg md:text-md text-zinc-100"
               initial={{ opacity: 0, y: 10 }}
@@ -198,16 +201,16 @@ export default function Home() {
             >
               <CartoonButton
                 label="REGISTER NOW"
-                color="mt-3 bg-[#6b0527]/30 backdrop-blur font-semibold text-white border-white"
+                color="mt-3 bg-[#9ebc16]/30 backdrop-blur font-semibold text-white border-white"
                 onClick={() => {
                   window.location.href = "/auditions";
                 }}
               />
             </motion.div>
-          </div>
+          </div> */}
         </motion.div>
       </section>
-      <section className="h-screen sm:min-h-fit w-full bg-[#722f37] relative">
+      <section className="h-screen sm:min-h-fit w-full bg-[#252e08] relative">
         {/* DomeGallery for mobile */}
         <div className="block lg:hidden w-full h-screen sm:mb-0 -mb-30">
           <DomeGallery
@@ -217,7 +220,7 @@ export default function Home() {
             segments={34}
             dragDampening={2}
             grayscale
-            overlayBlurColor="#722f37"
+            overlayBlurColor="#252e08"
           />
         </div>
 
@@ -227,12 +230,21 @@ export default function Home() {
         </div>
 
         {/* Top gradient */}
-        <div className="pointer-events-none absolute inset-x-0 top-0 h-64 bg-linear-to-b from-[#722f37] to-transparent" />
-
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-64 bg-linear-to-b from-[#242d06] from-10% to-transparent" />
         {/* Bottom gradient */}
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-64 bg-linear-to-t from-[#722f37] to-transparent" />
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-64 bg-linear-to-t from-[#242d06] to-transparent" />
       </section>
       <ScrollTimeline />
+      <GradualBlur
+        target="page"
+        position="bottom"
+        height="7rem"
+        strength={2}
+        divCount={5}
+        curve="bezier"
+        exponential
+        opacity={1}
+      />
     </main>
   );
 }

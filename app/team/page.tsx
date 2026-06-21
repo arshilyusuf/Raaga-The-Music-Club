@@ -5,6 +5,7 @@ import Grainient from "@/Reactbits/Grainient";
 import ProfileCard from "@/Reactbits/ProfileCard";
 import TiltedCard from "@/Reactbits/TiltedCard";
 import { InstagramIcon } from "@/components/ui/InstagramIcon";
+import GradualBlur from "@/Reactbits/GradualBlur";
 
 type RosterState = {
   heads: any[];
@@ -58,7 +59,7 @@ export default function Page() {
     );
   }
 
-  const colors = { c1: "#722f37", c2: "#bd9398", c3: "#18022e" };
+  const colors = { c1: "#547d1f", c2: "#203604", c3: "#2A330B" };
 
   return (
     <div className="relative w-full min-h-screen overflow-hidden">
@@ -195,6 +196,17 @@ export default function Page() {
         </div>
 
       </div>
+      <GradualBlur
+        target="page"
+        position="bottom"
+        height="5rem"
+        strength={2}
+        divCount={5}
+        curve="bezier"
+        exponential
+        opacity={1}
+        animated="scroll"
+      />
     </div>
   );
 }

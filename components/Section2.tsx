@@ -1,9 +1,10 @@
 import TextType from "@/Reactbits/TextType";
 import Image from "next/image"; // optional if you want next/image optimization
-import UntitledImage from "@/public/pictures/Untitled.png";
+import UntitledImage from "@/public/pictures/Section2BG.png";
 import { motion } from "framer-motion";
 import Button from "./Button";
 import { useRouter } from "next/navigation";
+import Strands from "@/Reactbits/Strands";
 export default function Section2() {
   const router = useRouter();
   const goToTeam = () => {
@@ -16,7 +17,7 @@ export default function Section2() {
     >
       <div className="flex flex-col py-5  justify-center items-center max-w-4xl sm:px-4 p-8 rounded">
         <TextType
-          text={["Ready to Make Your Music Heard?"]}
+          text={["Find your voice, join our symphony!"]}
           typingSpeed={45}
           deletingSpeed={50}
           pauseDuration={3200}
@@ -33,6 +34,7 @@ export default function Section2() {
           viewport={{ once: true, amount: 0.8 }} // trigger once when 50% visible
           transition={{ duration: 1, ease: "easeOut" }} // smooth animation
         >
+          
           Joining <span className="font-semibold">Raaga</span> is your chance to
           be part of a vibrant community of musicians and performers among NIT
           Raipur. Every year, we hold auditions in August to discover new talent
@@ -63,6 +65,7 @@ export default function Section2() {
         >
           <Button text="Meet our Team" onClick={goToTeam} />
         </motion.p>
+        
       </div>
     </section>
   );

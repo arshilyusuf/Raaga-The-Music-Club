@@ -63,7 +63,7 @@ export default function Footer() {
       </div>
 
       {/* Bottom bar */}
-      <div className="mt-12 pt-6 border-t border-gray-800 text-center text-gray-400">
+      <div className="mt-12 mb-15 pt-6 border-t border-gray-800 text-center text-gray-400">
         <p>Made by Raaga The Music Club</p>
       </div>
     </footer>

@@ -12,7 +12,7 @@ export default function Page() {
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
   const [showSuccess, setShowSuccess] = useState(false);
-  const DEADLINE = new Date("2026-06-15T23:59:59").getTime();
+  const DEADLINE = new Date("2026-07-15T23:59:59").getTime();
   const [windowOpen, setWindowOpen] = useState(() => Date.now() < DEADLINE);
   useEffect(() => {
     // If it's already closed, no need to run a timer
@@ -145,7 +145,7 @@ export default function Page() {
 
   const colors = useMemo(() => {
     if (type === "vocal") {
-      return { c1: "#722f37", c2: "#bd9398", c3: "#5b0b14" };
+      return { c1: "#83A317", c2: "#5C6931", c3: "#94AB49" };
     } else {
       return { c1: "#0e6227", c2: "#4aa244", c3: "#075414" };
     }
@@ -522,7 +522,7 @@ export default function Page() {
               </button>
             </form>
           </fieldset>
-          <p className="text-gray-300 mt-10 text-sm flex flex-col sm:flex-row items-start sm:items-center bg-red-950/40 border border-gray-100 rounded-lg px-4 py-3">
+          <p className="text-gray-300 mt-10 text-sm flex flex-col sm:flex-row items-start sm:items-center bg-[#4A5919]/40 border border-gray-100 rounded-lg px-4 py-3">
             <span className="inline-flex items-center justify-center w-5 h-5 rounded-full shrink-0 text-black bg-white backdrop-blur-sm text-xs mb-2 sm:mb-0">
               i
             </span>

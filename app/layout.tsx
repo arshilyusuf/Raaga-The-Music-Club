@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 import Footer from "@/components/Footer";
 import ClickSpark from "@/Reactbits/ClickSpark";
 import Image from "next/image";
+import GradualBlur from "@/Reactbits/GradualBlur";
 
 const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -115,21 +116,24 @@ export default function RootLayout({
                     socialItems={socialItems}
                     displaySocials
                     menuButtonColor="#ffffff"
-                    openMenuButtonColor="#b12f2f"
+                    openMenuButtonColor="#9ebc16"
                     changeMenuColorOnOpen
-                    colors={["#e31616", "#721d1d"]}
-                    accentColor="#b12f2f"
+                    colors={["#9ebc16", "#252e08"]}
+                    accentColor="#9ebc16"
                   />
                 </div>
 
                 <div className="flex-1">
                   <ZoomWrapper>{children}</ZoomWrapper>
                 </div>
-
+                  
                 <Footer />
               </div>
+              
             </div>
+            
           </div>
+
         </ClickSpark>
       </body>
     </html>

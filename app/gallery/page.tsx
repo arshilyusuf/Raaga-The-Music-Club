@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Event from "@/components/Event";
 import Grainient from "@/Reactbits/Grainient";
+import GradualBlur from '@/Reactbits/GradualBlur';
 
 interface GalleryGroup {
   id: string;
@@ -55,10 +56,10 @@ export default function GalleryPage() {
 
       <div className="absolute inset-0 -z-10">
         <Grainient
-          color1="#722f37"
-          color2="#bd9398"
-          color3="#5b0b14"
-          timeSpeed={0.25}
+          color1="#83A317"
+          color2="#2A330B"
+          color3="#2A330B"
+          timeSpeed={0.05}
           colorBalance={0}
           warpStrength={3.35}
           warpFrequency={5}
@@ -85,7 +86,7 @@ export default function GalleryPage() {
           Loading gallery...
         </div>
       ) : galleryGroups.length === 0 ? (
-        <div className="text-center py-40 text-sm text-zinc-500">
+        <div className="text-center py-40 text-sm text-zinc-100">
           No items found in the gallery gallery registry.
         </div>
       ) : (
@@ -104,6 +105,17 @@ export default function GalleryPage() {
           ))}
         </div>
       )}
+      <GradualBlur
+        target="page"
+        position="bottom"
+        height="5rem"
+        strength={2}
+        divCount={5}
+        curve="bezier"
+        exponential
+        opacity={1}
+        animated="scroll"
+      />
     </div>
   );
 }

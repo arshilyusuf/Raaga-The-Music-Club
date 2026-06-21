@@ -19,7 +19,7 @@ export default function SmoothScrollSections() {
       className="w-full"
       style={{
         background:
-          "linear-gradient(to bottom, #722f37 0%, #4a1f24 50%, #2a1215 100%)",
+          "linear-gradient(to bottom, #242d06 0%, #242d06 50%, #242d06 100%)",
       }}
     >
       <motion.div
