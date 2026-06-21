@@ -86,7 +86,7 @@ export default function Page() {
       setSubmitError(
         "The deadline for registrations has passed. Submissions are now closed.",
       );
-      
+
       return;
     }
     setSubmitting(true);
@@ -115,7 +115,13 @@ export default function Page() {
       const json = await res.json();
 
       if (!res.ok) {
-        if (
+        if (res.status === 409) {
+          setSubmitError(
+            json?.error || "You have already registered in this category.",
+          );
+        }
+        // Keep your fallback phone number error matching if still needed
+        else if (
           json?.error?.includes("unique_phone_per_type") ||
           json?.error?.includes("phone_number")
         ) {

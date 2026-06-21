@@ -36,26 +36,6 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Email address is required' }, { status: 400 })
     }
 
-    // --- 1. Check for Duplicate ---
-    const { data: existingRegistration, error: checkError } = await supabase
-      .from('audition_registrations')
-      .select('id')
-      .eq('roll_number', roll_number.trim())
-      .eq('registration_type', registration_type)
-      .maybeSingle()
-
-    if (checkError) {
-      console.error('Database validation error:', checkError)
-      return NextResponse.json({ error: 'Failed to validate registration info' }, { status: 500 })
-    }
-
-    if (existingRegistration) {
-      return NextResponse.json(
-        { error: `You have already submitted an audition registration for ${registration_type}` },
-        { status: 409 }
-      )
-    }
-
     // --- 2. Insert into Supabase ---
     const { data, error } = await supabase
       .from('audition_registrations')
@@ -80,6 +60,12 @@ export async function POST(req: NextRequest) {
 
     if (error) {
       console.error('Supabase insert error:', error)
+      if (error.code === '23505') {
+    return NextResponse.json(
+      { error: `You have already submitted an audition registration for ${body.registration_type}` },
+      { status: 409 }
+    )
+  }
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
@@ -88,7 +74,7 @@ export async function POST(req: NextRequest) {
     
     const textFallback = `Hello ${full_name},\n\nYour registration for the upcoming Raaga: The Music Club auditions has been received.\n\nRegistration Summary:\n- Category: ${registration_type.toUpperCase()}\n- Roll Number: ${data.roll_number}\n- Branch / Year: ${data.branch} (Year ${data.year})\n\nAudition Schedule:\nPlease report directly to the main auditorium on: ${auditionDate}\n\nIf you have any questions or need to reschedule, reply to this email or reach our support team at 98357828123 or 7808361946.\n\nBest regards,\nRaaga Auditions Coordination Team`
 
-    await Promise.allSettled([
+    Promise.allSettled([
       appendToSheet(data),
       transporter.sendMail({
         // CRITICAL SPAM PROTECTION: The sender address MUST precisely match process.env.GMAIL_USER
