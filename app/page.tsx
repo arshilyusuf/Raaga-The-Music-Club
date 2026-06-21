@@ -77,17 +77,34 @@ export default function Home() {
       )}
       <section className="relative z-10 flex min-h-screen items-center justify-center px-4">
         <div className="absolute -top-2 inset-0 -z-10">
+  {/* Desktop Image: Hidden on mobile, visible on medium screens (768px) and up */}
   <Image
-    src="/pictures/Raaga26BGG.png" // Update this extension if you converted to .webp
-    alt="Main Background"
+    src="/pictures/Raaga26BGG.png" 
+    alt="Main Background Desktop"
     fill
     sizes="100vw"
+    className="hidden md:block"
     style={{
-      objectFit: 'cover',
-      objectPosition: 'center',
+      objectFit: "cover",
+      objectPosition: "center",
     }}
     priority
-    quality={85 }
+    quality={100}
+  />
+
+  {/* Mobile Image: Visible on mobile, hidden on medium screens (768px) and up */}
+  <Image
+    src="/pictures/Raaga26BGMobile.png"
+    alt="Main Background Mobile"
+    fill
+    sizes="100vw"
+    className="block md:hidden"
+    style={{
+      objectFit: "cover",
+      objectPosition: "center",
+    }}
+    priority
+    quality={100}
   />
 </div>
         <div className="pointer-events-none absolute inset-0 -z-5 flex-col items-center justify-center">
