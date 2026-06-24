@@ -96,7 +96,7 @@ void main() {
 
   float lum = max(max(col.r, col.g), col.b);
   float alpha = clamp(lum, 0.0, 1.0) * uOpacity;
-
+  
   fragColor = vec4(col * uOpacity, alpha);
 }
 `;
@@ -204,7 +204,7 @@ const buildPalette = (colors: string[]): number[][] => {
 };
 
 export default function Strands({
-  colors = ['#FF4242', '#7C3AED', '#06B6D4', '#EAB308'],
+  colors = ['#7ca352', '#58da24', '#1c5f10', '#3b7527'],
   count = 3,
   speed = 0.5,
   amplitude = 1,

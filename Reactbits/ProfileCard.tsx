@@ -35,15 +35,23 @@ const getCloudinaryBlurUrl = (url?: string) => {
   return undefined;
 };
 // Add this near your getCloudinaryBlurUrl function
-const cloudinaryLoader = ({ src, width, quality }: { src: string; width: number; quality?: number }) => {
-  if (!src.includes('res.cloudinary.com')) return src;
-  
+const cloudinaryLoader = ({
+  src,
+  width,
+  quality,
+}: {
+  src: string;
+  width: number;
+  quality?: number;
+}) => {
+  if (!src.includes("res.cloudinary.com")) return src;
+
   // f_auto: Automatically formats to WebP/AVIF
   // q_auto: Automatically optimizes compression without losing visible quality
   // c_limit,w_{width}: Resizes the image to exactly what Next.js requests
-  const params = `f_auto,q_${quality || 'auto'},c_limit,w_${width}`;
-  
-  return src.replace('/upload/', `/upload/${params}/`);
+  const params = `f_auto,q_${quality || "auto"},c_limit,w_${width}`;
+
+  return src.replace("/upload/", `/upload/${params}/`);
 };
 const KEYFRAMES_ID = "pc-keyframes";
 if (typeof document !== "undefined" && !document.getElementById(KEYFRAMES_ID)) {
@@ -517,17 +525,6 @@ const ProfileCardComponent: React.FC<ProfileCardProps> = ({
         />
       )}
 
-      {instagram && (
-        <a
-          href={instagram}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="absolute bottom-4 right-4 flex items-center z-[1000] justify-center w-fit h-fit p-[0.5rem] rounded-full bg-white/20 backdrop-blur-md border border-white/20 hover:bg-white/30 transition"
-        >
-          <InstagramIcon size={20} />
-        </a>
-      )}
-
       <div ref={shellRef} className="relative z-[1] group">
         <section
           className="grid relative overflow-hidden"
@@ -709,7 +706,7 @@ const ProfileCardComponent: React.FC<ProfileCardProps> = ({
                 mixBlendMode: "luminosity",
                 gridArea: "1 / -1",
                 borderRadius: cardRadius,
-                pointerEvents: "none",
+                pointerEvents: "auto",
               }}
             >
               <div className="absolute bottom-6 left-6 flex flex-col items-start">
@@ -731,20 +728,31 @@ const ProfileCardComponent: React.FC<ProfileCardProps> = ({
                 >
                   {name}
                 </h3>
-                <p
-                  className="font-semibold"
+                <div
+                  className="font-semibold flex gap-3 items-center"
                   style={{
                     fontSize: "16px",
                     backgroundImage:
-                      "linear-gradient(to bottom, #fff, #4a4ac0)",
+                      "linear-gradient(to bottom, #fff, #9c9cec)",
                     backgroundSize: "1em 1.5em",
                     WebkitTextFillColor: "transparent",
                     backgroundClip: "text",
                     WebkitBackgroundClip: "text",
                   }}
                 >
-                  {title}
-                </p>
+                  <p>{title}</p>
+                  {instagram && (
+                    <a
+                      href={instagram}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{ pointerEvents: "auto" }}
+                      // className="absolute bottom-4 right-4 flex items-center z-[1000] justify-center w-fit h-fit p-[0.5rem] rounded-full bg-white/20 backdrop-blur-md border border-white/20 hover:bg-white/30 transition"
+                    >
+                      <InstagramIcon size={15} />
+                    </a>
+                  )}
+                </div>
               </div>
             </div>
           </div>

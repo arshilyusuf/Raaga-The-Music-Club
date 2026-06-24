@@ -9,6 +9,7 @@ import Footer from "@/components/Footer";
 import ClickSpark from "@/Reactbits/ClickSpark";
 import Image from "next/image";
 import GradualBlur from "@/Reactbits/GradualBlur";
+import SmoothScroller from "@/components/SmoothScroller";
 
 const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -19,7 +20,7 @@ const clashGrotesk = localFont({
 
 export const metadata: Metadata = {
   title: "Raaga – The Music Club",
-  description: "The official college music collective.",
+  description: "The Official Music Club of NIT Raipur",
 };
 const menuItems = [
   { label: "Home", ariaLabel: "Go to home page", link: "/" },
@@ -34,6 +35,10 @@ const socialItems = [
     label: "Youtube",
     link: "https://www.youtube.com/@raagathemusicclub",
   },
+  {
+    label: "Facebook",
+    link: "https://www.facebook.com/RaagaTheMusicClub",
+  },
 ];
 
 export default function RootLayout({
@@ -46,36 +51,44 @@ export default function RootLayout({
       <body
         className={`${clashGrotesk.className} antialiased bg-black cursor-pointer select-none overflow-hidden`}
       >
-        <ClickSpark
-          sparkColor="#fff"
-          sparkSize={16}
-          sparkRadius={15}
-          sparkCount={8}
-          duration={400}
-        >
-          <div className="relative min-h-screen w-screen">
-            {/* Full-screen black background */}
-            {/* <div className="absolute inset-0 bg-black z-0 touch-none" /> */}
+        <SmoothScroller>
+          <ClickSpark
+            sparkColor="#fff"
+            sparkSize={16}
+            sparkRadius={15}
+            sparkCount={8}
+            duration={400}
+          >
+            <div className="relative min-h-screen w-screen">
+              {/* Full-screen black background */}
+              {/* <div className="absolute inset-0 bg-black z-0 touch-none" /> */}
 
-            <div className="fixed overflow-y-auto overscroll-none no-scrollbar inset-2 sm:inset-3 md:inset-4 lg:inset-5 rounded-3xl z-10">
-              <div className="relative flex min-h-full flex-col w-full bg-black text-zinc-50 rounded-3xl">
-                {/* Top-left logo rectangle */}
-                <div className="fixed top-0 left-1 sm:top-1 sm:left-0 lg:top-4 lg:left-4 z-20">
-                  <div className="flex-col p-1">
-                    <div className="flex">
-                      <a href="/" className="select-none">
-                        <div className="bg-black h-13 sm:h-13 w-16 sm:w-auto rounded-br-2xl p-2 select-none">
-                          <Image
-                            src="/pictures/Shruti26 Profile Picture-7.png"
-                            className="h-full w-full object-contain"
-                            width={64}
-                            height={64}
-                            alt="Raaga Logo"
-                            draggable={false}
-                            priority
-                          />
-                        </div>
-                      </a>
+              <div id="scroll-container" className="fixed overflow-y-auto overscroll-none no-scrollbar inset-2 sm:inset-3 md:inset-4 lg:inset-5 rounded-3xl z-10">
+                <div className="relative flex min-h-full flex-col w-full bg-black text-zinc-50 rounded-3xl">
+                  {/* Top-left logo rectangle */}
+                  <div className="fixed top-0 left-1 sm:top-1 sm:left-0 lg:top-4 lg:left-4 z-20">
+                    <div className="flex-col p-1">
+                      <div className="flex">
+                        <a href="/" className="select-none">
+                          <div className="bg-black h-13 sm:h-13 w-16 sm:w-auto rounded-br-2xl p-2 select-none">
+                            <Image
+                              src="/pictures/Shruti26 Profile Picture-7.png"
+                              className="h-full w-full object-contain"
+                              width={64}
+                              height={64}
+                              alt="Raaga Logo"
+                              draggable={false}
+                              priority
+                            />
+                          </div>
+                        </a>
+                        <img
+                          src="/svg-path1.svg"
+                          alt=""
+                          aria-hidden="true"
+                          className="h-8"
+                        />
+                      </div>
                       <img
                         src="/svg-path1.svg"
                         alt=""
@@ -83,15 +96,8 @@ export default function RootLayout({
                         className="h-8"
                       />
                     </div>
-                    <img
-                      src="/svg-path1.svg"
-                      alt=""
-                      aria-hidden="true"
-                      className="h-8"
-                    />
                   </div>
-                </div>
-                {/* <div className="relative flex p-3 px-4 rounded-br-2xl h-15 w-25 sm:h-15 sm:w-25 items-center justify-center bg-black">
+                  {/* <div className="relative flex p-3 px-4 rounded-br-2xl h-15 w-25 sm:h-15 sm:w-25 items-center justify-center bg-black">
                     <img
                       src="/pictures/Shruti26 Profile Picture-7.png"
                       className="h-full w-full object-contain"
@@ -109,30 +115,31 @@ export default function RootLayout({
                       className="pointer-events-none absolute sm:left-1 left-[0.2rem] sm:-bottom-6 -bottom-[1.45rem] h-6 w-6"
                     />
                       </div> */}
-                <div className="fixed inset-0 z-999 pointer-events-none">
-                  <StaggeredMenu
-                    position="right"
-                    isFixed={true}
-                    items={menuItems}
-                    socialItems={socialItems}
-                    displaySocials
-                    menuButtonColor="#ffffff"
-                    openMenuButtonColor="#9ebc16"
-                    changeMenuColorOnOpen
-                    colors={["#9ebc16", "#252e08"]}
-                    accentColor="#9ebc16"
-                  />
-                </div>
+                  <div className="fixed inset-0 z-999 pointer-events-none">
+                    <StaggeredMenu
+                      position="right"
+                      isFixed={true}
+                      items={menuItems}
+                      socialItems={socialItems}
+                      displaySocials
+                      menuButtonColor="#ffffff"
+                      openMenuButtonColor="#9ebc16"
+                      changeMenuColorOnOpen
+                      colors={["#9ebc16", "#252e08"]}
+                      accentColor="#9ebc16"
+                    />
+                  </div>
 
-                <div className="flex-1">
-                  <ZoomWrapper>{children}</ZoomWrapper>
-                </div>
+                  <div className="flex-1">
+                    <ZoomWrapper>{children}</ZoomWrapper>
+                  </div>
 
-                <Footer />
+                  <Footer />
+                </div>
               </div>
             </div>
-          </div>
-        </ClickSpark>
+          </ClickSpark>
+        </SmoothScroller>
       </body>
     </html>
   );
