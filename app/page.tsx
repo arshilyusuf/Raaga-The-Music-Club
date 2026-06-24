@@ -55,7 +55,7 @@ export default function Home() {
   return (
     <main className="relative min-h-screen w-full text-zinc-50 overflow-hidden ">
       {isMobile ? (
-        <div className="absolute w-full h-screen mt-20 flex items-center justify-center z-[300] pointer-events-none">
+        <div className="absolute w-full h-screen mt-35 flex items-center justify-center z-[300] pointer-events-none">
           <CircularText
             text="AUDITIONS ✦ COMING ✦ SOON ✦ "
             onHover="speedUp"
@@ -77,36 +77,38 @@ export default function Home() {
       )}
       <section className="relative z-10 flex min-h-screen items-center justify-center px-4">
         <div className="absolute -top-2 inset-0 -z-10">
-  {/* Desktop Image: Hidden on mobile, visible on medium screens (768px) and up */}
-  <Image
-    src="/pictures/Raaga26BGG.png" 
-    alt="Main Background Desktop"
-    fill
-    sizes="100vw"
-    className="hidden md:block"
-    style={{
-      objectFit: "cover",
-      objectPosition: "center",
-    }}
-    priority
-    quality={100}
-  />
+          {/* Desktop Image: Hidden on mobile, visible on medium screens (768px) and up */}
+          <Image
+            src="/pictures/Raaga26BGG.png"
+            alt="Main Background Desktop"
+            fill
+            sizes="100vw"
+            className="hidden md:block"
+            style={{
+              objectFit: "cover",
+              objectPosition: "center",
+            }}
+            priority
+            quality={100}
+            draggable={false}
+          />
 
-  {/* Mobile Image: Visible on mobile, hidden on medium screens (768px) and up */}
-  <Image
-    src="/pictures/Raaga26BGMobile.png"
-    alt="Main Background Mobile"
-    fill
-    sizes="100vw"
-    className="block md:hidden"
-    style={{
-      objectFit: "cover",
-      objectPosition: "center",
-    }}
-    priority
-    quality={100}
-  />
-</div>
+          {/* Mobile Image: Visible on mobile, hidden on medium screens (768px) and up */}
+          <Image
+            src="/pictures/Raaga26BGMobile.png"
+            alt="Main Background Mobile"
+            fill
+            sizes="100vw"
+            className="block md:hidden"
+            style={{
+              objectFit: "cover",
+              objectPosition: "center",
+            }}
+            priority
+            quality={100}
+            draggable={false}
+          />
+        </div>
         <div className="pointer-events-none absolute inset-0 -z-5 flex-col items-center justify-center">
           <div className="w-full h-full">
             <MagicRings
@@ -155,31 +157,57 @@ export default function Home() {
               ease: [0.22, 1, 0.36, 1],
             }}
           >
-            <div className="relative w-120 sm:w-full  sm:h-full h-full">
+            <motion.div
+              // 1. Changed w-120 to w-full to prevent mobile overflow
+              // 2. Added flex justify-center items-center to center the image
+              className="relative w-full h-full flex justify-center items-center"
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{
+                duration: 0.8,
+                type: "spring",
+                damping: 6,
+                stiffness: 50,
+                delay: 1,
+              }}
+            >
               {isMobile ? (
-                <h1 className="text-6xl mt-10 font-black text-white [-webkit-text-stroke:14px_#252e08] [paint-order:stroke_fill]">
-                  RAAGA
-                </h1>
+                // <h1 className="text-6xl mt-10 font-black text-white [-webkit-text-stroke:14px_#252e08] [paint-order:stroke_fill]">
+                //   RAAGA
+                // </h1>
+                <Image
+                  src="/pictures/RaagaLogo1.png"
+                  alt="RAAGA"
+                  width={300}
+                  height={200}
+                  className="object-contain"
+                  draggable={false}
+                />
               ) : (
-                <TextPressure
-                  text="RAAGA"
-                  flex={false}
-                  alpha={false}
-                  stroke
-                  scale={false}
-                  weight
-                  strokeColor="#252e08"
-                  strokeWidth={13}
-                  width={true}
-                  italic
-                  textColor="#ffffff"
-                  minFontSize={260}
+                // <TextPressure
+                //   text="RAAGA"
+                //   flex={false}
+                //   alpha={false}
+                //   stroke
+                //   scale={false}
+                //   weight
+                //   strokeColor="#252e08"
+                //   strokeWidth={13}
+                //   width={true}
+                //   italic
+                //   textColor="#ffffff"
+                //   minFontSize={260}
+                // />
+                <Image
+                  src="/pictures/RaagaLogo1.png"
+                  alt="RAAGA"
+                  width={500}
+                  height={200}
+                  className="object-contain"
+                  draggable={false}
                 />
               )}
-            </div>
-            <span className="block text-2xl sm:text-lg md:text-xl lg:text-2xl font-black text-zinc-100/90 tracking-widest">
-              THE MUSIC CLUB <br />
-            </span>
+            </motion.div>
           </motion.h1>
           <motion.div
             initial={{ opacity: 0, y: 10 }}
@@ -191,7 +219,7 @@ export default function Home() {
             }}
           ></motion.div>
           <motion.p
-            className="sm:-mt-4 text-lg sm:text-xl md:text-lg font-medium text-zinc-200/90"
+            className="sm:-mt-3 text-[1rem] sm:text-xl md:text-lg font-medium text-zinc-200/90"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{
@@ -200,8 +228,11 @@ export default function Home() {
               ease: [0.22, 1, 0.36, 1],
             }}
           >
-            The official music club of <br className="block sm:hidden " /> NIT
-            Raipur{" "}
+            <span className="text-xl sm:text-3xl md:text-2xl font-bold text-white">
+              THE MUSIC CLUB
+            </span>
+            <br />
+            The official music club of NIT Raipur{" "}
           </motion.p>
           {/* <div className="mt-6">
             <motion.p

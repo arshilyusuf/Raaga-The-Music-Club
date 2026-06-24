@@ -63,14 +63,15 @@ export default function RootLayout({
                 <div className="fixed top-0 left-1 sm:top-1 sm:left-0 lg:top-4 lg:left-4 z-20">
                   <div className="flex-col p-1">
                     <div className="flex">
-                      <a href="/">
-                        <div className="bg-black h-13 sm:h-13 w-16 sm:w-auto rounded-br-2xl p-2">
+                      <a href="/" className="select-none">
+                        <div className="bg-black h-13 sm:h-13 w-16 sm:w-auto rounded-br-2xl p-2 select-none">
                           <Image
                             src="/pictures/Shruti26 Profile Picture-7.png"
                             className="h-full w-full object-contain"
                             width={64}
                             height={64}
                             alt="Raaga Logo"
+                            draggable={false}
                             priority
                           />
                         </div>
@@ -126,14 +127,11 @@ export default function RootLayout({
                 <div className="flex-1">
                   <ZoomWrapper>{children}</ZoomWrapper>
                 </div>
-                  
+
                 <Footer />
               </div>
-              
             </div>
-            
           </div>
-
         </ClickSpark>
       </body>
     </html>

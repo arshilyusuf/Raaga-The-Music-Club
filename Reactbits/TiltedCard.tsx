@@ -1,16 +1,42 @@
-'use client'
-import type { SpringOptions } from 'motion/react';
-import { useRef, useState } from 'react';
-import { motion, useMotionValue, useSpring } from 'motion/react';
+"use client";
+import type { SpringOptions } from "motion/react";
+import { useRef, useState } from "react";
+import { motion, useMotionValue, useSpring } from "motion/react";
+import Image from "next/image";
+
+// Cloudinary Transformation Helpers
+const getCloudinaryBlurUrl = (url?: string) => {
+  if (!url || typeof url !== "string" || !url.includes("res.cloudinary.com"))
+    return undefined;
+  const parts = url.split("/upload/");
+  if (parts.length === 2) {
+    return `${parts[0]}/upload/w_50,e_blur:1000,q_10,f_auto/${parts[1]}`;
+  }
+  return undefined;
+};
+
+const cloudinaryLoader = ({
+  src,
+  width,
+  quality,
+}: {
+  src: string;
+  width: number;
+  quality?: number;
+}) => {
+  if (!src.includes("res.cloudinary.com")) return src;
+  const params = `f_auto,q_${quality || "auto"},c_limit,w_${width}`;
+  return src.replace("/upload/", `/upload/${params}/`);
+};
 
 interface TiltedCardProps {
-  imageSrc: React.ComponentProps<'img'>['src'];
+  imageSrc: string; // Updated to string for Next.js Image
   altText?: string;
   captionText?: string;
-  containerHeight?: React.CSSProperties['height'];
-  containerWidth?: React.CSSProperties['width'];
-  imageHeight?: React.CSSProperties['height'];
-  imageWidth?: React.CSSProperties['width'];
+  containerHeight?: React.CSSProperties["height"];
+  containerWidth?: React.CSSProperties["width"];
+  imageHeight?: React.CSSProperties["height"];
+  imageWidth?: React.CSSProperties["width"];
   scaleOnHover?: number;
   rotateAmplitude?: number;
   showMobileWarning?: boolean;
@@ -22,23 +48,23 @@ interface TiltedCardProps {
 const springValues: SpringOptions = {
   damping: 30,
   stiffness: 100,
-  mass: 2
+  mass: 2,
 };
 
 export default function TiltedCard({
   imageSrc,
-  altText = 'Tilted card image',
-  captionText = '',
-  containerHeight = '300px',
-  containerWidth = '100%',
-  imageHeight = '300px',
-  imageWidth = '100%',
+  altText = "Tilted card image",
+  captionText = "",
+  containerHeight = "300px",
+  containerWidth = "100%",
+  imageHeight = "300px",
+  imageWidth = "100%",
   scaleOnHover = 1.1,
   rotateAmplitude = 14,
   showMobileWarning = true,
   showTooltip = true,
   overlayContent = null,
-  displayOverlayContent = false
+  displayOverlayContent = false,
 }: TiltedCardProps) {
   const ref = useRef<HTMLElement>(null);
   const x = useMotionValue(0);
@@ -50,7 +76,7 @@ export default function TiltedCard({
   const rotateFigcaption = useSpring(0, {
     stiffness: 350,
     damping: 30,
-    mass: 1
+    mass: 1,
   });
 
   const [lastY, setLastY] = useState(0);
@@ -95,7 +121,7 @@ export default function TiltedCard({
       className="relative w-full h-full [perspective:800px] flex flex-col items-center justify-center"
       style={{
         height: containerHeight,
-        width: containerWidth
+        width: containerWidth,
       }}
       onMouseMove={handleMouse}
       onMouseEnter={handleMouseEnter}
@@ -114,25 +140,25 @@ export default function TiltedCard({
           height: imageHeight,
           rotateX,
           rotateY,
-          scale
+          scale,
         }}
       >
-        <motion.img
+        {/* Swapped motion.img for Next.js Image with Cloudinary optimization */}
+        <Image
+          loader={cloudinaryLoader}
           src={imageSrc}
           alt={altText}
-          className="absolute top-0 left-0 object-cover rounded-[15px] will-change-transform [transform:translateZ(0)]"
-          style={{
-            width: imageWidth,
-            height: imageHeight
-          }}
+          fill
+          sizes="(max-width: 768px) 100vw, 500px"
+          placeholder={getCloudinaryBlurUrl(imageSrc) ? "blur" : "empty"}
+          blurDataURL={getCloudinaryBlurUrl(imageSrc)}
+          className="object-cover rounded-[15px] will-change-transform [transform:translateZ(0)]"
         />
 
         {displayOverlayContent && overlayContent && (
           <motion.div className="absolute top-0 left-0 z-[2] text-lg bg-black px-3 py-1 rounded-lg will-change-transform [transform:translateZ(30px)]">
             {overlayContent}
-            <p className='text-zinc-200 text-light text-sm'>
-              {altText}
-            </p>
+            <p className="text-zinc-200 text-light text-sm">{altText}</p>
           </motion.div>
         )}
       </motion.div>
@@ -144,7 +170,7 @@ export default function TiltedCard({
             x,
             y,
             opacity,
-            rotate: rotateFigcaption
+            rotate: rotateFigcaption,
           }}
         >
           {captionText}
