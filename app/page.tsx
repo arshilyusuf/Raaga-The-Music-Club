@@ -217,7 +217,7 @@ export default function Home() {
             duration: 0.8,
             ease: "easeIn",
           }}
-          className="absolute w-full h-screen mt-35 flex items-center justify-center z-[300] pointer-events-none"
+          className="absolute w-full h-screen mt-20 flex items-center justify-center z-[300] pointer-events-none"
         >
           <CircularText
             text="AUDITIONS ✦ COMING ✦ SOON ✦ "
@@ -319,7 +319,7 @@ export default function Home() {
           className="flex flex-col items-center justify-center text-center -mt-30 sm:mt-0"
         >
           <motion.h1
-            className="sm:text-5xl md:text-6xl lg:text-7xl mb-6 -mt-55 tracking-normal leading-tight"
+            className="sm:text-5xl md:text-6xl lg:text-7xl mb-1 -mt-55 tracking-normal leading-tight"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{
