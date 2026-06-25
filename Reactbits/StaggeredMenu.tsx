@@ -573,7 +573,7 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
                       aria-label={it.ariaLabel}
                       data-index={idx + 1}
                     >
-                      <span className="sm-panel-itemLabel sm:text-[3.5rem] text-[3.8rem] tracking-tighter inline-block [transform-origin:50%_100%] will-change-transform">
+                      <span className="sm-panel-itemLabel sm:text-[3.5rem] text-[3.1rem] sm:tracking-tighter inline-block [transform-origin:50%_100%] will-change-transform">
                         {it.label}
                       </span>
                     </a>
@@ -598,7 +598,7 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
                 className="sm-socials mt-auto mb-10 pt-8 flex flex-col gap-3"
                 aria-label="Social links"
               >
-                <h3 className="sm-socials-title m-0 text-base font-medium [color:var(--sm-accent,#ff0000)]">
+                <h3 className="sm-socials-title m-0 sm:text-base font-medium [color:var(--sm-accent,#ff0000)]">
                   Socials
                 </h3>
                 <ul
@@ -611,7 +611,7 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
                         href={s.link}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="sm-socials-link sm:text-[1.2rem]  font-medium text-[#111] no-underline relative inline-block py-[2px] transition-[color,opacity] duration-300 ease-linear"
+                        className="sm-socials-link sm:text-[1.2rem] font-medium text-[#111] no-underline relative inline-block py-[2px] transition-[color,opacity] duration-300 ease-linear"
                       >
                         {s.label}
                       </a>
@@ -655,7 +655,7 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
 .sm-scope .sm-socials-list .sm-socials-link:hover,
 .sm-scope .sm-socials-list .sm-socials-link:focus-visible { opacity: 1; }
 .sm-scope .sm-socials-link:focus-visible { outline: 2px solid var(--sm-accent, #ff0000); outline-offset: 3px; }
-.sm-scope .sm-socials-link { font-size: 1.2rem; font-weight: 500; color: #111; text-decoration: none; position: relative; padding: 2px 0; display: inline-block; transition: color 0.3s ease, opacity 0.3s ease; }
+.sm-scope .sm-socials-link { font-size: 0.9rem; font-weight: 500; color: #111; text-decoration: none; position: relative; padding: 2px 0; display: inline-block; transition: color 0.3s ease, opacity 0.3s ease; }
 .sm-scope .sm-socials-link:hover { color: var(--sm-accent, #ff0000); }
 .sm-scope .sm-panel-title { margin: 0; font-size: 1rem; font-weight: 600; color: #fff; text-transform: uppercase; }
 .sm-scope .sm-panel-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.5rem; }

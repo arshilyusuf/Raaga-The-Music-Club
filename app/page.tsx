@@ -319,7 +319,7 @@ export default function Home() {
           className="flex flex-col items-center justify-center text-center -mt-30 sm:mt-0"
         >
           <motion.h1
-            className="sm:text-5xl md:text-6xl lg:text-7xl mb-1 -mt-55 tracking-normal leading-tight"
+            className="sm:text-5xl md:text-6xl lg:text-7xl mb-1 -mt-45 tracking-normal leading-tight"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{
@@ -349,8 +349,8 @@ export default function Home() {
                 <Image
                   src="/pictures/RaagaLogo1.png"
                   alt="RAAGA"
-                  width={300}
-                  height={200}
+                  width={200}
+                  height={100}
                   className="object-contain"
                   draggable={false}
                 />
