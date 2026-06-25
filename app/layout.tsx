@@ -10,6 +10,7 @@ import ClickSpark from "@/Reactbits/ClickSpark";
 import Image from "next/image";
 import GradualBlur from "@/Reactbits/GradualBlur";
 import SmoothScroller from "@/components/SmoothScroller";
+import { FaFacebook, FaInstagram, FaYoutube } from "react-icons/fa";
 
 const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -31,13 +32,13 @@ const menuItems = [
 ];
 
 const socialItems = [
-  { label: "Instagram", link: "https://www.instagram.com/raaga.nitrr" },
+  { label: <FaInstagram />, link: "https://www.instagram.com/raaga.nitrr" },
   {
-    label: "Youtube",
+    label: <FaYoutube />,
     link: "https://www.youtube.com/@raagathemusicclub",
   },
   {
-    label: "Facebook",
+    label: <FaFacebook />,
     link: "https://www.facebook.com/RaagaTheMusicClub",
   },
 ];

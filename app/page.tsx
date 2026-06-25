@@ -13,6 +13,10 @@ import Button from "@/components/Button";
 import { CartoonButton } from "@/components/ui/CartoonButton";
 import GradualBlur from "@/Reactbits/GradualBlur";
 import Image from "next/image";
+import { FaInstagram, FaYoutube, FaFacebook } from "react-icons/fa";
+
+
+
 const InfiniteMenu = lazy(() => import("@/Reactbits/InfiniteMenu"));
 export default function Home() {
   const items = [
@@ -349,8 +353,8 @@ export default function Home() {
                 <Image
                   src="/pictures/RaagaLogo1.png"
                   alt="RAAGA"
-                  width={200}
-                  height={100}
+                  width={250}
+                  height={200}
                   className="object-contain"
                   draggable={false}
                 />
@@ -454,7 +458,6 @@ export default function Home() {
           />
         </div>
 
-        {/* InfiniteMenu for larger screens */}
         <div className="h-full w-full sm:block hidden bg-transparent">
           <InfiniteMenu items={items} scale={1.8} />
         </div>
