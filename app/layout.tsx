@@ -27,6 +27,7 @@ const menuItems = [
   { label: "auditions", ariaLabel: "Learn about us", link: "/auditions" },
   { label: "gallery", ariaLabel: "View our services", link: "/gallery" },
   { label: "team", ariaLabel: "Get in touch", link: "/team" },
+  { label: "ABOUT", ariaLabel: "about us", link: "/about" },
 ];
 
 const socialItems = [

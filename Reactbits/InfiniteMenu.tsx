@@ -932,20 +932,42 @@ class InfiniteGridMenu {
     canvas.height = this.atlasSize * cellSize;
 
     Promise.all(
-      this.items.map(
-        (item) =>
-          new Promise<HTMLImageElement>((resolve) => {
-            const img = new Image();
-            img.crossOrigin = "anonymous";
-            img.onload = () => resolve(img);
-            img.src = item.image;
-          }),
-      ),
-    ).then((images) => {
-      images.forEach((img, i) => {
+      this.items.map(async (item) => {
+        try {
+          const response = await fetch(item.image);
+          const blob = await response.blob();
+          return await createImageBitmap(blob);
+        } catch (error) {
+          console.error(`Failed to load image: ${item.image}`, error);
+          // Return a transparent empty bitmap as a fallback to prevent Promise.all from failing
+          return await createImageBitmap(new ImageData(1, 1));
+        }
+      }),
+    ).then((bitmaps) => {
+      bitmaps.forEach((bitmap, i) => {
         const x = (i % this.atlasSize) * cellSize;
         const y = Math.floor(i / this.atlasSize) * cellSize;
-        ctx.drawImage(img, x, y, cellSize, cellSize);
+
+        // Calculate crop dimensions for an 'object-fit: cover' effect
+        const minSize = Math.min(bitmap.width, bitmap.height);
+        const sx = (bitmap.width - minSize) / 2;
+        const sy = (bitmap.height - minSize) / 2;
+
+        // Use the 9-argument drawImage to crop and scale
+        ctx.drawImage(
+          bitmap,
+          sx,
+          sy,
+          minSize,
+          minSize,
+          x,
+          y,
+          cellSize,
+          cellSize,
+        );
+
+        // Free up memory immediately after drawing
+        bitmap.close();
       });
 
       gl.bindTexture(gl.TEXTURE_2D, this.tex);
@@ -1278,10 +1300,12 @@ const InfiniteMenu: FC<InfiniteMenuProps> = ({ items = [], scale = 1.0 }) => {
 
   const handleButtonClick = () => {
     if (!activeItem?.link) return;
+
     if (activeItem.link.startsWith("http")) {
       window.open(activeItem.link, "_blank");
     } else {
-      console.log("Internal route:", activeItem.link);
+      // Navigates to your internal route by changing the browser's URL
+      window.location.href = activeItem.link;
     }
   };
 
@@ -1296,7 +1320,7 @@ const InfiniteMenu: FC<InfiniteMenuProps> = ({ items = [], scale = 1.0 }) => {
       {activeItem && (
         <>
           <h2
-             className={`
+            className={`
     select-none
     absolute
     font-black
@@ -1339,14 +1363,14 @@ const InfiniteMenu: FC<InfiniteMenuProps> = ({ items = [], scale = 1.0 }) => {
 
           <motion.div
             onClick={handleButtonClick}
-  whileHover={{ scale: 1.2 }}
-  whileTap={{ scale: 0.9 }}
-  transition={{
-    type: "spring",
-    stiffness: 1200,
-    damping: 15,
-    mass: 0.3
-  }}
+            whileHover={{ scale: 1.2 }}
+            whileTap={{ scale: 0.9 }}
+            transition={{
+              type: "spring",
+              stiffness: 1200,
+              damping: 15,
+              mass: 0.3,
+            }}
             className={`
     absolute
     left-1/2

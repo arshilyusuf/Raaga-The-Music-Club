@@ -52,7 +52,7 @@ export default function Section2() {
           </span>
           <span>
             Auditions are also taken for{" "}
-            <span className="font-semibold">Management</span> and{" "}
+            {/* <span className="font-semibold">Management</span> and{" "} */}
             <span className="font-semibold">Anchoring</span> domains.
           </span>
         </motion.div>

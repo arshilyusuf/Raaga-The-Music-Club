@@ -4,7 +4,12 @@ import { useRef, useState } from "react";
 import { motion, useMotionValue, useSpring } from "motion/react";
 import Image from "next/image";
 
-// Cloudinary Transformation Helpers
+// Detect touch/mobile once — avoids per-render overhead
+const IS_MOBILE =
+  typeof window !== "undefined" &&
+  (window.matchMedia("(pointer: coarse)").matches ||
+    /Android|iPhone|iPad|iPod/i.test(navigator.userAgent));
+
 const getCloudinaryBlurUrl = (url?: string) => {
   if (!url || typeof url !== "string" || !url.includes("res.cloudinary.com"))
     return undefined;
@@ -30,7 +35,7 @@ const cloudinaryLoader = ({
 };
 
 interface TiltedCardProps {
-  imageSrc: string; // Updated to string for Next.js Image
+  imageSrc: string;
   altText?: string;
   captionText?: string;
   containerHeight?: React.CSSProperties["height"];
@@ -51,7 +56,50 @@ const springValues: SpringOptions = {
   mass: 2,
 };
 
-export default function TiltedCard({
+// ─── Mobile variant: pure CSS, zero JS on interaction ───────────────────────
+function TiltedCardMobile({
+  imageSrc,
+  altText = "Tilted card image",
+  containerHeight = "300px",
+  containerWidth = "100%",
+  imageHeight = "300px",
+  imageWidth = "100%",
+  overlayContent,
+  displayOverlayContent = false,
+}: TiltedCardProps) {
+  return (
+    <figure
+      className="relative flex flex-col items-center justify-center"
+      style={{ height: containerHeight, width: containerWidth }}
+    >
+      <div
+        className="relative overflow-hidden rounded-[15px]"
+        style={{ width: imageWidth, height: imageHeight }}
+      >
+        <Image
+          loader={cloudinaryLoader}
+          src={imageSrc}
+          alt={altText}
+          fill
+          sizes="(max-width: 768px) 100vw, 500px"
+          placeholder={getCloudinaryBlurUrl(imageSrc) ? "blur" : "empty"}
+          blurDataURL={getCloudinaryBlurUrl(imageSrc)}
+          className="object-cover rounded-[15px]"
+          // No will-change, no transform — just the image
+        />
+        {displayOverlayContent && overlayContent && (
+          <div className="absolute top-0 left-0 z-[2] text-lg bg-black px-3 py-1 rounded-lg">
+            {overlayContent}
+            <p className="text-zinc-200 text-sm">{altText}</p>
+          </div>
+        )}
+      </div>
+    </figure>
+  );
+}
+
+// ─── Desktop variant: full Framer Motion springs ─────────────────────────────
+function TiltedCardDesktop({
   imageSrc,
   altText = "Tilted card image",
   captionText = "",
@@ -61,7 +109,6 @@ export default function TiltedCard({
   imageWidth = "100%",
   scaleOnHover = 1.1,
   rotateAmplitude = 14,
-  showMobileWarning = true,
   showTooltip = true,
   overlayContent = null,
   displayOverlayContent = false,
@@ -78,27 +125,18 @@ export default function TiltedCard({
     damping: 30,
     mass: 1,
   });
-
   const [lastY, setLastY] = useState(0);
 
   function handleMouse(e: React.MouseEvent<HTMLElement>) {
     if (!ref.current) return;
-
     const rect = ref.current.getBoundingClientRect();
     const offsetX = e.clientX - rect.left - rect.width / 2;
     const offsetY = e.clientY - rect.top - rect.height / 2;
-
-    const rotationX = (offsetY / (rect.height / 2)) * -rotateAmplitude;
-    const rotationY = (offsetX / (rect.width / 2)) * rotateAmplitude;
-
-    rotateX.set(rotationX);
-    rotateY.set(rotationY);
-
+    rotateX.set((offsetY / (rect.height / 2)) * -rotateAmplitude);
+    rotateY.set((offsetX / (rect.width / 2)) * rotateAmplitude);
     x.set(e.clientX - rect.left);
     y.set(e.clientY - rect.top);
-
-    const velocityY = offsetY - lastY;
-    rotateFigcaption.set(-velocityY * 0.6);
+    rotateFigcaption.set(-(offsetY - lastY) * 0.6);
     setLastY(offsetY);
   }
 
@@ -119,20 +157,11 @@ export default function TiltedCard({
     <figure
       ref={ref}
       className="relative w-full h-full [perspective:800px] flex flex-col items-center justify-center"
-      style={{
-        height: containerHeight,
-        width: containerWidth,
-      }}
+      style={{ height: containerHeight, width: containerWidth }}
       onMouseMove={handleMouse}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
-      {showMobileWarning && (
-        <div className="absolute top-4 text-center text-sm block sm:hidden">
-          This effect is not optimized for mobile. Check on desktop.
-        </div>
-      )}
-
       <motion.div
         className="relative [transform-style:preserve-3d]"
         style={{
@@ -143,7 +172,6 @@ export default function TiltedCard({
           scale,
         }}
       >
-        {/* Swapped motion.img for Next.js Image with Cloudinary optimization */}
         <Image
           loader={cloudinaryLoader}
           src={imageSrc}
@@ -154,7 +182,6 @@ export default function TiltedCard({
           blurDataURL={getCloudinaryBlurUrl(imageSrc)}
           className="object-cover rounded-[15px] will-change-transform [transform:translateZ(0)]"
         />
-
         {displayOverlayContent && overlayContent && (
           <motion.div className="absolute top-0 left-0 z-[2] text-lg bg-black px-3 py-1 rounded-lg will-change-transform [transform:translateZ(30px)]">
             {overlayContent}
@@ -166,16 +193,20 @@ export default function TiltedCard({
       {showTooltip && (
         <motion.figcaption
           className="pointer-events-none absolute left-0 top-0 rounded-[4px] bg-white px-[10px] py-[4px] text-[10px] text-[#2d2d2d] opacity-0 z-[3] hidden sm:block"
-          style={{
-            x,
-            y,
-            opacity,
-            rotate: rotateFigcaption,
-          }}
+          style={{ x, y, opacity, rotate: rotateFigcaption }}
         >
           {captionText}
         </motion.figcaption>
       )}
     </figure>
   );
+}
+
+// ─── Public export: picks the right variant at runtime ───────────────────────
+export default function TiltedCard(props: TiltedCardProps) {
+  if (IS_MOBILE) {
+    // Never import or instantiate Framer Motion springs on mobile
+    return <TiltedCardMobile {...props} />;
+  }
+  return <TiltedCardDesktop {...props} />;
 }

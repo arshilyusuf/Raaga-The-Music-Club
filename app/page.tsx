@@ -1,8 +1,8 @@
 "use client";
-
+import { Suspense, lazy } from "react";
 import { motion } from "framer-motion";
 import MagicRings from "@/Reactbits/MagicRings";
-import InfiniteMenu from "@/Reactbits/InfiniteMenu";
+// import InfiniteMenu from "@/Reactbits/InfiniteMenu";
 import CurvedLoop from "@/Reactbits/CurvedLoop";
 import TextPressure from "@/Reactbits/TextPressure";
 import ScrollTimeline from "@/components/ScrollTimeline";
@@ -13,34 +13,188 @@ import Button from "@/components/Button";
 import { CartoonButton } from "@/components/ui/CartoonButton";
 import GradualBlur from "@/Reactbits/GradualBlur";
 import Image from "next/image";
+const InfiniteMenu = lazy(() => import("@/Reactbits/InfiniteMenu"));
 export default function Home() {
   const items = [
     {
-      image: "https://picsum.photos/300/300?grayscale",
-      link: "https://google.com/",
+      image: "/pictures/domeGallery/Shruti - 6.jpg",
+      link: "/gallery",
       title: "Shruti 25",
-      description: "This is pretty cool, right?",
+      description: "",
     },
     {
-      image: "https://picsum.photos/400/400?grayscale",
-      link: "https://google.com/",
-      title: "Shruti 24",
-      description: "This is pretty cool, right?",
-    },
-    {
-      image: "https://picsum.photos/500/500?grayscale",
-      link: "https://google.com/",
-      title: "Shruti 23",
-      description: "This is pretty cool, right?",
-    },
-    {
-      image: "https://picsum.photos/600/600?grayscale",
-      link: "https://google.com/",
+      image: "/pictures/domeGallery/Shruti - 1.jpg",
+      link: "/gallery",
       title: "Shruti 22",
-      description: "This is pretty cool, right?",
+      description: "",
+    },
+    {
+      image: "/pictures/domeGallery/Shruti - 2.jpg",
+      link: "/gallery",
+      title: "Shruti 23",
+      description: "",
+    },
+    {
+      image: "/pictures/domeGallery/Shruti - 3.jpg",
+      link: "/gallery",
+      title: "Shruti 25",
+      description: "",
+    },
+    {
+      image: "/pictures/domeGallery/Shruti - 4.jpg",
+      link: "/gallery",
+      title: "Shruti 25",
+      description: "",
+    },
+    {
+      image: "/pictures/domeGallery/Shruti - 5.jpg",
+      link: "/gallery",
+      title: "Shruti 25",
+      description: "",
+    },
+    {
+      image: "/pictures/domeGallery/Shruti - 7.jpg",
+      link: "/gallery",
+      title: "Shruti 23",
+      description: "",
+    },
+    {
+      image: "/pictures/domeGallery/Shruti - 8.jpg",
+      link: "/gallery",
+      title: "Shruti 24",
+      description: "",
+    },
+    {
+      image: "/pictures/domeGallery/Shruti - 9.jpg",
+      link: "/gallery",
+      title: "Shruti 24",
+      description: "",
+    },
+    {
+      image: "/pictures/domeGallery/Shruti - 10.jpg",
+      link: "/gallery",
+      title: "Shruti 24",
+      description: "",
+    },
+    {
+      image: "/pictures/domeGallery/Shruti - 11.jpg",
+      link: "/gallery",
+      title: "Shruti 22",
+      description: "",
+    },
+    {
+      image: "/pictures/domeGallery/Shruti - 12.jpg",
+      link: "/gallery",
+      title: "Shruti 24",
+      description: "",
+    },
+    {
+      image: "/pictures/domeGallery/Shruti - 13.jpg",
+      link: "/gallery",
+      title: "Shruti 24",
+      description: "",
+    },
+    {
+      image: "/pictures/domeGallery/Shruti - 14.jpg",
+      link: "/gallery",
+      title: "Shruti 24",
+      description: "",
+    },
+    {
+      image: "/pictures/domeGallery/Shruti - 15.jpg",
+      link: "/gallery",
+      title: "Shruti 23",
+      description: "",
+    },
+    {
+      image: "/pictures/domeGallery/Shruti - 16.jpg",
+      link: "/gallery",
+      title: "Shruti 23",
+      description: "",
+    },
+    {
+      image: "/pictures/domeGallery/Shruti - 17.jpg",
+      link: "/gallery",
+      title: "Shruti 23",
+      description: "",
+    },
+    {
+      image: "/pictures/domeGallery/Shruti - 18.jpg",
+      link: "/gallery",
+      title: "Shruti 24",
+      description: "",
+    },
+    {
+      image: "/pictures/domeGallery/Shruti - 19.jpg",
+      link: "/gallery",
+      title: "Shruti 24",
+      description: "",
+    },
+    {
+      image: "/pictures/domeGallery/Shruti - 20.jpg",
+      link: "/gallery",
+      title: "Shruti 24",
+      description: "",
+    },
+    {
+      image: "/pictures/domeGallery/Shruti - 21.jpg",
+      link: "/gallery",
+      title: "Shruti 22",
+      description: "",
+    },
+    {
+      image: "/pictures/domeGallery/Shruti - 22.jpg",
+      link: "/gallery",
+      title: "Shruti 22",
+      description: "",
+    },
+    {
+      image: "/pictures/domeGallery/Shruti - 23.jpg",
+      link: "/gallery",
+      title: "Shruti 23",
+      description: "",
+    },
+    {
+      image: "/pictures/domeGallery/Shruti - 24.jpg",
+      link: "/gallery",
+      title: "Shruti 24",
+      description: "",
+    },
+    {
+      image: "/pictures/domeGallery/Shruti - 25.jpg",
+      link: "/gallery",
+      title: "Shruti 22",
+      description: "",
+    },
+    {
+      image: "/pictures/domeGallery/Shruti - 26.jpg",
+      link: "/gallery",
+      title: "Shruti 22",
+      description: "",
+    },
+    {
+      image: "/pictures/domeGallery/Shruti - 27.jpg",
+      link: "/gallery",
+      title: "Shruti 22",
+      description: "",
+    },
+    {
+      image: "/pictures/domeGallery/Shruti - 28.jpg",
+      link: "/gallery",
+      title: "Shruti 22",
+      description: "",
     },
   ];
   const [isMobile, setIsMobile] = useState(false);
+  const [showMenu, setShowMenu] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowMenu(true);
+    }, 2000); // 2 seconds
+
+    return () => clearTimeout(timer);
+  }, []);
   useEffect(() => {
     const handleResize = () => {
       const mobile = window.innerWidth < 640;
@@ -55,16 +209,34 @@ export default function Home() {
   return (
     <main className="relative min-h-screen w-full text-zinc-50 overflow-hidden ">
       {isMobile ? (
-        <div className="absolute w-full h-screen mt-35 flex items-center justify-center z-[300] pointer-events-none">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{
+            delay: 1.5,
+            duration: 0.8,
+            ease: "easeIn",
+          }}
+          className="absolute w-full h-screen mt-35 flex items-center justify-center z-[300] pointer-events-none"
+        >
           <CircularText
             text="AUDITIONS ✦ COMING ✦ SOON ✦ "
             onHover="speedUp"
             spinDuration={20}
             className="custom-class"
           />
-        </div>
+        </motion.div>
       ) : (
-        <div className="pointer-events-none sm:top-30 absolute z-[300] left-5 sm:left-10 right-0 w-[calc(100%-1.25rem)] sm:w-full">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{
+            delay: 1.5,
+            duration: 0.8,
+            ease: "easeIn",
+          }}
+          className="pointer-events-none sm:top-30 absolute z-[300] left-5 sm:left-10 right-0 w-[calc(100%-1.25rem)] sm:w-full"
+        >
           <CurvedLoop
             marqueeText="Auditions ✦ coming ✦ soon ✦ "
             speed={2}
@@ -73,7 +245,7 @@ export default function Home() {
             interactive
             className="w-full"
           />
-        </div>
+        </motion.div>
       )}
       <section className="relative z-10 flex min-h-screen items-center justify-center px-4">
         <div className="absolute -top-2 inset-0 -z-10">
@@ -89,7 +261,7 @@ export default function Home() {
               objectPosition: "center",
             }}
             priority
-            quality={100}
+            quality={70}
             draggable={false}
           />
 
@@ -105,7 +277,6 @@ export default function Home() {
               objectPosition: "center",
             }}
             priority
-            quality={100}
             draggable={false}
           />
         </div>
@@ -269,23 +440,46 @@ export default function Home() {
       </section>
       <section className="h-screen sm:min-h-fit w-full bg-[#252e08] relative">
         {/* DomeGallery for mobile */}
-        <div className="block lg:hidden w-full h-screen sm:mb-0 -mb-30">
+        <div
+          className="block lg:hidden  w-full h-screen sm:mb-0 -mb-30"
+          style={{ pointerEvents: "none", touchAction: "none" }}
+        >
           <DomeGallery
             fit={0.8}
             minRadius={600}
-            maxVerticalRotationDeg={0}
             segments={34}
-            dragDampening={2}
-            grayscale
+            grayscale={false}
             overlayBlurColor="#252e08"
+            autoSpinSpeed={2}
           />
         </div>
 
         {/* InfiniteMenu for larger screens */}
-        <div className="hidden lg:block h-full w-full relative">
+        <div className="h-full w-full sm:block hidden bg-transparent">
           <InfiniteMenu items={items} scale={1.8} />
         </div>
-
+        <a
+          href="https://www.instagram.com/clickclubnitrr/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="absolute bottom-6 left-18 z-20 flex items-center gap-1.5 text-white/50 hover:text-white transition-colors duration-300 text-sm font-medium tracking-wide drop-shadow-md cursor-pointer"
+        >
+          Shot by Click Club, NITRR
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth={2}
+            stroke="currentColor"
+            className="w-4 h-4"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M4.5 19.5l15-15m0 0H8.25m11.25 0v11.25"
+            />
+          </svg>
+        </a>
         {/* Top gradient */}
         <div className="pointer-events-none absolute inset-x-0 top-0 h-64 bg-linear-to-b from-[#242d06] from-10% to-transparent" />
         {/* Bottom gradient */}

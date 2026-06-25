@@ -102,24 +102,24 @@ export default function Page() {
         />
       </div>
 
-      <LoadingOverlay isLoading={loading} />
-      {/* {loading ? (
+      {loading ? (
+        <LoadingOverlay message="Loading team information..." />
       ) : (
-      )} */}
         <>
-          <div className="relative mb-10 z-10 flex flex-col items-center h-full">
+          <div className="relative mb-10 w-full z-10 flex flex-col items-center h-full">
             {/* Section A: Head Coordinators Layout */}
-            <div className="sm:w-[75%] w-full mt-20">
+            <div className="sm:w-[75%] mt-20">
               <h1 className="text-white font-bold text-3xl sm:text-6xl text-center sm:mb-10">
                 Head Coordinators
               </h1>
-              <div className="flex flex-wrap justify-center gap-14 gap-y-6 mt-5">
+              <div className="flex flex-wrap justify-center gap-14 gap-y-6 mt-5 ">
                 {roster.heads.map((person, i) => (
                   <div
                     key={i}
-                    className="w-full lg:w-[22%] flex justify-center"
+                    className="w-full lg:w-[22%] flex justify-center "
                   >
                     <ProfileCard
+                      
                       name={person.name}
                       title={person.title}
                       avatarUrl={person.avatar}
@@ -262,6 +262,7 @@ export default function Page() {
             animated="scroll"
           />
         </>
+      )}
     </div>
   );
 }

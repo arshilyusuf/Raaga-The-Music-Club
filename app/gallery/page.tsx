@@ -48,6 +48,7 @@ export default function GalleryPage() {
           <div className="bg-black sm:rounded-bl-2xl rounded-br-2xl px-2 sm:px-4 pb-0 sm:pb-2 pl-4 sm:pl-4">
             <h1 className="text-center font-bold text-2xl sm:text-4xl bg-linear-to-br from-yellow-200 to-white bg-clip-text text-transparent drop-shadow-[0_8px_25px_rgba(0,0,0,0.9)]">
               GALLERY
+              
             </h1>
           </div>
           <img src="/svg-path.svg" className="h-9 w-auto max-h-full" alt="" />
@@ -96,6 +97,7 @@ export default function GalleryPage() {
               key={group.id} 
               className={index !== galleryGroups.length - 1 ? "mb-5 border-b border-zinc-50" : ""}
             >
+
               <Event 
                 eventName={group.eventName} 
                 date={group.date} 

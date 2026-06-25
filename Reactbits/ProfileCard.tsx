@@ -251,6 +251,9 @@ const ProfileCardComponent: React.FC<ProfileCardProps> = ({
 
   const handlePointerMove = useCallback(
     (event: PointerEvent): void => {
+      // Bypasses logic for touch screens and mobile viewports
+      if (event.pointerType === "touch" || window.innerWidth <= 768) return;
+
       const shell = shellRef.current;
       if (!shell || !tiltEngine) return;
       const { x, y } = getOffsets(event, shell);
@@ -261,6 +264,8 @@ const ProfileCardComponent: React.FC<ProfileCardProps> = ({
 
   const handlePointerEnter = useCallback(
     (event: PointerEvent): void => {
+      if (event.pointerType === "touch" || window.innerWidth <= 768) return;
+
       const shell = shellRef.current;
       if (!shell || !tiltEngine) return;
 
@@ -277,25 +282,30 @@ const ProfileCardComponent: React.FC<ProfileCardProps> = ({
     [tiltEngine],
   );
 
-  const handlePointerLeave = useCallback((): void => {
-    const shell = shellRef.current;
-    if (!shell || !tiltEngine) return;
+  const handlePointerLeave = useCallback(
+    (event: PointerEvent): void => {
+      if (event.pointerType === "touch" || window.innerWidth <= 768) return;
 
-    tiltEngine.toCenter();
+      const shell = shellRef.current;
+      if (!shell || !tiltEngine) return;
 
-    const checkSettle = (): void => {
-      const { x, y, tx, ty } = tiltEngine.getCurrent();
-      const settled = Math.hypot(tx - x, ty - y) < 0.6;
-      if (settled) {
-        shell.classList.remove("active");
-        leaveRafRef.current = null;
-      } else {
-        leaveRafRef.current = requestAnimationFrame(checkSettle);
-      }
-    };
-    if (leaveRafRef.current) cancelAnimationFrame(leaveRafRef.current);
-    leaveRafRef.current = requestAnimationFrame(checkSettle);
-  }, [tiltEngine]);
+      tiltEngine.toCenter();
+
+      const checkSettle = (): void => {
+        const { x, y, tx, ty } = tiltEngine.getCurrent();
+        const settled = Math.hypot(tx - x, ty - y) < 0.6;
+        if (settled) {
+          shell.classList.remove("active");
+          leaveRafRef.current = null;
+        } else {
+          leaveRafRef.current = requestAnimationFrame(checkSettle);
+        }
+      };
+      if (leaveRafRef.current) cancelAnimationFrame(leaveRafRef.current);
+      leaveRafRef.current = requestAnimationFrame(checkSettle);
+    },
+    [tiltEngine],
+  );
 
   const handleDeviceOrientation = useCallback(
     (event: DeviceOrientationEvent): void => {
@@ -505,7 +515,7 @@ const ProfileCardComponent: React.FC<ProfileCardProps> = ({
   return (
     <div
       ref={wrapRef}
-      className={`relative touch-none ${className}`.trim()}
+      className={`relative ${className}`.trim()}
       style={
         {
           perspective: "500px",
@@ -541,12 +551,15 @@ const ProfileCardComponent: React.FC<ProfileCardProps> = ({
             background: "#252e08",
             backfaceVisibility: "hidden",
           }}
-          onMouseEnter={(e) => {
+          onPointerEnter={(e) => {
+            if (e.pointerType === "touch" || window.innerWidth <= 768) return;
             e.currentTarget.style.transition = "none";
             e.currentTarget.style.transform =
               "translateZ(0) rotateX(var(--rotate-y)) rotateY(var(--rotate-x))";
           }}
-          onMouseLeave={(e) => {
+          // Changed to onPointerLeave and added touch guard
+          onPointerLeave={(e) => {
+            if (e.pointerType === "touch" || window.innerWidth <= 768) return;
             const shell = shellRef.current;
             if (shell?.classList.contains("entering")) {
               e.currentTarget.style.transition = "transform 180ms ease-out";
@@ -565,6 +578,7 @@ const ProfileCardComponent: React.FC<ProfileCardProps> = ({
               borderRadius: cardRadius,
               display: "grid",
               gridArea: "1 / -1",
+              
             }}
           >
             {iconUrl && !iconUrl.includes("Placeholder") && (
