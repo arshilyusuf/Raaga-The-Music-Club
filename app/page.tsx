@@ -319,7 +319,7 @@ export default function Home() {
           className="flex flex-col items-center justify-center text-center -mt-30 sm:mt-0"
         >
           <motion.h1
-            className="sm:text-5xl md:text-6xl lg:text-7xl mb-6 -mt-40 tracking-normal leading-tight"
+            className="sm:text-5xl md:text-6xl lg:text-7xl mb-6 -mt-55 tracking-normal leading-tight"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{
@@ -462,7 +462,7 @@ export default function Home() {
           href="https://www.instagram.com/clickclubnitrr/"
           target="_blank"
           rel="noopener noreferrer"
-          className="absolute bottom-6 left-18 z-20 flex items-center gap-1.5 text-white/50 hover:text-white transition-colors duration-300 text-sm font-medium tracking-wide drop-shadow-md cursor-pointer"
+          className="absolute bottom-6 sm:left-18 left-5 z-20 flex items-center gap-1.5 text-white/50 hover:text-white transition-colors duration-300 text-sm font-medium tracking-wide drop-shadow-md cursor-pointer"
         >
           Shot by Click Club, NITRR
           <svg
