@@ -15,8 +15,6 @@ import GradualBlur from "@/Reactbits/GradualBlur";
 import Image from "next/image";
 import { FaInstagram, FaYoutube, FaFacebook } from "react-icons/fa";
 
-
-
 const InfiniteMenu = lazy(() => import("@/Reactbits/InfiniteMenu"));
 export default function Home() {
   const items = [
@@ -467,7 +465,15 @@ export default function Home() {
           rel="noopener noreferrer"
           className="absolute bottom-6 sm:left-18 left-5 z-20 flex items-center gap-1.5 text-white/50 hover:text-white transition-colors duration-300 text-sm font-medium tracking-wide drop-shadow-md cursor-pointer"
         >
-          Shot by Click Club, NITRR
+          Shot by{" "}
+          <Image
+            src="/pictures/Click White Logo.webp"
+            alt="Click Club Logo"
+            width={20}
+            height={24}
+            className=""
+          />
+          Click Club, NITRR
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"

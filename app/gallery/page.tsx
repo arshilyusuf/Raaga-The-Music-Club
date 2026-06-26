@@ -48,7 +48,6 @@ export default function GalleryPage() {
           <div className="bg-black sm:rounded-bl-2xl rounded-br-2xl px-2 sm:px-4 pb-0 sm:pb-2 pl-4 sm:pl-4">
             <h1 className="text-center font-bold text-2xl sm:text-4xl bg-linear-to-br from-yellow-200 to-white bg-clip-text text-transparent drop-shadow-[0_8px_25px_rgba(0,0,0,0.9)]">
               GALLERY
-              
             </h1>
           </div>
           <img src="/svg-path.svg" className="h-9 w-auto max-h-full" alt="" />
@@ -57,9 +56,9 @@ export default function GalleryPage() {
 
       <div className="absolute inset-0 -z-10">
         <Grainient
-          color1="#83A317"
-          color2="#2A330B"
-          color3="#2A330B"
+          color1="#2f6b34"
+          color3="#727636"
+          color2="#0f4652"
           timeSpeed={0.05}
           colorBalance={0}
           warpStrength={3.35}
@@ -81,7 +80,7 @@ export default function GalleryPage() {
           zoom={1.6}
         />
       </div>
-      
+
       {loading ? (
         <div className="text-center py-40 text-sm text-zinc-400">
           Loading gallery...
@@ -93,15 +92,21 @@ export default function GalleryPage() {
       ) : (
         <div className="mt-10">
           {galleryGroups.map((group, index) => (
-            <div 
-              key={group.id} 
-              className={index !== galleryGroups.length - 1 ? "mb-5 border-b border-zinc-50" : ""}
+            <div
+              key={group.id}
+              className={
+                index !== galleryGroups.length - 1
+                  ? "mb-5 border-b border-zinc-50"
+                  : ""
+              }
             >
-
-              <Event 
-                eventName={group.eventName} 
-                date={group.date} 
-                items={group.items} 
+              <Event
+                eventName={group.eventName}
+                date={group.date}
+                items={group.items}
+                clickclub={["25", "24", "23", "22"].some((x) =>
+                  group.eventName.toLowerCase().includes(x),
+                )}
               />
             </div>
           ))}

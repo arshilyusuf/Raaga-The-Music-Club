@@ -21,13 +21,9 @@ const useMedia = (
 
   useEffect(() => {
     if (typeof window === "undefined") return;
-
     const handler = () => setValue(get());
-
     const mql = queries.map((q) => window.matchMedia(q));
-
     mql.forEach((q) => q.addEventListener("change", handler));
-
     return () => mql.forEach((q) => q.removeEventListener("change", handler));
   }, [queries]);
 
@@ -49,19 +45,6 @@ const useMeasure = <T extends HTMLElement>() => {
   }, []);
 
   return [ref, size] as const;
-};
-
-const preloadImages = async (urls: string[]): Promise<void> => {
-  await Promise.all(
-    urls.map(
-      (src) =>
-        new Promise<void>((resolve) => {
-          const img = new Image();
-          img.src = src;
-          img.onload = img.onerror = () => resolve();
-        }),
-    ),
-  );
 };
 
 interface Item {
@@ -114,7 +97,6 @@ const Masonry: React.FC<MasonryProps> = ({
   );
 
   const [containerRef, { width }] = useMeasure<HTMLDivElement>();
-  const [imagesReady, setImagesReady] = useState(false);
 
   const getInitialPosition = (item: GridItem) => {
     const containerRect = containerRef.current?.getBoundingClientRect();
@@ -147,10 +129,6 @@ const Masonry: React.FC<MasonryProps> = ({
     }
   };
 
-  useEffect(() => {
-    preloadImages(items.map((i) => i.img)).then(() => setImagesReady(true));
-  }, [items]);
-
   const grid = useMemo<GridItem[]>(() => {
     if (!width) return [];
     const colHeights = new Array(columns).fill(0);
@@ -163,7 +141,6 @@ const Masonry: React.FC<MasonryProps> = ({
       const x = col * (columnWidth + gap);
       const height = child.height / 2;
       const y = colHeights[col];
-
       colHeights[col] += height + gap;
       return { ...child, x, y, w: columnWidth, h: height };
     });
@@ -171,8 +148,9 @@ const Masonry: React.FC<MasonryProps> = ({
 
   const hasMounted = useRef(false);
 
+  // Animate as soon as the grid is laid out — no waiting for images
   useLayoutEffect(() => {
-    if (!imagesReady) return;
+    if (!grid.length) return;
 
     grid.forEach((item, index) => {
       const selector = `[data-key="${item.id}"]`;
@@ -210,7 +188,7 @@ const Masonry: React.FC<MasonryProps> = ({
     });
 
     hasMounted.current = true;
-  }, [grid, imagesReady, stagger, animateFrom, blurToFocus, duration, ease]);
+  }, [grid, stagger, animateFrom, blurToFocus, duration, ease]);
 
   const handleMouseEnter = (id: string, element: HTMLElement) => {
     if (scaleOnHover) {
@@ -248,7 +226,6 @@ const Masonry: React.FC<MasonryProps> = ({
         height: grid.length ? Math.max(...grid.map((i) => i.y + i.h)) : 0,
       }}
     >
-      {" "}
       {grid.map((item) => (
         <div
           key={item.id}
