@@ -553,17 +553,17 @@ export default function Page() {
           </p>
         </>
       ) : (
-        <div className="flex flex-col items-center gap-6">
+        <div className="flex flex-col bg-[#252e08]/20 backdrop-blur-sm rounded-lg p-8 items-center gap-6">
           <ShinyText
-            text="REGISTRATIONS ARE CLOSED"
+            text="REGISTRATIONS CLOSED"
             speed={4}
             color="#ffffff"
-            shineColor={colors.c1}
-            spread={120}
+            shineColor={colors.c3}
+            spread={100}
             direction="left"
             className="text-3xl font-bold mb-4"
           />
-          <p className="text-white text-lg">
+          <p className="text-white text-xl">
             The Auditions are not open for registration at the moment. Please
             check back later!
           </p>

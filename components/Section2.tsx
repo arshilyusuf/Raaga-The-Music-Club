@@ -34,7 +34,6 @@ export default function Section2() {
           viewport={{ once: true, amount: 0.8 }} // trigger once when 50% visible
           transition={{ duration: 1, ease: "easeOut" }} // smooth animation
         >
-          
           Joining <span className="font-semibold">Raaga</span> is your chance to
           be part of a vibrant community of musicians and performers among NIT
           Raipur. Every year, we hold auditions in August to discover new talent
@@ -65,8 +64,8 @@ export default function Section2() {
         >
           <Button text="Meet our Team" onClick={goToTeam} />
         </motion.p>
-        
       </div>
+      
     </section>
   );
 }

@@ -23,17 +23,20 @@ export default function SmoothScrollSections() {
       }}
     >
       <motion.div
-        className="h-screen flex items-center justify-center"
+        className="relative h-screen flex items-center justify-center"
         {...animationProps}
       >
         <Section1 />
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-48 md:h-64 bg-linear-to-b from-[#242d06] from-10% to-transparent" />
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-48 md:h-64 bg-linear-to-t from-[#131609] from-20% to-transparent" />
       </motion.div>
 
       <motion.div
-        className="h-screen flex items-center justify-center"
+        className="relative h-screen flex items-center justify-center"
         {...animationProps}
       >
         <Section2 />
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-48 md:h-64 bg-linear-to-b from-[#131609] from-20% to-transparent" />
       </motion.div>
     </section>
   );

@@ -288,14 +288,14 @@ export default function Home() {
               color="#9ebc16"
               colorTwo="#9ebc16"
               ringCount={6}
-              speed={1}
+              speed={0.5}
               attenuation={8.5}
               lineThickness={2}
               baseRadius={0.35}
               radiusStep={0.1}
               scaleRate={0.1}
               opacity={1}
-              blur={0}
+              blur={1}
               noiseAmount={0.1}
               rotation={0}
               ringGap={1.5}
@@ -443,7 +443,7 @@ export default function Home() {
       <section className="h-screen sm:min-h-fit w-full bg-[#252e08] relative">
         {/* DomeGallery for mobile */}
         <div
-          className="block lg:hidden  w-full h-screen sm:mb-0 -mb-30"
+          className="block sm:hidden w-full h-screen -mb-30"
           style={{ pointerEvents: "none", touchAction: "none" }}
         >
           <DomeGallery
@@ -456,7 +456,7 @@ export default function Home() {
           />
         </div>
 
-        <div className="h-full w-full sm:block hidden bg-transparent">
+        <div className="hidden sm:block w-full h-screen bg-transparent">
           <InfiniteMenu items={items} scale={1.8} />
         </div>
         <a

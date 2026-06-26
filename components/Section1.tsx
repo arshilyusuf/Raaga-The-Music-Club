@@ -52,6 +52,7 @@ drop-shadow-[0_8px_25px_rgba(0,0,0,0.9)]"
         </p>
         <Button text="View Gallery" onClick={() => router.push("/gallery")} />
       </div>
+      
     </div>
   );
 }
