@@ -1,17 +1,19 @@
 "use client";
 
 import { useEffect } from "react";
-import Lenis from "@studio-freight/lenis";
-
+import Lenis from "lenis";
+import { usePathname } from "next/navigation";
+interface SmoothScrollerProps {
+  children: React.ReactNode;
+}
 export default function SmoothScroller({
   children,
-}: {
-  children: React.ReactNode;
-}) {
+}: SmoothScrollerProps) {
+  const pathname = usePathname();
+  const enableOnMobile = pathname === "/gallery";
   useEffect(() => {
     // Grab your custom scroll container
     const scrollContainer = document.getElementById("scroll-container");
-
     if (!scrollContainer) return;
 
     const lenis = new Lenis({
@@ -21,10 +23,10 @@ export default function SmoothScroller({
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       orientation: "vertical",
       gestureOrientation: "vertical",
-      // syncTouch: true,
+      syncTouch: enableOnMobile,
       smoothWheel: true,
       wheelMultiplier: 1,
-      touchMultiplier: 0.8,
+      touchMultiplier: 0.6,
     });
 
     function raf(time: number) {

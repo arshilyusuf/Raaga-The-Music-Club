@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef, useCallback } from "react";
 import Event from "@/components/Event";
 import Grainient from "@/Reactbits/Grainient";
-import GradualBlur from '@/Reactbits/GradualBlur';
-
+import GradualBlur from "@/Reactbits/GradualBlur";
+import VirtualBlock from "@/components/VirtualBlock";
 interface GalleryGroup {
   id: string;
   yearLabel: string;
@@ -17,17 +17,21 @@ export default function GalleryPage() {
   const [galleryGroups, setGalleryGroups] = useState<GalleryGroup[]>([]);
   const [loading, setLoading] = useState(true);
 
+  // State to track how many groups are currently rendered
+  const [visibleCount, setVisibleCount] = useState(1);
+
   useEffect(() => {
     async function loadGallery() {
       try {
         setLoading(true);
         const response = await fetch("/api/gallery");
-        if (!response.ok) throw new Error("Failed fetching public gallery records");
-        
+        if (!response.ok)
+          throw new Error("Failed fetching public gallery records");
+
         const data = await response.json();
         setGalleryGroups(data || []);
       } catch (err) {
-        console.error('Error hydrating gallery interface:', err);
+        console.error("Error hydrating gallery interface:", err);
       } finally {
         setLoading(false);
       }
@@ -35,6 +39,30 @@ export default function GalleryPage() {
 
     loadGallery();
   }, []);
+
+  // Intersection Observer to detect when the user reaches the bottom of the rendered list
+  const observer = useRef<IntersectionObserver | null>(null);
+  const lastGroupElementRef = useCallback(
+    (node: HTMLDivElement | null) => {
+      if (loading) return;
+
+      // Disconnect the previous observer
+      if (observer.current) observer.current.disconnect();
+
+      observer.current = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting && visibleCount < galleryGroups.length) {
+          // Increase the number of visible events by 2 when the last element is in view
+          setVisibleCount((prevCount) => prevCount + 1);
+        }
+      });
+
+      if (node) observer.current.observe(node);
+    },
+    [loading, visibleCount, galleryGroups.length],
+  );
+
+  // Only render the groups up to the visibleCount limit
+  const visibleGroups = galleryGroups.slice(0, visibleCount);
 
   return (
     <div className="relative flex flex-col justify-center w-full min-h-full">
@@ -87,31 +115,47 @@ export default function GalleryPage() {
         </div>
       ) : galleryGroups.length === 0 ? (
         <div className="text-center py-40 text-sm text-zinc-100">
-          No items found in the gallery gallery registry.
+          No items found in the gallery registry.
         </div>
       ) : (
         <div className="mt-10">
-          {galleryGroups.map((group, index) => (
-            <div
-              key={group.id}
-              className={
-                index !== galleryGroups.length - 1
-                  ? "mb-5 border-b border-zinc-50"
-                  : ""
-              }
-            >
-              <Event
-                eventName={group.eventName}
-                date={group.date}
-                items={group.items}
-                clickclub={["25", "24", "23", "22"].some((x) =>
-                  group.eventName.toLowerCase().includes(x),
-                )}
-              />
+          {visibleGroups.map((group, index) => {
+            // Determine if this is the last rendered element
+            const isLastElement = index === visibleGroups.length - 1;
+
+            return (
+              <div
+                key={group.id}
+                ref={isLastElement ? lastGroupElementRef : null}
+                className={
+                  index !== galleryGroups.length - 1
+                    ? "mb-5 border-b border-zinc-50"
+                    : ""
+                }
+              >
+                <VirtualBlock>
+                  <Event
+                    eventName={group.eventName}
+                    date={group.date}
+                    items={group.items}
+                    clickclub={["25", "24", "23", "22"].some((x) =>
+                      group.eventName.toLowerCase().includes(x),
+                    )}
+                  />
+                </VirtualBlock>
+              </div>
+            );
+          })}
+
+          {/* Optional Loading indicator for fetching more items visually */}
+          {visibleCount < galleryGroups.length && (
+            <div className="text-center py-10 text-sm text-zinc-400">
+              Loading more events...
             </div>
-          ))}
+          )}
         </div>
       )}
+
       <GradualBlur
         target="page"
         position="bottom"
