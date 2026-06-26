@@ -155,13 +155,13 @@ export default function Home() {
     {
       image: "/pictures/domeGallery/Shruti - 23.jpg",
       link: "/gallery",
-      title: "Shruti 23",
+      title: "Shruti 22",
       description: "",
     },
     {
       image: "/pictures/domeGallery/Shruti - 24.jpg",
       link: "/gallery",
-      title: "Shruti 24",
+      title: "Shruti 22",
       description: "",
     },
     {
