@@ -7,7 +7,13 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!,
 );
-
+const RESTRICTED_EMAILS = [
+  "faculty@nitrr.ac.in",
+  "deans@nitrr.ac.in",
+  "users@nitrr.ac.in",
+  "employees@nitrr.ac.in",
+  "all@nitrr.ac.in"
+];
 const transporter = nodemailer.createTransport({
   // service: "gmail",
   // auth: {
@@ -27,8 +33,15 @@ const transporter = nodemailer.createTransport({
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { registration_type, roll_number, email, full_name } = body;
-
+    const { registration_type, roll_number, full_name } = body;
+    const email = body.email?.toLowerCase().trim();
+    
+    if (email && RESTRICTED_EMAILS.includes(email)) {
+      return NextResponse.json(
+        { error: "Registration with this email address is not permitted." },
+        { status: 403 },
+      );
+    }
     // --- 1. Validation Rules ---
     if (!["vocalist", "instrumentalist"].includes(registration_type)) {
       return NextResponse.json(
