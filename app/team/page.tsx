@@ -108,15 +108,15 @@ export default function Page() {
         <>
           <div className="relative mb-10 w-full z-10 flex flex-col items-center h-full">
             {/* Section A: Head Coordinators Layout */}
-            <div className="sm:w-[75%] mt-20">
+            <div className="lg:w-[90%] sm:w-[85%]  mt-20">
               <h1 className="text-white font-bold text-3xl sm:text-6xl text-center sm:mb-10">
                 Head Coordinators
               </h1>
-              <div className="flex flex-wrap justify-center gap-14 gap-y-6 mt-5 ">
+              <div className="flex flex-wrap justify-center gap-14 gap-y-10  mt-5 ">
                 {roster.heads.map((person, i) => (
                   <div
                     key={i}
-                    className="w-full lg:w-[22%] flex justify-center "
+                    className="w-full lg:w-[20%] flex justify-center "
                   >
                     <ProfileCard
                       
