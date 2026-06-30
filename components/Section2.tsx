@@ -36,7 +36,7 @@ export default function Section2() {
         >
           Joining <span className="font-semibold">Raaga</span> is your chance to
           be part of a vibrant community of musicians and performers among NIT
-          Raipur. Every year, we hold auditions in August to discover new talent
+          Raipur. Every year, we hold auditions to discover new talent
           and welcome passionate artists into our club.
         </motion.p>
         <motion.div
