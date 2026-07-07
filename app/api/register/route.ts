@@ -97,7 +97,7 @@ export async function POST(req: NextRequest) {
       appendToSheet(data),
       resend.emails.send({
         from: "Raaga The Music Club <auditions@raagathemusicclub.in>",
-        replyTo: "raagathemusicclubnitrr@gmail.com", 
+        replyTo: "support@raagathemusicclub.in",
         to: email,
         subject: `Audition Registration Confirmation - ${full_name}`,
         text: textFallback,
