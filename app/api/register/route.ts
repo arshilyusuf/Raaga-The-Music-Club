@@ -1,47 +1,36 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { appendToSheet } from "@/lib/googleSheets";
-import nodemailer from "nodemailer";
+import { Resend } from "resend";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!,
 );
+
+const resend = new Resend(process.env.RESEND_API_KEY);
+
 const RESTRICTED_EMAILS = [
   "faculty@nitrr.ac.in",
   "deans@nitrr.ac.in",
   "users@nitrr.ac.in",
   "employees@nitrr.ac.in",
-  "all@nitrr.ac.in"
+  "all@nitrr.ac.in",
 ];
-const transporter = nodemailer.createTransport({
-  // service: "gmail",
-  // auth: {
-  //   type: "OAuth2",
-  //   user: process.env.GMAIL_USER,
-  //   clientId: process.env.OAUTH_CLIENT_ID,
-  //   clientSecret: process.env.OAUTH_CLIENT_SECRET,
-  //   refreshToken: process.env.OAUTH_REFRESH_TOKEN,
-  // },
-  service: "gmail",
-  auth: {
-    user: process.env.GMAIL_USER, 
-    pass: process.env.GMAIL_APP_PASSWORD, 
-  },
-});
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     const { registration_type, roll_number, full_name } = body;
     const email = body.email?.toLowerCase().trim();
-    
+
     if (email && RESTRICTED_EMAILS.includes(email)) {
       return NextResponse.json(
         { error: "Registration with this email address is not permitted." },
         { status: 403 },
       );
     }
+
     // --- 1. Validation Rules ---
     if (!["vocalist", "instrumentalist"].includes(registration_type)) {
       return NextResponse.json(
@@ -104,12 +93,11 @@ export async function POST(req: NextRequest) {
 
     console.log(`Initiating background tasks for ${email}...`);
 
-    // CRITICAL FIX: Await the Promise.allSettled so the serverless function does not exit prematurely.
     const results = await Promise.allSettled([
       appendToSheet(data),
-      transporter.sendMail({
-        from: `"Raaga The Music Club" <${process.env.GMAIL_USER}>`,
-        replyTo: process.env.GMAIL_USER, // Added Reply-To header to improve deliverability
+      resend.emails.send({
+        from: "Raaga The Music Club <auditions@raagathemusicclub.in>",
+        replyTo: "raagathemusicclubnitrr@gmail.com", 
         to: email,
         subject: `Audition Registration Confirmation - ${full_name}`,
         text: textFallback,
@@ -152,18 +140,20 @@ export async function POST(req: NextRequest) {
     }
 
     if (emailResult.status === "rejected") {
-      console.error("❌ Email dispatch failed:", emailResult.reason);
+      console.error("❌ Email dispatch request failed:", emailResult.reason);
     } else {
-      // Nodemailer returns an object containing details about the sent email on success
-      console.log("✅ Email sent successfully.");
-      console.log("   - Message ID:", emailResult.value.messageId);
-      console.log("   - Accepted by:", emailResult.value.accepted);
-      if (emailResult.value.rejected.length > 0) {
-        console.warn("   ⚠️ Rejected by:", emailResult.value.rejected);
+      // Resend specific error handling structure
+      if (emailResult.value.error) {
+        console.error(
+          "❌ Resend API returned an error:",
+          emailResult.value.error,
+        );
+      } else {
+        console.log("✅ Email sent successfully.");
+        console.log("   - Message ID:", emailResult.value.data?.id);
       }
     }
 
-    // Only return the response after the promises have fully resolved
     return NextResponse.json({ success: true, id: data.id }, { status: 201 });
   } catch (err) {
     console.error("❌ Registration route error:", err);
