@@ -12,7 +12,9 @@ export default function SmoothScroller({
   const pathname = usePathname();
   const enableOnMobile = pathname === "/gallery";
   useEffect(() => {
+    if (pathname?.startsWith("/admin")) return;
     // Grab your custom scroll container
+    
     const scrollContainer = document.getElementById("scroll-container");
     if (!scrollContainer) return;
 

@@ -443,7 +443,7 @@ export default function Home() {
       <section className="h-screen sm:min-h-fit w-full bg-[#252e08] relative">
         {/* DomeGallery for mobile */}
         <div
-          className="block sm:hidden w-full h-screen -mb-30"
+          className="block lg:hidden w-full h-screen -mb-30"
           style={{ pointerEvents: "none", touchAction: "none" }}
         >
           <DomeGallery
@@ -456,7 +456,7 @@ export default function Home() {
           />
         </div>
 
-        <div className="hidden sm:block w-full h-screen bg-transparent">
+        <div className="hidden lg:block w-full h-screen bg-transparent">
           <InfiniteMenu items={items} scale={1.8} />
         </div>
         <a

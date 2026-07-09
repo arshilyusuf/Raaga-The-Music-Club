@@ -15,7 +15,7 @@ export default function Section2() {
       className="flex flex-col h-screen justify-center items-center w-full bg-cover bg-center"
       style={{ backgroundImage: `url(${UntitledImage.src})` }}
     >
-      <div className="flex flex-col py-5  justify-center items-center max-w-4xl sm:px-4 p-8 rounded">
+      <div className="flex flex-col py-5 justify-center items-center max-w-4xl lg:px-4 p-8 rounded">
         <TextType
           text={["Find your voice, join our symphony!"]}
           typingSpeed={45}
@@ -56,7 +56,7 @@ export default function Section2() {
           </span>
         </motion.div>
         <motion.p
-          className="text-2xl w-full sm:w-1/4 lg:w-1/2 text-white text-center"
+          className="text-2xl w-full sm:w-[60%] lg:w-[60%] text-white text-center"
           initial={{ opacity: 0, y: 40 }} // start slightly below and invisible
           whileInView={{ opacity: 1, y: 0 }} // animate when it enters viewport
           viewport={{ once: true, amount: 0.8 }} // trigger once when 50% visible
