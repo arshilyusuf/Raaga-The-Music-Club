@@ -462,7 +462,14 @@ export function AdminDashboardContent() {
 
     // Re-trigger the whole validation logic block to populate data arrays cleanly
     setLoading(true);
-    const authResponse = await fetch("/api/auth/check-admin");
+    const authResponse = await fetch("/api/auth/check-admin", {
+      headers: data.session?.access_token
+        ? {
+            Authorization: `Bearer ${data.session.access_token}`,
+          }
+        : undefined,
+      cache: "no-store",
+    });
     const authData = await authResponse.json();
 
     if (authData.isAdmin) {

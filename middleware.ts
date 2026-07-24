@@ -46,15 +46,15 @@ export async function middleware(request: NextRequest) {
 
   // If the user tries to hit any URL starting with /admin...
   if (request.nextUrl.pathname.startsWith("/admin")) {
-    // 1. Allow unauthenticated visitors through to access the inline login panel
+    // Allow the dashboard page to decide whether to show the login screen.
+    // The API routes still enforce the admin allowlist for protected actions.
     if (!user) {
       return response;
     }
 
-    // 2. Kick out authenticated users who are NOT in the admin allowlist
     const isAdmin = await isAdminUser(supabase, user.id);
     if (!isAdmin) {
-      return NextResponse.redirect(new URL("/", request.url)); // Send to public home page
+      return response;
     }
   }
 

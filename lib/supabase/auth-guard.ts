@@ -10,6 +10,10 @@ export async function isAdminUser(supabase: any, userId: string) {
   return !error && !!data;
 }
 
+function hasAdminMetadata(user: any) {
+  return user?.app_metadata?.is_admin === true || user?.user_metadata?.is_admin === true;
+}
+
 export async function enforceAdminCheck(supabase: any) {
   // 1. Get the current authenticated user securely via JWT validation
   const {
@@ -27,8 +31,8 @@ export async function enforceAdminCheck(supabase: any) {
     };
   }
 
-  // 2. Validate against the trusted admin allowlist table
-  const isAdmin = await isAdminUser(supabase, user.id);
+  // 2. Validate against the trusted admin allowlist table or explicit auth metadata
+  const isAdmin = hasAdminMetadata(user) || (await isAdminUser(supabase, user.id));
   if (!isAdmin) {
     return {
       authorized: false,
