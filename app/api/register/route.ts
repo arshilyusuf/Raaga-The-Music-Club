@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { appendToSheet } from "@/lib/googleSheets";
 import { Resend } from "resend";
+import { enforceRateLimit } from "@/lib/security/rate-limit";
+
+export const maxDuration = 10;
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -18,11 +21,79 @@ const RESTRICTED_EMAILS = [
   "all@nitrr.ac.in",
 ];
 
+function escapeHtml(value: unknown) {
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+function isAllowedOrigin(request: NextRequest) {
+  const origin = request.headers.get("origin");
+  if (!origin) {
+    return true;
+  }
+
+  try {
+    const originUrl = new URL(origin);
+    const host = request.headers.get("host");
+    if (!host) {
+      return false;
+    }
+
+    return originUrl.host === host;
+  } catch {
+    return false;
+  }
+}
+
 export async function POST(req: NextRequest) {
   try {
+    if (!isAllowedOrigin(req)) {
+      return NextResponse.json(
+        { error: "Origin not allowed." },
+        { status: 403 },
+      );
+    }
+
+    const rateLimit = enforceRateLimit(req, {
+      key: "registration",
+      limit: 3,
+      windowMs: 60_000,
+      message:
+        "Too many registration attempts from this IP. Please try again later.",
+    });
+
+    if (!rateLimit.allowed) {
+      return rateLimit.response;
+    }
+
+    const contentLength = req.headers.get("content-length");
+    if (contentLength && Number(contentLength) > 32_768) {
+      return NextResponse.json(
+        { error: "Request body is too large." },
+        { status: 413 },
+      );
+    }
+
     const body = await req.json();
-    const { registration_type, roll_number, full_name } = body;
-    const email = body.email?.toLowerCase().trim();
+    const registrationType = String(body.registration_type ?? "")
+      .toLowerCase()
+      .trim();
+    const rollNumber = String(body.roll_number ?? "").trim();
+    const fullName = String(body.full_name ?? "").trim();
+    const email = String(body.email ?? "")
+      .toLowerCase()
+      .trim();
+
+    if (!fullName || fullName.length > 120) {
+      return NextResponse.json(
+        { error: "Full name is required and must be 120 characters or fewer." },
+        { status: 400 },
+      );
+    }
 
     if (email && RESTRICTED_EMAILS.includes(email)) {
       return NextResponse.json(
@@ -32,13 +103,13 @@ export async function POST(req: NextRequest) {
     }
 
     // --- 1. Validation Rules ---
-    if (!["vocalist", "instrumentalist"].includes(registration_type)) {
+    if (!["vocalist", "instrumentalist"].includes(registrationType)) {
       return NextResponse.json(
         { error: "Invalid registration type" },
         { status: 400 },
       );
     }
-    if (!roll_number) {
+    if (!rollNumber) {
       return NextResponse.json(
         { error: "Roll number is required" },
         { status: 400 },
@@ -50,20 +121,26 @@ export async function POST(req: NextRequest) {
         { status: 400 },
       );
     }
+    if (email.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return NextResponse.json(
+        { error: "Email address is invalid." },
+        { status: 400 },
+      );
+    }
 
     // --- 2. Insert into Supabase ---
     const { data, error } = await supabase
       .from("audition_registrations")
       .insert([
         {
-          full_name: body.full_name,
-          email: body.email,
-          roll_number: body.roll_number.trim(),
+          full_name: fullName,
+          email,
+          roll_number: rollNumber,
           branch: body.branch,
           year: body.year,
           phone_number: body.phone_number,
           remarks: body.remarks ?? null,
-          registration_type: body.registration_type,
+          registration_type: registrationType,
           languages: body.languages ?? null,
           backing_track_links: body.backing_track_links ?? null,
           instruments: body.instruments ?? null,
@@ -87,9 +164,17 @@ export async function POST(req: NextRequest) {
     }
 
     // --- 3. Send Email & Sync Data ---
-    const auditionDate = "October 15, 2026, at 10:00 AM";
+    const auditionDate = "August 1st(Vocals)/2nd(Instruments), at 10:00 AM";
+    const safeName = escapeHtml(fullName);
+    const safeBranch = escapeHtml(data.branch);
+    const safeYear = escapeHtml(data.year);
+    const safeRollNumber = escapeHtml(data.roll_number);
+    const safeRegistrationType = escapeHtml(registrationType.toUpperCase());
+    const safeInstruments = escapeHtml(data.instruments);
+    const safeLanguages = escapeHtml(data.languages);
+    const safeAuditionDate = escapeHtml(auditionDate);
 
-    const textFallback = `Hello ${full_name},\n\nYour registration for the upcoming Raaga: The Music Club auditions has been received.\n\nRegistration Summary:\n- Category: ${registration_type.toUpperCase()}\n- Roll Number: ${data.roll_number}\n- Branch / Year: ${data.branch} (Year ${data.year})\n\nAudition Schedule:\nPlease report directly to the main auditorium on: ${auditionDate}\n\nIf you have any questions or need to reschedule, reply to this email or reach our support team at 98357828123 or 7808361946.\n\nBest regards,\nRaaga Auditions Coordination Team`;
+    const textFallback = `Hello ${fullName},\n\nYour registration for the upcoming Raaga: The Music Club auditions has been received.\n\nRegistration Summary:\n- Category: ${registrationType.toUpperCase()}\n- Roll Number: ${data.roll_number}\n- Branch / Year: ${data.branch} (Year ${data.year})\n\nAudition Schedule:\nPlease report directly to the main auditorium on: ${auditionDate}\n\nIf you have any questions or need to reschedule, reply to this email or reach our support team at 98357828123 or 7808361946.\n\nBest regards,\nRaaga Auditions Coordination Team`;
 
     console.log(`Initiating background tasks for ${email}...`);
 
@@ -99,30 +184,30 @@ export async function POST(req: NextRequest) {
         from: "Raaga The Music Club <auditions@raagathemusicclub.in>",
         replyTo: "support@raagathemusicclub.in",
         to: email,
-        subject: `Audition Registration Confirmation - ${full_name}`,
+        subject: `Audition Registration Confirmation - ${fullName}`,
         text: textFallback,
         html: `
           <div style="font-family: Arial, sans-serif; line-height: 1.6; max-width: 550px; color: #222222;">
-            <p>Hello <strong>${full_name}</strong>,</p>
+            <p>Hello <strong>${safeName}</strong>,</p>
             <p>Your registration for the upcoming <strong>Raaga: The Music Club</strong> auditions has been received.</p>
             
             <hr style="border: 0; border-top: 1px solid #eeeeee; margin: 15px 0;" />
             
             <p><strong>Registration Summary:</strong></p>
             <ul>
-              <li><strong>Category:</strong> ${registration_type.toUpperCase()}</li>
-              <li><strong>Roll Number:</strong> ${data.roll_number}</li>
-              <li><strong>Branch / Year:</strong> ${data.branch} (Year ${data.year})</li>
-              ${data.instruments ? `<li><strong>Instruments:</strong> ${data.instruments}</li>` : ""}
-              ${data.languages ? `<li><strong>Languages:</strong> ${data.languages}</li>` : ""}
+              <li><strong>Category:</strong> ${safeRegistrationType}</li>
+              <li><strong>Roll Number:</strong> ${safeRollNumber}</li>
+              <li><strong>Branch / Year:</strong> ${safeBranch} (Year ${safeYear})</li>
+              ${data.instruments ? `<li><strong>Instruments:</strong> ${safeInstruments}</li>` : ""}
+              ${data.languages ? `<li><strong>Languages:</strong> ${safeLanguages}</li>` : ""}
             </ul>
 
             <hr style="border: 0; border-top: 1px solid #eeeeee; margin: 15px 0;" />
 
             <p><strong>Audition Schedule:</strong><br />
-            Please report directly to the main auditorium on: <strong>${auditionDate}</strong></p>
+            Please report directly to the Yoga Hall on: <strong>${safeAuditionDate}</strong></p>
 
-            <p>If you have any questions, reply to this email or contact us at 98357828123 or 7808361946.</p>
+            <p>If you have any questions, reply to this email or contact us at 6263770320 (Satyam [Vocals]) or 9584493008 (Naman [Instruments]).</p>
             
             <p>Best regards,<br />Raaga Auditions Coordination Team</p>
           </div>
@@ -159,7 +244,12 @@ export async function POST(req: NextRequest) {
     console.error("❌ Registration route error:", err);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 },
+      {
+        status: 500,
+        headers: {
+          "Cache-Control": "no-store, max-age=0",
+        },
+      },
     );
   }
 }

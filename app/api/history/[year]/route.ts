@@ -1,13 +1,28 @@
 import { NextResponse } from "next/server";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { enforceAdminCheck } from "@/lib/supabase/auth-guard";
+import { enforceRateLimit } from "@/lib/security/rate-limit";
+
+export const maxDuration = 5;
 
 export async function GET(
   request: Request,
-  { params }: { params: Promise<{ year: string }> }
+  { params }: { params: Promise<{ year: string }> },
 ) {
+  const rateLimit = enforceRateLimit(request, {
+    key: "api:history:get",
+    limit: 60,
+    windowMs: 60_000,
+    message:
+      "History endpoint is temporarily rate-limited. Please try again shortly.",
+  });
+
+  if (!rateLimit.allowed) {
+    return rateLimit.response;
+  }
+
   const supabase = await createServerSupabaseClient();
-  const { year: targetYear } = await params; 
+  const { year: targetYear } = await params;
 
   console.log(`[API /api/history/${targetYear}] Request received.`);
 
@@ -18,12 +33,14 @@ export async function GET(
   try {
     const { data, error } = await supabase
       .from("club_memberships")
-      .select(`
+      .select(
+        `
         id,
         academic_year,
         year_of_study,
         team_members (*)
-      `)
+      `,
+      )
       .eq("academic_year", targetYear);
 
     if (error) {
@@ -46,7 +63,7 @@ export async function GET(
         domain: item.team_members?.domain,
         role: item.team_members?.role,
         is_active: item.team_members?.is_active,
-        year_of_study: item.year_of_study, 
+        year_of_study: item.year_of_study,
         academic_year: item.academic_year,
       }));
 
@@ -62,11 +79,22 @@ export async function GET(
       { members: sortedHistory },
       {
         headers: {
-          "Cache-Control": "public, s-maxage=60, stale-while-revalidate=30",
+          "Cache-Control":
+            "public, s-maxage=300, stale-while-revalidate=600, stale-if-error=86400",
+          "CDN-Cache-Control":
+            "public, s-maxage=300, stale-while-revalidate=600, stale-if-error=86400",
         },
-      }
+      },
     );
   } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 });
+    return NextResponse.json(
+      { error: err.message },
+      {
+        status: 500,
+        headers: {
+          "Cache-Control": "no-store, max-age=0",
+        },
+      },
+    );
   }
 }

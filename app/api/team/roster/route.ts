@@ -1,7 +1,22 @@
 import { NextResponse } from "next/server";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { enforceRateLimit } from "@/lib/security/rate-limit";
 
-export async function GET() {
+export const maxDuration = 5;
+
+export async function GET(request: Request) {
+  const rateLimit = enforceRateLimit(request, {
+    key: "api:team-roster:get",
+    limit: 120,
+    windowMs: 60_000,
+    message:
+      "Team roster is temporarily rate-limited. Please try again shortly.",
+  });
+
+  if (!rateLimit.allowed) {
+    return rateLimit.response;
+  }
+
   try {
     const supabase = await createServerSupabaseClient();
 
@@ -30,38 +45,70 @@ export async function GET() {
       arr.sort((a, b) => (a.name || "").localeCompare(b.name || ""));
 
     // Distribute into target roster structural lists based on team_members fields
-    const heads = activeMembers.filter((m) => m.year === 4).map((m) => ({
-      name: m.name,
-      title: m.role || "Head Coordinator",
-      avatar: m.photo_url || "",
-      instagramURL: m.instagram || "",
-    }));
+    const heads = activeMembers
+      .filter((m) => m.year === 4)
+      .map((m) => ({
+        name: m.name,
+        title: m.role || "Head Coordinator",
+        avatar: m.photo_url || "",
+        instagramURL: m.instagram || "",
+      }));
 
-    const core = activeMembers.filter((m) => m.year === 3).map((m) => ({
-      name: m.name,
-      title: m.role || "Vocalist",
-      image: m.photo_url || "https://i.scdn.co/image/ab67616d0000b273d9985092cd88bffd97653b58",
-      instagramURL: m.instagram || "",
-    }));
+    const core = activeMembers
+      .filter((m) => m.year === 3)
+      .map((m) => ({
+        name: m.name,
+        title: m.role || "Vocalist",
+        image:
+          m.photo_url ||
+          "https://i.scdn.co/image/ab67616d0000b273d9985092cd88bffd97653b58",
+        instagramURL: m.instagram || "",
+      }));
 
     const exes = activeMembers
-      .filter((m) => m.year === 2 && ["musician", "instrumentals", "vocals"].includes(m.domain))
+      .filter(
+        (m) =>
+          m.year === 2 &&
+          ["musician", "instrumentals", "vocals"].includes(m.domain),
+      )
       .map((m) => ({
         name: m.name,
         title: m.role || "Vocalist",
       }));
 
-    const management = activeMembers.filter((m) => m.domain === "management").map((m) => ({ name: m.name }));
-    const anchoring = activeMembers.filter((m) => m.domain === "anchoring").map((m) => ({ name: m.name }));
+    const management = activeMembers
+      .filter((m) => m.domain === "management")
+      .map((m) => ({ name: m.name }));
+    const anchoring = activeMembers
+      .filter((m) => m.domain === "anchoring")
+      .map((m) => ({ name: m.name }));
 
-    return NextResponse.json({
-      heads: sortAlphabetically(heads),
-      core: sortAlphabetically(core),
-      exes: sortAlphabetically(exes),
-      management: sortAlphabetically(management),
-      anchoring: sortAlphabetically(anchoring),
-    });
+    return NextResponse.json(
+      {
+        heads: sortAlphabetically(heads),
+        core: sortAlphabetically(core),
+        exes: sortAlphabetically(exes),
+        management: sortAlphabetically(management),
+        anchoring: sortAlphabetically(anchoring),
+      },
+      {
+        headers: {
+          "Cache-Control":
+            "public, s-maxage=300, stale-while-revalidate=600, stale-if-error=86400",
+          "CDN-Cache-Control":
+            "public, s-maxage=300, stale-while-revalidate=600, stale-if-error=86400",
+        },
+      },
+    );
   } catch (err: any) {
-    return NextResponse.json({ error: "Internal Server Error", message: err.message }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal Server Error", message: err.message },
+      {
+        status: 500,
+        headers: {
+          "Cache-Control": "no-store, max-age=0",
+        },
+      },
+    );
   }
 }

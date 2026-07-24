@@ -12,7 +12,7 @@ export default function Page() {
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
   const [showSuccess, setShowSuccess] = useState(false);
-  const DEADLINE = new Date("2026-06-15T23:59:59").getTime();
+  const DEADLINE = new Date("2026-08-15T23:59:59").getTime();
   const [windowOpen, setWindowOpen] = useState(() => Date.now() < DEADLINE);
   useEffect(() => {
     // If it's already closed, no need to run a timer
@@ -536,17 +536,17 @@ export default function Page() {
               For any queries, contact us at
               <span className="sm:ml-3 flex flex-wrap gap-2 items-center">
                 <a
-                  href="tel:9999999999"
+                  href="tel:6263770320"
                   className="text-white font-semibold hover:underline"
                 >
-                  9999999999
+                  6263770320 - Satyam [Vocals]
                 </a>
                 <span className="hidden sm:inline">|</span>
                 <a
-                  href="tel:8888888888"
+                  href="tel:9584493008"
                   className="text-white font-semibold hover:underline"
                 >
-                  8888888888
+                  9584493008 - Naman [Instruments]
                 </a>
               </span>
             </span>

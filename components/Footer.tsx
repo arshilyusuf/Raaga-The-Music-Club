@@ -10,7 +10,6 @@ export default function Footer() {
         width={24}
         height={24}
         className="absolute z-100 sm:-top-6 -top-[1.45rem] left-0 rotate-270 pointer-events-none"
-        
       />
 
       {/* Right inverted border */}
@@ -42,10 +41,20 @@ export default function Footer() {
         <div>
           <h3 className="text-xl font-semibold mb-4">Connect With Us</h3>
           <div className="flex flex-col gap-3 text-gray-300">
-            <a href="https://www.instagram.com/raaga.nitrr/" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">
+            <a
+              href="https://www.instagram.com/raaga.nitrr/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-white transition"
+            >
               Instagram
             </a>
-            <a href="https://www.youtube.com/@raagathemusicclub" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">
+            <a
+              href="https://www.youtube.com/@raagathemusicclub"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-white transition"
+            >
               YouTube
             </a>
           </div>
@@ -55,8 +64,11 @@ export default function Footer() {
         <div>
           <h3 className="text-xl font-semibold mb-4">Contact</h3>
           <div className="flex flex-col gap-2 text-gray-300">
-            <a href="mailto:raagathemusicclubnitrr@gmail.com" className="hover:text-white transition">
-              raagathemusicclubnitrr@gmail.com
+            <a
+              href="mailto:raagathemusicclubnitrr@gmail.com"
+              className="hover:text-white transition"
+            >
+              raagaclub21@gmail.com
             </a>
           </div>
         </div>

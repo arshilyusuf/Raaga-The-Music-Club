@@ -1,5 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { isAdminUser } from "@/lib/supabase/auth-guard";
 
 export async function middleware(request: NextRequest) {
   let response = NextResponse.next({
@@ -25,32 +26,33 @@ export async function middleware(request: NextRequest) {
               ...options,
             });
           });
-          
+
           response = NextResponse.next({
             request: { headers: request.headers },
           });
-          
+
           cookiesToSet.forEach(({ name, value, options }) =>
-            response.cookies.set(name, value, options)
+            response.cookies.set(name, value, options),
           );
         },
       },
-    }
+    },
   );
 
   // Validate the user token securely on the server
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   // If the user tries to hit any URL starting with /admin...
   if (request.nextUrl.pathname.startsWith("/admin")) {
-    
     // 1. Allow unauthenticated visitors through to access the inline login panel
     if (!user) {
       return response;
     }
 
-    // 2. Kick out authenticated users who are NOT admins
-    const isAdmin = user.user_metadata?.is_admin === true;
+    // 2. Kick out authenticated users who are NOT in the admin allowlist
+    const isAdmin = await isAdminUser(supabase, user.id);
     if (!isAdmin) {
       return NextResponse.redirect(new URL("/", request.url)); // Send to public home page
     }
