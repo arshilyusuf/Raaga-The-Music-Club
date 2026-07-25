@@ -530,6 +530,64 @@ export default function Page() {
               </button>
             </form>
           </fieldset>
+          <div className="mt-6 rounded-xl border border-white/20 bg-white/5 p-4 sm:p-6">
+            {type === "vocal" ? (
+              <>
+                <h3 className="mb-4 text-lg font-bold uppercase text-white">
+                  Vocals
+                </h3>
+
+                <ul className="list-disc space-y-2 pl-5 text-sm leading-6 text-gray-200 marker:text-yellow-400">
+                  <li>
+                    Prepare two songs of different genres with their respective
+                    karaoke tracks.
+                  </li>
+                  <li>
+                    Choose songs that best showcase your vocal versatility and
+                    style.
+                  </li>
+                  <li>
+                    Your performance will be assessed on key musical parameters
+                    including scale accuracy, tempo, pitch, rhythm, vocal range,
+                    expression, and stage presence.
+                  </li>
+                  <li>
+                    Ensure these aspects are maintained consistently throughout
+                    your performance.
+                  </li>
+                </ul>
+              </>
+            ) : (
+              <>
+                <h3 className="mb-4 text-lg font-bold uppercase text-white">
+                  Instrument
+                </h3>
+
+                <ul className="list-disc space-y-2 pl-5 text-sm leading-6 text-gray-200 marker:text-yellow-400">
+                  <li>
+                    Prepare two songs of your choice that best showcase your
+                    ability, musicality, and overall performance.
+                  </li>
+                  <li>
+                    Be familiar with basic music theory, including concepts such
+                    as scales, chord progressions, rhythm, and keys.
+                  </li>
+                  <li>
+                    <strong>Percussionists:</strong> You shall prepare a song
+                    wherein your instrument plays a dominant role in its
+                    arrangement. All the fillers, beats, transitions, etc.
+                    should be neatly placed.
+                  </li>
+                  <li>
+                    <strong>Tabla, Dholak and Octapad players:</strong> Should
+                    be able to play the respective instrument's sync to
+                    accompany the vocalists (song will be played on speakers
+                    (song itself), it shall be close and then there itself).
+                  </li>
+                </ul>
+              </>
+            )}
+          </div>
           <p className="text-gray-300 mt-10 text-sm flex flex-col sm:flex-row items-start sm:items-center bg-[#4A5919]/40 border border-gray-100 rounded-lg px-4 py-3">
             <span className="inline-flex items-center justify-center w-5 h-5 rounded-full shrink-0 text-black bg-white backdrop-blur-sm text-xs mb-2 sm:mb-0">
               i
