@@ -242,6 +242,7 @@ export default function Page() {
             direction="left"
             className="text-3xl font-bold mb-8"
           />
+
           <fieldset
             disabled={submitting || showSuccess}
             className="w-full max-w-4xl"
@@ -592,22 +593,39 @@ export default function Page() {
             <span className="inline-flex items-center justify-center w-5 h-5 rounded-full shrink-0 text-black bg-white backdrop-blur-sm text-xs mb-2 sm:mb-0">
               i
             </span>
-            <span className="sm:mx-3 flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-0">
-              For any queries, contact us at
-              <span className="sm:ml-3 flex flex-wrap gap-2 items-center">
+            <span className="mx-3 flex flex-col items-center gap-2 text-center sm:text-left">
+              <span className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-0">
+                <span>For any queries, contact us at</span>
+
+                <span className="sm:ml-3 flex flex-col sm:flex-row sm:flex-wrap items-center gap-1 sm:gap-2">
+                  <a
+                    href="tel:6263770320"
+                    className="text-white font-semibold hover:underline"
+                  >
+                    6263770320 - Satyam [Vocals]
+                  </a>
+
+                  <span className="hidden sm:inline">|</span>
+
+                  <a
+                    href="tel:9584493008"
+                    className="text-white font-semibold hover:underline"
+                  >
+                    9584493008 - Naman [Instruments]
+                  </a>
+                </span>
+              </span>
+
+              <span>
+                For other domains like anchoring, video editing, photography,
+                design & volunteering, register{" "}
                 <a
-                  href="tel:6263770320"
-                  className="text-white font-semibold hover:underline"
+                  href="https://docs.google.com/forms/d/e/1FAIpQLSfcsd8fTXwYazJwQggAtQiaJwRJYNkqllKWev4gyNVOGbc1aA/viewform"
+                  className="text-yellow-200 hover:underline"
                 >
-                  6263770320 - Satyam [Vocals]
+                  here
                 </a>
-                <span className="hidden sm:inline">|</span>
-                <a
-                  href="tel:9584493008"
-                  className="text-white font-semibold hover:underline"
-                >
-                  9584493008 - Naman [Instruments]
-                </a>
+                .
               </span>
             </span>
           </p>
