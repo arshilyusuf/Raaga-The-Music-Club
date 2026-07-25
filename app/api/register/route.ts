@@ -207,7 +207,7 @@ export async function POST(req: NextRequest) {
             <p><strong>Audition Schedule:</strong><br />
             Please report directly to the Yoga Hall on: <strong>${safeAuditionDate}</strong></p>
 
-            <p>If you have any questions, reply to this email or contact us at 6263770320 (Satyam [Vocals]) or 9584493008 (Naman [Instruments]).</p>
+            <p>If you have any questions, contact us at 6263770320 (Satyam [Vocals]) or 9584493008 (Naman [Instruments]).</p>
             
             <p>Best regards,<br />Raaga Auditions Coordination Team</p>
           </div>

@@ -210,7 +210,7 @@ export default function Home() {
 
   return (
     <main className="relative min-h-screen w-full text-zinc-50 overflow-hidden ">
-      {isMobile ? (
+      {/* {isMobile ? (
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -248,7 +248,7 @@ export default function Home() {
             className="w-full"
           />
         </motion.div>
-      )}
+      )} */}
       <section className="relative z-10 flex min-h-screen items-center justify-center px-4">
         <div className="absolute -top-2 inset-0 -z-10">
           {/* Desktop Image: Hidden on mobile, visible on medium screens (768px) and up */}
@@ -407,7 +407,7 @@ export default function Home() {
             <br />
             The official music club of NIT Raipur{" "}
           </motion.p>
-          {/* <div className="mt-6">
+          <div className="mt-6">
             <motion.p
               className=" text-md sm:text-lg md:text-md text-zinc-100"
               initial={{ opacity: 0, y: 10 }}
@@ -437,7 +437,7 @@ export default function Home() {
                 }}
               />
             </motion.div>
-          </div> */}
+          </div>
         </motion.div>
       </section>
       <section className="h-screen sm:min-h-fit w-full bg-[#252e08] relative">
