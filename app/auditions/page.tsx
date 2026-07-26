@@ -417,7 +417,7 @@ export default function Page() {
                         <input
                           type="text"
                           name="backing_track_links"
-                          placeholder="Paste link(s) here"
+                          placeholder="Paste YouTube/Drive karaoke link(s) here"
                           className="input"
                           value={formData.backing_track_links}
                           onChange={handleChange}
