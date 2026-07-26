@@ -552,10 +552,7 @@ export default function Page() {
                     including scale accuracy, tempo, pitch, rhythm, vocal range,
                     expression, and stage presence.
                   </li>
-                  <li>
-                    Ensure these aspects are maintained consistently throughout
-                    your performance.
-                  </li>
+                  <li><strong>Note:</strong> We encourage everyone to participate in the auditions, regardless of their experience or chances of selection.</li>
                 </ul>
               </>
             ) : (
@@ -585,6 +582,7 @@ export default function Page() {
                     accompany the vocalists (song will be played on speakers
                     (song itself), it shall be close and then there itself).
                   </li>
+                  <li><strong>Note:</strong> We encourage everyone to participate in the auditions, regardless of their experience or chances of selection.</li>
                 </ul>
               </>
             )}
