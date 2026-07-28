@@ -579,8 +579,7 @@ export default function Page() {
                   <li>
                     <strong>Tabla, Dholak and Octapad players:</strong> Should
                     be able to play the respective instrument's sync to
-                    accompany the vocalists (song will be played on speakers
-                    (song itself), it shall be close and then there itself).
+                    accompany the vocalists (song will be played on speaker, it shall be disclosed then and there itself).
                   </li>
                   <li><strong>Note:</strong> We encourage everyone to participate in the auditions, regardless of their experience or chances of selection.</li>
                 </ul>
