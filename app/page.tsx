@@ -207,7 +207,8 @@ export default function Home() {
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
-
+const DEADLINE = new Date("2026-07-30T23:59:59").getTime();
+const isBeforeDeadline = Date.now() < DEADLINE;
   return (
     <main className="relative min-h-screen w-full text-zinc-50 overflow-hidden ">
       {/* {isMobile ? (
@@ -429,13 +430,15 @@ export default function Home() {
                 ease: [0.22, 1, 0.36, 1],
               }}
             >
-              <CartoonButton
-                label="REGISTER NOW"
-                color="mt-3 bg-[#9ebc16]/30 backdrop-blur font-semibold text-white border-white"
-                onClick={() => {
-                  window.location.href = "/auditions";
-                }}
-              />
+              {isBeforeDeadline && (
+  <CartoonButton
+    label="REGISTER NOW"
+    color="mt-3 bg-[#9ebc16]/30 backdrop-blur font-semibold text-white border-white"
+    onClick={() => {
+      window.location.href = "/auditions";
+    }}
+  />
+)}
             </motion.div>
           </div>
         </motion.div>
