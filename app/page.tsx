@@ -409,6 +409,7 @@ const isBeforeDeadline = Date.now() < DEADLINE;
             The official music club of NIT Raipur{" "}
           </motion.p>
           <div className="mt-6">
+            {isBeforeDeadline && (
             <motion.p
               className=" text-md sm:text-lg md:text-md text-zinc-100"
               initial={{ opacity: 0, y: 10 }}
@@ -421,6 +422,7 @@ const isBeforeDeadline = Date.now() < DEADLINE;
             >
               Auditions are now open!
             </motion.p>
+            )}
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
