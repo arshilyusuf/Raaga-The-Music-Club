@@ -639,8 +639,7 @@ export default function Page() {
             className="text-3xl font-bold mb-4"
           />
           <p className="text-white text-xl">
-            The Auditions are not open for registration at the moment. Please
-            check back later!
+            The Auditions are not open for registration at the moment.
           </p>
         </div>
       )}
