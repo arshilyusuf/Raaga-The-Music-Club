@@ -58,11 +58,6 @@ export default function Page() {
         ...prev,
         phone_number: value.replace(/\D/g, "").slice(0, 10),
       }));
-    } else if (name === "roll_number") {
-      setFormData((prev) => ({
-        ...prev,
-        roll_number: value.replace(/\D/g, "").slice(0, 8),
-      }));
     } else {
       setFormData((prev) => ({
         ...prev,
@@ -287,12 +282,11 @@ export default function Page() {
                   <input
                     type="text"
                     name="roll_number"
-                    placeholder="Enter roll number"
+                    placeholder="Enter roll number, if not alloted, "
                     className="input"
                     value={formData.roll_number}
                     onChange={handleChange}
                     pattern="\d{8}"
-                    maxLength={8}
                     required
                   />
                 </div>
