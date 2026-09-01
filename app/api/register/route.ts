@@ -164,7 +164,7 @@ export async function POST(req: NextRequest) {
     }
 
     // --- 3. Send Email & Sync Data ---
-    const auditionDate = "August 1st(Vocals)/2nd(Instruments), at 10:00 AM";
+    const auditionDate = "September 5th/6th, at 10:30 AM";
     const safeName = escapeHtml(fullName);
     const safeBranch = escapeHtml(data.branch);
     const safeYear = escapeHtml(data.year);
@@ -174,7 +174,7 @@ export async function POST(req: NextRequest) {
     const safeLanguages = escapeHtml(data.languages);
     const safeAuditionDate = escapeHtml(auditionDate);
 
-    const textFallback = `Hello ${fullName},\n\nYour registration for the upcoming Raaga: The Music Club auditions has been received.\n\nRegistration Summary:\n- Category: ${registrationType.toUpperCase()}\n- Roll Number: ${data.roll_number}\n- Branch / Year: ${data.branch} (Year ${data.year})\n\nAudition Schedule:\nPlease report directly to the main auditorium on: ${auditionDate}\n\nIf you have any questions or need to reschedule, reply to this email or reach our support team at 98357828123 or 7808361946.\n\nBest regards,\nRaaga Auditions Coordination Team`;
+    const textFallback = `Hello ${fullName},\n\nYour registration for the upcoming Raaga: The Music Club auditions has been received.\n\nRegistration Summary:\n- Category: ${registrationType.toUpperCase()}\n- Roll Number: ${data.roll_number}\n- Branch / Year: ${data.branch} (Year ${data.year})\n\nAudition Schedule:\nPlease report directly to the yoga hall on: ${auditionDate}\n\nIf you have any questions or need to reschedule, reply to this email or reach our support team at 9302689470 or 8349816667.\n\nBest regards,\nRaaga Auditions Coordination Team`;
 
     console.log(`Initiating background tasks for ${email}...`);
 
@@ -207,9 +207,10 @@ export async function POST(req: NextRequest) {
             <p><strong>Audition Schedule:</strong><br />
             Please report directly to the Yoga Hall on: <strong>${safeAuditionDate}</strong></p>
 
-            <p>If you have any questions, contact us at 6263770320 (Satyam [Vocals]) or 9584493008 (Naman [Instruments]).</p>
+            <p>If you have any questions, contact us at 8349816667 - Debanjan or 9302689470 - Himanshu.</p>
             
             <p>Best regards,<br />Raaga Auditions Coordination Team</p>
+            
           </div>
         `,
       }),

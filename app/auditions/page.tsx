@@ -12,7 +12,7 @@ export default function Page() {
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
   const [showSuccess, setShowSuccess] = useState(false);
-  const DEADLINE = new Date("2026-07-30T23:59:59").getTime();
+  const DEADLINE = new Date("2026-09-04T18:29:59").getTime();
   const [windowOpen, setWindowOpen] = useState(() => Date.now() < DEADLINE);
   useEffect(() => {
     // If it's already closed, no need to run a timer
@@ -151,9 +151,9 @@ export default function Page() {
 
   const colors = useMemo(() => {
     if (type === "vocal") {
-      return { c1: "#83A317", c2: "#5C6931", c3: "#94AB49" };
+      return { c1: "#9ea317", c2: "#696331", c3: "#ab9e49" };
     } else {
-      return { c1: "#0e6227", c2: "#4aa244", c3: "#075414" };
+      return { c1: "#0e625c", c2: "#44a29f", c3: "#074d54" };
     }
   }, [type]);
 
@@ -550,7 +550,11 @@ export default function Page() {
                     including scale accuracy, tempo, pitch, rhythm, vocal range,
                     expression, and stage presence.
                   </li>
-                  <li><strong>Note:</strong> We encourage everyone to participate in the auditions, regardless of their experience or chances of selection.</li>
+                  <li>
+                    <strong>Note:</strong> We encourage everyone to participate
+                    in the auditions, regardless of their experience or chances
+                    of selection.
+                  </li>
                 </ul>
               </>
             ) : (
@@ -577,9 +581,14 @@ export default function Page() {
                   <li>
                     <strong>Tabla, Dholak and Octapad players:</strong> Should
                     be able to play the respective instrument's sync to
-                    accompany the vocalists (song will be played on speaker, it shall be disclosed then and there itself).
+                    accompany the vocalists (song will be played on speaker, it
+                    shall be disclosed then and there itself).
                   </li>
-                  <li><strong>Note:</strong> We encourage everyone to participate in the auditions, regardless of their experience or chances of selection.</li>
+                  <li>
+                    <strong>Note:</strong> We encourage everyone to participate
+                    in the auditions, regardless of their experience or chances
+                    of selection.
+                  </li>
                 </ul>
               </>
             )}
@@ -594,24 +603,24 @@ export default function Page() {
 
                 <span className="sm:ml-3 flex flex-col sm:flex-row sm:flex-wrap items-center gap-1 sm:gap-2">
                   <a
-                    href="tel:6263770320"
+                    href="tel:8349816667"
                     className="text-white font-semibold hover:underline"
                   >
-                    6263770320 - Satyam [Vocals]
+                    8349816667 - Debanjan
                   </a>
 
                   <span className="hidden sm:inline">|</span>
 
                   <a
-                    href="tel:9584493008"
+                    href="tel:9302689470"
                     className="text-white font-semibold hover:underline"
                   >
-                    9584493008 - Naman [Instruments]
+                    9302689470 - Himanshu
                   </a>
                 </span>
               </span>
 
-              <span>
+              {/* <span>
                 For other domains like anchoring, video editing, photography,
                 design & volunteering, register{" "}
                 <a
@@ -621,7 +630,7 @@ export default function Page() {
                   here
                 </a>
                 .
-              </span>
+              </span> */}
             </span>
           </p>
         </>
