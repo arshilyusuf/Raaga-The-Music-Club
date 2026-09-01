@@ -278,11 +278,11 @@ export default function Page() {
                 </div>
 
                 <div className="flex flex-col">
-                  <label className="font-semibold mb-1">Roll/EnrollmemtNumber</label>
+                  <label className="font-semibold mb-1">Roll/Enrollment</label>
                   <input
                     type="text"
                     name="roll_number"
-                    placeholder="Enter roll or enrollment numberif not alloted"
+                    placeholder="Enter roll or enrollment number if not alloted"
                     className="input"
                     value={formData.roll_number}
                     onChange={handleChange}
