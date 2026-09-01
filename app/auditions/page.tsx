@@ -286,7 +286,6 @@ export default function Page() {
                     className="input"
                     value={formData.roll_number}
                     onChange={handleChange}
-                    pattern="\d{8}"
                     required
                   />
                 </div>
