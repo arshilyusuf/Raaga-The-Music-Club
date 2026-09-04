@@ -207,7 +207,7 @@ export default function Home() {
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
-const DEADLINE = new Date("2026-09-04T18:29:59").getTime();
+const DEADLINE = new Date("2026-09-04T22:00:59").getTime();
 const isBeforeDeadline = Date.now() < DEADLINE;
   return (
     <main className="relative min-h-screen w-full text-zinc-50 overflow-hidden ">
