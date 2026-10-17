@@ -43,6 +43,7 @@ export async function addRegistrationToTeam(reg: AddToTeamInput) {
     : 'Instrumentalist' 
 
   let memberId: string | null = null
+  let createdMember = false
 
   // 3. Check if the profile already exists in the permanent team_members table
   if (reg.roll_number) {
@@ -81,6 +82,19 @@ export async function addRegistrationToTeam(reg: AddToTeamInput) {
         .from('club_memberships')
         .update({ is_active: false })
         .eq('member_id', memberId)
+
+      const { error: profileUpdateError } = await supabase
+        .from('team_members')
+        .update({
+          year: integerYear,
+          domain,
+          role,
+        })
+        .eq('id', memberId)
+
+      if (profileUpdateError) {
+        throw new Error(`Failed to update member profile: ${profileUpdateError.message}`)
+      }
     }
   }
 
@@ -95,6 +109,9 @@ export async function addRegistrationToTeam(reg: AddToTeamInput) {
           phone: reg.phone_number,
           roll_number: reg.roll_number,
           branch: reg.branch,
+          year: integerYear,
+          domain,
+          role,
         }
       ])
       .select('id')
@@ -106,6 +123,7 @@ export async function addRegistrationToTeam(reg: AddToTeamInput) {
     }
     
     memberId = newProfile.id
+    createdMember = true
   }
 
   // 5. Scenario B: Create their active entry in the club memberships log
@@ -116,9 +134,6 @@ export async function addRegistrationToTeam(reg: AddToTeamInput) {
         member_id: memberId,
         academic_year: activeAcademicYearStr,
         year_of_study: integerYear,
-        domain: domain,
-        role: role,
-        is_active: true
       }
     ])
     .select()
@@ -126,6 +141,18 @@ export async function addRegistrationToTeam(reg: AddToTeamInput) {
 
   if (membershipError) {
     console.error('Membership assignment entry failed:', membershipError.message)
+
+    if (createdMember && memberId) {
+      const { error: cleanupError } = await supabase
+        .from('team_members')
+        .delete()
+        .eq('id', memberId)
+
+      if (cleanupError) {
+        console.error('Failed to clean up incomplete team member:', cleanupError.message)
+      }
+    }
+
     throw new Error(`Failed to assign member to current team: ${membershipError.message}`)
   }
 

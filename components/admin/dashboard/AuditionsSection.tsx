@@ -29,6 +29,7 @@ type Registration = {
 
 type AuditionsSectionProps = {
   registrations: Registration[];
+  teamMembers: Array<{ roll_number?: string; email?: string }>;
   filter: "all" | "vocalist" | "instrumentalist";
   expandedRow: string | null;
   yearColors: Record<number, string>;
@@ -38,15 +39,19 @@ type AuditionsSectionProps = {
 
 export function AuditionsSection({
   registrations: initialRegistrations, // Rename prop to keep track of initial data
+  teamMembers,
   filter,
   expandedRow,
   yearColors,
   onFilterChange,
   onToggleRow,
 }: AuditionsSectionProps) {
-  // Move registrations into local component state to handle real-time UI clearing
+  // Keep local state so successfully assigned registrations can be marked.
   const [registrations, setRegistrations] =
     useState<Registration[]>(initialRegistrations);
+  const [addedRegistrationIds, setAddedRegistrationIds] = useState<Set<string>>(
+    new Set(),
+  );
   const [isArchiving, setIsArchiving] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [banner, setBanner] = useState<{
@@ -57,7 +62,23 @@ export function AuditionsSection({
   // Sync state if server data changes down the line
   useEffect(() => {
     setRegistrations(initialRegistrations);
-  }, [initialRegistrations]);
+    setAddedRegistrationIds(
+      new Set(
+        initialRegistrations
+          .filter((registration) =>
+            teamMembers.some(
+              (member) =>
+                (registration.roll_number &&
+                  member.roll_number === registration.roll_number) ||
+                (registration.email &&
+                  member.email?.toLowerCase() ===
+                    registration.email.toLowerCase()),
+            ),
+          )
+          .map((registration) => registration.id),
+      ),
+    );
+  }, [initialRegistrations, teamMembers]);
 
   const filtered =
     filter === "all"
@@ -66,7 +87,7 @@ export function AuditionsSection({
           (registration) => registration.registration_type === filter,
         );
 
-  const handleAddToTeam = async (registration: any, parsedYear: number) => {
+  const handleAddToTeam = async (registration: Registration) => {
     try {
       // 1. Execute the Server Action with the raw registration fields
       await addRegistrationToTeam({
@@ -80,20 +101,26 @@ export function AuditionsSection({
         instruments: registration.instruments,
       });
 
-      // 3. Fire success notification banner
+      setAddedRegistrationIds((previous) => {
+        const next = new Set(previous);
+        next.add(registration.id);
+        return next;
+      });
+
+      // Fire success notification banner
       setBanner({
         message: `${registration.full_name} added to the current team!`,
         type: "success",
       });
-    } catch (error: any) {
-      // 4. Fire error notification banner if mutations or constraints fail
+    } catch (error: unknown) {
+      // Keep failed registrations visible so the assignment can be retried.
       setBanner({
-        message: error.message || "An error occurred",
+        message: error instanceof Error ? error.message : "An error occurred",
         type: "error",
       });
     }
 
-    // 5. Clear notification layout tracking state after timeout expiration
+    // Clear notification layout tracking state after timeout expiration.
     setTimeout(() => setBanner(null), 3000);
   };
 
@@ -111,9 +138,12 @@ export function AuditionsSection({
           type: "success",
         });
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       setBanner({
-        message: error.message || "Failed to complete archival query process.",
+        message:
+          error instanceof Error
+            ? error.message
+            : "Failed to complete archival query process.",
         type: "error",
       });
     } finally {
@@ -234,6 +264,7 @@ export function AuditionsSection({
         yearColors={yearColors}
         onToggleRow={onToggleRow}
         onAddToTeam={handleAddToTeam}
+        addedRegistrationIds={addedRegistrationIds}
       />
 
       <p className="text-gray-600 text-xs mt-4 text-center">

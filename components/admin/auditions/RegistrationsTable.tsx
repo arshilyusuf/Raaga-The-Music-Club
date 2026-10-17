@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { Detail } from "@/components/admin/auditions/Detail";
-import Link from "next/link";
 import { ChevronDownIcon } from "@/components/ui/ChevronDownIcon";
 import { ChevronUpIcon } from "@/components/ui/ChevronUpIcon";
 
@@ -30,14 +29,8 @@ type RegistrationsTableProps = {
   // Added callback prop to connect with your Supabase insert function
   onAddToTeam: (
     registration: Registration,
-    parsedYear: number,
   ) => Promise<void>;
-};
-
-// Helper to convert registration string year ("1st", "2nd") to database integer format (1, 2)
-const parseYearToInteger = (yearStr: string): number => {
-  const match = yearStr.match(/\d+/);
-  return match ? parseInt(match[0], 10) : 1;
+  addedRegistrationIds: Set<string>;
 };
 
 export function RegistrationsTable({
@@ -46,6 +39,7 @@ export function RegistrationsTable({
   yearColors,
   onToggleRow,
   onAddToTeam,
+  addedRegistrationIds,
 }: RegistrationsTableProps) {
   // Track loading state for each button row using registration ID
   const [processingIds, setProcessingIds] = useState<Record<string, boolean>>(
@@ -60,8 +54,7 @@ export function RegistrationsTable({
 
     setProcessingIds((prev) => ({ ...prev, [reg.id]: true }));
     try {
-      const parsedYear = parseYearToInteger(reg.year);
-      await onAddToTeam(reg, parsedYear);
+      await onAddToTeam(reg);
     } catch (error) {
       console.error("Failed to add team member:", error);
     } finally {
@@ -186,6 +179,7 @@ export function RegistrationsTable({
             const colorClass =
               yearColors[Number(reg.year)] || "bg-gray-800/40 text-gray-200";
             const isProcessing = processingIds[reg.id];
+            const isAddedToTeam = addedRegistrationIds.has(reg.id);
 
             return (
               <React.Fragment key={reg.id}>
@@ -247,14 +241,18 @@ export function RegistrationsTable({
                   <td className="px-4 py-3 text-center bg-gray-900/95 backdrop-blur-sm ">
                     <button
                       onClick={(e) => handleAddToTeamClick(e, reg)}
-                      disabled={isProcessing}
+                      disabled={isProcessing || isAddedToTeam}
                       className={`px-3 py-1.5 rounded-lg text-xs font-medium transition ${
-                        isProcessing
+                        isProcessing || isAddedToTeam
                           ? "bg-gray-700 text-gray-400 cursor-not-allowed"
                           : "bg-white/10 hover:bg-white/20 text-white shadow-sm"
                       }`}
                     >
-                      {isProcessing ? "Adding..." : "Add to Team"}
+                      {isProcessing
+                        ? "Adding..."
+                        : isAddedToTeam
+                          ? "Added to Team"
+                          : "Add to Team"}
                     </button>
                   </td>
                 </tr>

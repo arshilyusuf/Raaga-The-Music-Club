@@ -12,6 +12,7 @@ type RosterState = {
   heads: any[];
   core: any[];
   exes: any[];
+  firsts: any[];
   management: any[];
   anchoring: any[];
 };
@@ -21,6 +22,7 @@ export default function Page() {
     heads: [],
     core: [],
     exes: [],
+    firsts:[],
     management: [],
     anchoring: [],
   });
@@ -30,7 +32,9 @@ export default function Page() {
     async function fetchRosterData() {
       try {
         setLoading(true);
-        const response = await fetch("/api/team/roster");
+        const response = await fetch(`/api/team/roster?_cb=${Date.now()}`, {
+          cache: "no-store",
+        });
         const data = await response.json();
 
         if (!response.ok)
@@ -40,6 +44,7 @@ export default function Page() {
           heads: data.heads || [],
           core: data.core || [],
           exes: data.exes || [],
+          firsts: data.exes || [],
           management: data.management || [],
           anchoring: data.anchoring || [],
         });
@@ -141,7 +146,7 @@ export default function Page() {
             {/* Section B: Core Coordinators Layout */}
             <div className="w-[70%] sm:w-[80%] border-t-2 border-white/10 pt-8 mt-10 mb-20">
               <h1 className="text-white text-3xl sm:text-6xl text-center mb-7 sm:mb-10">
-                Core Coordinators
+                3rd Years
               </h1>
               <div className="flex flex-wrap justify-center gap-y-20 gap-x-7">
                 {roster.core.map((person, i) => (
@@ -184,10 +189,32 @@ export default function Page() {
             {roster.exes.length > 0 && (
               <div className="w-[70%] sm:w-[80%] border-t-2 border-white/10 pt-8 mt-10 mb-20">
                 <h1 className="text-white text-3xl sm:text-6xl text-center mb-7 sm:mb-10">
-                  Executives
+                  2nd Years
                 </h1>
                 <div className="flex flex-wrap justify-center gap-8">
                   {roster.exes.map((person, i) => (
+                    <div
+                      key={i}
+                      className="w-full sm:w-[45%] lg:w-[22%] h-32.5 flex flex-col items-center justify-center rounded-2xl bg-white/10 backdrop-blur-lg border border-white/20 text-white"
+                    >
+                      <p className="text-lg sm:text-xl font-semibold">
+                        {person.name}
+                      </p>
+                      <p className="text-sm sm:text-base text-white/70 mt-1">
+                        {person.title}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+            {roster.firsts.length > 0 && (
+              <div className="w-[70%] sm:w-[80%] border-t-2 border-white/10 pt-8 mt-10 mb-20">
+                <h1 className="text-white text-3xl sm:text-6xl text-center mb-7 sm:mb-10">
+                  1st Years
+                </h1>
+                <div className="flex flex-wrap justify-center gap-8">
+                  {roster.firsts.map((person, i) => (
                     <div
                       key={i}
                       className="w-full sm:w-[45%] lg:w-[22%] h-32.5 flex flex-col items-center justify-center rounded-2xl bg-white/10 backdrop-blur-lg border border-white/20 text-white"

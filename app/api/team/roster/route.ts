@@ -61,7 +61,7 @@ export async function GET(request: Request) {
         title: m.role || "Vocalist",
         image:
           m.photo_url ||
-          "https://i.scdn.co/image/ab67616d0000b273d9985092cd88bffd97653b58",
+          "/pictures/Shruti26 Profile Picture-1.png",
         instagramURL: m.instagram || "",
       }));
 
@@ -69,6 +69,16 @@ export async function GET(request: Request) {
       .filter(
         (m) =>
           m.year === 2 &&
+          ["musician", "instrumentals", "vocals"].includes(m.domain),
+      )
+      .map((m) => ({
+        name: m.name,
+        title: m.role || "Vocalist",
+      }));
+    const firsts = activeMembers
+      .filter(
+        (m) =>
+          m.year === 1 &&
           ["musician", "instrumentals", "vocals"].includes(m.domain),
       )
       .map((m) => ({
@@ -88,15 +98,14 @@ export async function GET(request: Request) {
         heads: sortAlphabetically(heads),
         core: sortAlphabetically(core),
         exes: sortAlphabetically(exes),
+        firsts: sortAlphabetically(firsts),
         management: sortAlphabetically(management),
         anchoring: sortAlphabetically(anchoring),
       },
       {
         headers: {
-          "Cache-Control":
-            "public, s-maxage=300, stale-while-revalidate=600, stale-if-error=86400",
-          "CDN-Cache-Control":
-            "public, s-maxage=300, stale-while-revalidate=600, stale-if-error=86400",
+          "Cache-Control": "no-store",
+          "CDN-Cache-Control": "no-store",
         },
       },
     );

@@ -207,8 +207,8 @@ export default function Home() {
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
-const DEADLINE = new Date("2026-09-04T18:29:59").getTime();
-const isBeforeDeadline = Date.now() < DEADLINE;
+  const DEADLINE = new Date("2026-09-04T18:29:59").getTime();
+  const isBeforeDeadline = Date.now() < DEADLINE;
   return (
     <main className="relative min-h-screen w-full text-zinc-50 overflow-hidden ">
       {/* {isMobile ? (
@@ -408,20 +408,39 @@ const isBeforeDeadline = Date.now() < DEADLINE;
             <br />
             The official music club of NIT Raipur{" "}
           </motion.p>
+          <motion.div
+            className="mt-1 flex justify-center"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{
+              delay: 1.2,
+              duration: 2,
+              ease: [0.22, 1, 0.36, 1],
+            }}
+          >
+            <Image
+              src="/pictures/shruti-date.png"
+              alt="Shruti date"
+              width={420}
+              height={180}
+              className="h-auto w-[min(85vw,420px)] object-contain"
+              draggable={false}
+            />
+          </motion.div>
           <div className="mt-6">
             {isBeforeDeadline && (
-            <motion.p
-              className=" text-md sm:text-lg md:text-md text-zinc-100"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{
-                delay: 1,
-                duration: 2,
-                ease: [0.22, 1, 0.36, 1],
-              }}
-            >
-              Auditions are now open!
-            </motion.p>
+              <motion.p
+                className=" text-md sm:text-lg md:text-md text-zinc-100"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{
+                  delay: 1,
+                  duration: 2,
+                  ease: [0.22, 1, 0.36, 1],
+                }}
+              >
+                Auditions are now open!
+              </motion.p>
             )}
             <motion.div
               initial={{ opacity: 0, y: 10 }}
@@ -433,14 +452,14 @@ const isBeforeDeadline = Date.now() < DEADLINE;
               }}
             >
               {isBeforeDeadline && (
-  <CartoonButton
-    label="REGISTER NOW"
-    color="mt-3 bg-[#9ebc16]/30 backdrop-blur font-semibold text-white border-white"
-    onClick={() => {
-      window.location.href = "/auditions";
-    }}
-  />
-)}
+                <CartoonButton
+                  label="REGISTER NOW"
+                  color="mt-3 bg-[#9ebc16]/30 backdrop-blur font-semibold text-white border-white"
+                  onClick={() => {
+                    window.location.href = "/auditions";
+                  }}
+                />
+              )}
             </motion.div>
           </div>
         </motion.div>

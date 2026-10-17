@@ -1059,6 +1059,7 @@ export function AdminDashboardContent() {
         {activeTab === "auditions" && (
           <AuditionsSection
             registrations={registrations}
+            teamMembers={teamMembers}
             filter={filter}
             expandedRow={expandedRow}
             yearColors={{
