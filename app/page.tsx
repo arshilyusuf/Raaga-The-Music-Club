@@ -319,7 +319,7 @@ const isBeforeDeadline = Date.now() < DEADLINE;
             damping: 6,
             mass: 0.7,
           }}
-          className="flex flex-col items-center justify-center text-center -mt-30 sm:mt-0"
+          className="flex flex-col items-center justify-center text-center -mt-5 sm:mt-0"
         >
           <motion.h1
             className="sm:text-5xl md:text-6xl lg:text-7xl mb-1 -mt-45 tracking-normal leading-tight"
