@@ -44,7 +44,7 @@ export default function Page() {
           heads: data.heads || [],
           core: data.core || [],
           exes: data.exes || [],
-          firsts: data.exes || [],
+          firsts: data.firsts || [],
           management: data.management || [],
           anchoring: data.anchoring || [],
         });
