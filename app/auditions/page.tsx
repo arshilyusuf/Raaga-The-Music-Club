@@ -12,7 +12,7 @@ export default function Page() {
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
   const [showSuccess, setShowSuccess] = useState(false);
-  const DEADLINE = new Date("2026-09-04T18:29:59").getTime();
+  const DEADLINE = new Date("2026-09-04T22:00:59").getTime();
   const [windowOpen, setWindowOpen] = useState(() => Date.now() < DEADLINE);
   useEffect(() => {
     // If it's already closed, no need to run a timer
